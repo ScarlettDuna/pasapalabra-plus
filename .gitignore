@@ -1,0 +1,37 @@
+# General
+node_modules/
+.env
+.env.*
+*.log
+
+# Frontend (Vite / React)
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Backend (Node / Express)
+backend/node_modules/
+backend/dist/
+backend/build/
+
+# Prisma (si usáis Prisma)
+backend/prisma/migrations/
+
+# Databases / Dumps
+*.sql
+*.dump
+*.sqlite
+*.db
+
+# OS / Editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Testing / Coverage
+coverage/
+
+# Build tools / caches
+.cache/
+.eslintcache
