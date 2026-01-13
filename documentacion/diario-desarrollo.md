@@ -35,3 +35,41 @@
 * PostgreSQL está instalado en local.
 * Prisma está inicializado, pero **aún no se han creado tablas**.
 
+## 🗓️ Diario de desarrollo — Día 2
+
+**Nombre:** Arantxa
+**Fecha:** *13 enero 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+Objetivo del día:
+Avanzar desde un rosco funcional hacia un sistema completo de partidas con persistencia (Game + Score).
+
+### ✅ Trabajo realizado
+
+* Se confirmó que Categories y Rosco funcionan correctamente.
+* Se detectaron y corrigieron duplicados en base de datos, añadiendo:
+
+  @@unique en Category (name, language, type)
+  @@unique en Question (letter, language, difficulty, categoryId, question)
+  Limpieza de duplicados existentes vía SQL.
+
+* Se diseñaron e implementaron los modelos:
+
+  Game
+  Score
+
+*Migración de los nuevos modelos realizada con éxito.
+*Se implementaron los endpoints:
+
+  POST /api/games/start
+  POST /api/games/:gameId/finish
+
+* Se resolvieron errores típicos de Node + ESM:
+* Se configuró y probó la API usando Thunder Client (en lugar de Postman).
+* Se verificó que:
+
+  las partidas se crean correctamente
+  los resultados se guardan
+  la duración se calcula
+  la puntuación se genera
+
