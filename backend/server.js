@@ -2,6 +2,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import categoriesRoutes from "./src/routes/categories.routes.js";
+import roscoRoutes from "./src/routes/rosco.routes.js";
+import gamesRoutes from "./src/routes/games.routes.js";
+
+
 dotenv.config();
 
 const app = express();
@@ -29,6 +34,10 @@ app.get("/api/health", (_req, res) => {
         time: new Date().toISOString(),
     });
 });
+app.use("/api/categories", categoriesRoutes);
+app.use("/api/rosco", roscoRoutes);
+app.use("/api/games", gamesRoutes);
+
 
 // 404
 app.use((_req, res) => {

@@ -16,6 +16,53 @@ datasource db {
 model Category {
   id       Int    @id @default(autoincrement())
   name     String
-  language String   // ES | EN | FR
-  type     String   // theme | learning
+  language String // ES | EN | FR
+  type     String // theme | learning
+
+  questions Question[]
+  games     Game[]
+
+  @@unique([name, language, type])
+}
+
+model Question {
+  id         String @id @default(uuid())
+  letter     String
+  question   String
+  answer     String
+  language   String // ES | EN | FR
+  difficulty String // easy | medium | hard
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([letter, language, difficulty, categoryId, question])
+  @@index([language, difficulty])
+  @@index([letter])
+}
+
+model Game {
+  id         String @id @default(uuid())
+  language   String // ES | EN | FR
+  difficulty String // easy | medium | hard
+
+  categoryId Int
+  category   Category  @relation(fields: [categoryId], references: [id])
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+  duration   Int?
+  score      Score?
+
+  @@index([language, difficulty, categoryId])
+}
+
+model Score {
+  id        String   @id @default(uuid())
+  correct   Int
+  wrong     Int
+  duration  Int
+  score     Int
+  gameId    String   @unique
+  game      Game     @relation(fields: [gameId], references: [id])
+  createdAt DateTime @default(now())
 }
