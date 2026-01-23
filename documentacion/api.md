@@ -126,13 +126,13 @@ Query params:
 
 Response 200:
 [
-  {
-    "username": "Anchan",
-    "correct": 24,
-    "duration": 172,
-    "date": "2026-01-10"
-  }
+  { 
+    "score": 1745, 
+  "correct": 18, 
+  "duration": 30, 
+  "createdAt": "2026-01-23T22:22:02.545Z" }
 ]
+Más adelante se añadirá usuario
 
 ---
 

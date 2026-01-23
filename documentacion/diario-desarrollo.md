@@ -73,3 +73,22 @@ Avanzar desde un rosco funcional hacia un sistema completo de partidas con persi
   * la duración se calcula
   * la puntuación se genera
 
+## Diario de desarrollo - Día 3
+
+Implementación del ranking y depuración del backend
+
+**Nombre:** Arantxa
+**Fecha:** *23 enero 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+Durante esta sesión se ha implementado el endpoint de ranking global del juego.
+
+Se ha creado la ruta `GET /api/ranking`, permitiendo obtener los mejores resultados almacenados en la base de datos. El ranking se construye a partir de la entidad `Score`, ordenando los resultados por puntuación de forma descendente y utilizando criterios secundarios de duración y fecha de creación para resolver empates.
+
+El endpoint acepta filtros mediante query params, permitiendo restringir el ranking por idioma y categoría. Para ello, se ha implementado la validación de los parámetros recibidos y el filtrado correcto a través de la relación entre `Score` y `Game` en Prisma.
+
+Durante el desarrollo se han corregido errores relacionados con el enrutado de Express, rutas de importación en un entorno ESM y validaciones incorrectas de parámetros. También se ha verificado el correcto montaje del router en el servidor principal.
+
+Se han realizado pruebas manuales utilizando Thunder Client, creando y finalizando varias partidas en español para generar puntuaciones reales. Se ha comprobado que el endpoint funciona correctamente incluso con pocos registros en la base de datos y que el ranking devuelve los resultados ordenados correctamente.
+
+El backend queda estable tras la incorporación del ranking, con la lógica de partidas y puntuaciones completamente funcional.

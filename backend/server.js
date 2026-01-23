@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import categoriesRoutes from "./src/routes/categories.routes.js";
 import roscoRoutes from "./src/routes/rosco.routes.js";
 import gamesRoutes from "./src/routes/games.routes.js";
+import rankingRoutes from "./src/routes/ranking.routes.js";
 
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/rosco", roscoRoutes);
 app.use("/api/games", gamesRoutes);
+app.use("/api/ranking", rankingRoutes);
 
 
 // 404
