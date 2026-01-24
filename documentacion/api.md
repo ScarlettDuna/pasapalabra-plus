@@ -91,6 +91,17 @@ Response 200:
 }
 
 ---
+## 🕹️ Iniciar partida
+
+### POST /api/games/start (opcional)
+
+{
+  "language": "ES",
+  "difficulty": "medium",
+  "categoryId": 1,
+  "userId": "uuid-opcional"
+}
+
 
 ## 🏁 Finalizar partida
 
@@ -133,6 +144,22 @@ Response 200:
   "createdAt": "2026-01-23T22:22:02.545Z" }
 ]
 Más adelante se añadirá usuario
+
+## 🙎 Añadir usuario
+
+### POST /api/users
+Para crear usuario sin contraseña
+
+{
+  "username": "Anchan"
+}
+Respuesta:
+{
+  "id": "uuid",
+  "username": "Anchan",
+  "createdAt": "2026-01-23T22:40:00.000Z"
+}
+
 
 ---
 

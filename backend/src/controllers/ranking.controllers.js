@@ -15,17 +15,33 @@ export const getRanking = async (req, res, next) => {
             return res.status(400).json({ message: "language debe ser ES, EN o FR" });
         }
 
-        const categ = Number(category)
-        const categoryExists = await prisma.category.findUnique({
-            where: { id: categ }
-            });
+        let categ;
 
-        if (!categoryExists) {
-            return res.status(400).json({ message: "category not recognized" });
+        if (category !== undefined) {
+            categ = Number(category);
+
+            if (Number.isNaN(categ)) {
+                return res.status(400).json({ message: "category debe ser un número" });
+            }
+
+            const categoryExists = await prisma.category.findUnique({
+                where: { id: categ }
+            })
+
+            if (!categoryExists) {
+                return res.status(400).json({ message: "category not recognized" });
+            }
         }
+        const where = {
+            game: {
+                language: lang,
+                ...(categ && { categoryId: categ })
+            }
+        };
+
 
         const scores = await prisma.score.findMany({
-            where: { game: { language: lang, categoryId: categ } },
+            where,
             orderBy: [{ score: "desc" }, { duration: "asc"}],
             take: 15,
             select: { score: true, correct: true, duration: true, createdAt: true }

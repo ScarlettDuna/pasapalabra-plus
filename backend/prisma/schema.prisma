@@ -48,11 +48,16 @@ model Game {
 
   categoryId Int
   category   Category  @relation(fields: [categoryId], references: [id])
+  
+  userId     String?
+  user       User? @relation(fields: [userId], references: [id])
+  
   startedAt  DateTime  @default(now())
   endedAt    DateTime?
   duration   Int?
+  
   score      Score?
-
+  
   @@index([language, difficulty, categoryId])
 }
 
@@ -66,3 +71,12 @@ model Score {
   game      Game     @relation(fields: [gameId], references: [id])
   createdAt DateTime @default(now())
 }
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  createdAt DateTime @default(now())
+
+  games     Game[]
+}
+

@@ -92,3 +92,22 @@ Durante el desarrollo se han corregido errores relacionados con el enrutado de E
 Se han realizado pruebas manuales utilizando Thunder Client, creando y finalizando varias partidas en español para generar puntuaciones reales. Se ha comprobado que el endpoint funciona correctamente incluso con pocos registros en la base de datos y que el ranking devuelve los resultados ordenados correctamente.
 
 El backend queda estable tras la incorporación del ranking, con la lógica de partidas y puntuaciones completamente funcional.
+
+## Diario de desarrollo - Día 4
+
+### Implementación del modelo de usuario y endpoint básico
+
+**Nombre:** Arantxa
+**Fecha:** *24 enero 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+
+Durante esta sesión se ha incorporado el modelo `User` al proyecto con el objetivo de comenzar a asociar partidas a jugadores, manteniendo la aplicación funcional sin necesidad de autenticación.
+
+Se ha definido un modelo de usuario mínimo, compuesto por un identificador único, un nombre de usuario único y la fecha de creación. La relación entre `User` y `Game` se ha establecido como opcional, permitiendo la coexistencia de partidas anónimas y partidas asociadas a un usuario sin romper la lógica existente.
+
+Se ha implementado el endpoint `POST /api/users`, que permite crear usuarios mediante un nombre de usuario único. El endpoint valida la presencia del campo obligatorio, normaliza el valor recibido y delega la validación de unicidad en la base de datos mediante restricciones `@unique`. Los errores por duplicidad se gestionan devolviendo un código de estado adecuado.
+
+El endpoint ha sido integrado correctamente en el servidor principal y probado mediante Thunder Client, verificando la creación de varios usuarios distintos y el manejo correcto de conflictos por nombre de usuario duplicado.
+
+Con esta incorporación, el backend deja de ser completamente anónimo y queda preparado para futuras ampliaciones como la asociación de partidas a usuarios o la implementación de autenticación en fases posteriores.
