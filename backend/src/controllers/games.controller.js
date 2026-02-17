@@ -11,6 +11,7 @@ function calcScore({ correct, wrong, duration }) {
 
 export const startGame = async (req, res, next) => {
     try {
+        console.log("Usuario autenticado:", req.user);
         const { language, difficulty, categoryId } = req.body;
 
         if (!language || !difficulty || !categoryId) {
@@ -33,7 +34,7 @@ export const startGame = async (req, res, next) => {
         if (!Number.isInteger(catId) || catId <= 0) {
             return res.status(400).json({ message: "categoryId debe ser un entero positivo" });
         }
-
+        
         // Verifica que la categoría exista (evita FK error)
         const category = await prisma.category.findUnique({ where: { id: catId } });
         if (!category) {
@@ -45,6 +46,7 @@ export const startGame = async (req, res, next) => {
                 language: lang,
                 difficulty: diff,
                 categoryId: catId,
+                userId: req.user.userId 
                 // startedAt lo pone Prisma con @default(now())
             },
             select: {

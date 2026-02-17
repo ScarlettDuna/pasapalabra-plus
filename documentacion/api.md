@@ -147,17 +147,19 @@ Más adelante se añadirá usuario
 
 ## 🙎 Añadir usuario
 
-### POST /api/users
-Para crear usuario sin contraseña
-
+### POST /api/auth/register
+Creamos usuario con contraseña y autentificación. 
 {
-  "username": "Anchan"
-}
-Respuesta:
-{
-  "id": "uuid",
   "username": "Anchan",
-  "createdAt": "2026-01-23T22:40:00.000Z"
+  "email": "anchan@test.com",
+  "password": "12345678"
+}
+
+
+### POST /api/auth/login
+{
+  "email": "anchan@test.com",
+  "password": "12345678"
 }
 
 

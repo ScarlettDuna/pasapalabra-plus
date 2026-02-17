@@ -111,3 +111,24 @@ Se ha implementado el endpoint `POST /api/users`, que permite crear usuarios med
 El endpoint ha sido integrado correctamente en el servidor principal y probado mediante Thunder Client, verificando la creación de varios usuarios distintos y el manejo correcto de conflictos por nombre de usuario duplicado.
 
 Con esta incorporación, el backend deja de ser completamente anónimo y queda preparado para futuras ampliaciones como la asociación de partidas a usuarios o la implementación de autenticación en fases posteriores.
+
+
+### Implementación de autenticación clásica (JWT)
+
+**Nombre:** Arantxa
+**Fecha:** *17 febrero 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+Durante esta sesión se ha incorporado un sistema completo de autenticación basado en registro, login y verificación mediante JWT.
+
+Se ha ampliado el modelo `User` añadiendo los campos `email` (único) y `passwordHash`, permitiendo almacenar credenciales de forma segura. Tras la modificación del esquema, se ha realizado la migración correspondiente y se ha reseteado la base de datos en entorno de desarrollo para mantener la coherencia estructural.
+
+Se ha implementado el endpoint `POST /api/auth/register`, que permite crear usuarios validando campos obligatorios y almacenando la contraseña mediante hash con `bcrypt`. La unicidad de `username` y `email` se delega en la base de datos y se gestionan correctamente los errores de conflicto.
+
+Posteriormente se ha desarrollado el endpoint `POST /api/auth/login`, que verifica credenciales y genera un token JWT firmado con una clave secreta almacenada en variables de entorno. El token incluye información mínima del usuario (id y username) y un tiempo de expiración configurable.
+
+Se ha implementado un middleware de autenticación que valida el token enviado en el header `Authorization: Bearer <token>`, bloqueando accesos no autorizados y añadiendo la identidad decodificada a `req.user`.
+
+Finalmente, se ha protegido el endpoint `POST /api/games/start`, obligando a que las partidas se creen únicamente por usuarios autenticados. La asociación entre partida y usuario se realiza automáticamente a partir del token, eliminando la necesidad de enviar `userId` desde el cliente.
+
+El backend queda ahora preparado para trabajar con identidad verificada y control de acceso básico.
