@@ -24,6 +24,10 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-image: url(assets/image_9_1.png);
+  background-size: cover;
+  background-position: center;
+
 }
 
 h1 {

@@ -7,6 +7,7 @@ import './App.css'
 
 // 1. Importamos Home y el Router
 import Home from './pages/Home'; 
+import Login from './pages/Login'; 
 import Contact from './pages/Contact'; 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
@@ -29,6 +30,7 @@ function App() {
         {/* RUTA 2: La página Home */}
         <Route path="/home" element={<Home />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   )
