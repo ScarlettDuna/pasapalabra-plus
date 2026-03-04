@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import reactLogo from './assets/logo-pasapalabra.png'
 import viteLogo from '/vite.svg'
-import ButtonComponent_Inicio from "./components/ButtonComponent_Inicio";
-import ButtonComponent_Invitado from "./components/ButtonComponent_Invitado";
 import './App.css'
 
 // 1. Importamos Home y el Router
 import Home from './pages/Home'; 
 import Login from './pages/Login'; 
-import Contact from './pages/Contact'; 
+import Register from './pages/Register';
+import GameMode from './pages/GameMode'; 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -29,8 +28,9 @@ function App() {
 
         {/* RUTA 2: La página Home */}
         <Route path="/home" element={<Home />} />
-        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/gamemode" element={<GameMode />} />
       </Routes>
     </BrowserRouter>
   )

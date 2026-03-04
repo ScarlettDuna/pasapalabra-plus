@@ -1,14 +1,18 @@
 // src/pages/Home.jsx
 import React from 'react';
+import HeaderComponent from '../components/HeaderComponent';
+import LoginComponent from '../components/LoginComponent';
+import FooterComponent from '../components/FooterComponent';
 
 const Login = () => {
   return (
     <main style={{ padding: '20px', textAlign: 'center' }}>
-      <h1>Página de Inicio</h1>
-      <p>Probando probando</p>
+      <HeaderComponent></HeaderComponent>
+      <h2>INICIAR SESIÓN</h2>
       <section>
-        <p>Aquí puedes empezar a añadir el contenido principal de tu aplicación.</p>
+        <LoginComponent></LoginComponent>
       </section>
+      <FooterComponent></FooterComponent>
     </main>
   );
 };
