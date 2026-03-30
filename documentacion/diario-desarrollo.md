@@ -132,3 +132,27 @@ Se ha implementado un middleware de autenticación que valida el token enviado e
 Finalmente, se ha protegido el endpoint `POST /api/games/start`, obligando a que las partidas se creen únicamente por usuarios autenticados. La asociación entre partida y usuario se realiza automáticamente a partir del token, eliminando la necesidad de enviar `userId` desde el cliente.
 
 El backend queda ahora preparado para trabajar con identidad verificada y control de acceso básico.
+
+## Diario de desarrollo - Día 5
+
+### Modo anónimo, protección de partidas y endpoints de usuario
+
+**Nombre:** Arantxa
+**Fecha:** *30 marzo 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+Durante esta sesión se ha rediseñado el sistema de autenticación de partidas para soportar dos modos de juego: anónimo y registrado.
+
+El primer objetivo fue proteger el endpoint `POST /api/games/:gameId/finish`. Al plantearlo, se detectó un problema de diseño: si tanto `/start` como `/finish` requerían token obligatorio, el modo anónimo quedaba completamente bloqueado. Se decidió implementar un middleware `optionalAuth` que intenta verificar el token si está presente, pero no bloquea la petición si no lo hay. En caso de token inválido, trata la petición como anónima. Esto permite que usuarios no registrados puedan jugar con normalidad, mientras que los registrados tienen sus partidas vinculadas a su cuenta.
+
+Se ha actualizado la lógica de `finishGame` para verificar los permisos de forma correcta en todos los casos posibles: partida anónima sin token (permitido), partida de usuario con token propio (permitido), y partida de usuario sin token o con token de otro usuario (denegado con 403). La condición resultante es:
+
+```js
+if (game.userId && (!req.user || game.userId !== req.user.userId))
+```
+
+A continuación se ha implementado el endpoint `GET /api/users/me`, protegido con el middleware de autenticación obligatorio. El endpoint devuelve los datos del usuario autenticado (id, username, email, createdAt) a partir del `userId` extraído del token, sin necesidad de ningún parámetro en el body ni en la URL.
+
+Por último, se ha añadido el endpoint `GET /api/users/me/games`, que devuelve el historial de partidas finalizadas del usuario autenticado, incluyendo la puntuación asociada a cada una. Los resultados se devuelven ordenados por puntuación descendente. Se utiliza `findMany` con `include: { score: true }` para obtener los datos relacionados en una sola consulta.
+
+Los tres endpoints han sido probados con Thunder Client, verificando el comportamiento correcto en todos los casos.

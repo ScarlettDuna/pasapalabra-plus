@@ -7,6 +7,7 @@ import roscoRoutes from "./src/routes/rosco.routes.js";
 import gamesRoutes from "./src/routes/games.routes.js";
 import rankingRoutes from "./src/routes/ranking.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
+import userRoutes from "./src/routes/users.routes.js"
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use("/api/rosco", roscoRoutes);
 app.use("/api/games", gamesRoutes);
 app.use("/api/ranking", rankingRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes)
 
 // 404
 app.use((_req, res) => {

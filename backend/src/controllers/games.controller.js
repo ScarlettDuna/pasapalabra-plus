@@ -46,7 +46,7 @@ export const startGame = async (req, res, next) => {
                 language: lang,
                 difficulty: diff,
                 categoryId: catId,
-                userId: req.user.userId 
+                userId: req.user?.userId ?? null,
                 // startedAt lo pone Prisma con @default(now())
             },
             select: {
@@ -83,11 +83,15 @@ export const finishGame = async (req, res, next) => {
         // Traemos la partida
         const game = await prisma.game.findUnique({
             where: { id: gameId },
-            select: { id: true, startedAt: true, endedAt: true, duration: true, categoryId: true, language: true, difficulty: true },
+            select: { id: true, startedAt: true, endedAt: true, userId: true, duration: true, categoryId: true, language: true, difficulty: true },
         });
 
         if (!game) {
             return res.status(404).json({ message: "Partida no encontrada" });
+        }
+        // Si la partida pertenece a alguien y o no hay token o el token es de otro usuario -> error 403
+        if (game.userId && (!req.user || game.userId !== req.user.userId)){   
+            return res.status(403).json({ message: "No tienes permiso para finalizar esta partida" });
         }
 
         if (game.endedAt) {

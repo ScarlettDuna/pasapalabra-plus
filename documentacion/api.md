@@ -8,63 +8,85 @@ http://localhost:5000/api
 
 ---
 
-## 🔐 Autenticación
+## Health check
+
+### GET /health
+
+Response 200:
+```json
+{
+  "ok": true,
+  "service": "pasapalabra-backend",
+  "time": "2026-03-30T13:00:00.000Z"
+}
+```
+
+---
+
+## Autenticación
 
 ### POST /auth/register
-Registrar un usuario.
-
+Registrar un nuevo usuario.
 
 Body:
-````
+```json
 {
   "username": "string",
   "email": "string",
-  "password": "string"
+  "password": "string (mínimo 6 caracteres)"
 }
-````
+```
+
 Response 201:
-````
+```json
 {
   "id": "uuid",
   "username": "string",
-  "email": "string"
+  "email": "string",
+  "createdAt": "2026-01-13T..."
 }
-````
+```
+
+Errores:
+- 400 → Faltan campos obligatorios o password < 6 caracteres
+- 409 → Username o email ya en uso
+
 ---
 
 ### POST /auth/login
-Iniciar sesión.
+Iniciar sesión. Devuelve un token JWT con validez de 1 hora.
 
 Body:
-````
+```json
 {
   "email": "string",
   "password": "string"
 }
-````
+```
+
 Response 200:
-````
+```json
 {
-  "token": "jwt-token",
-  "user": {
-    "id": "uuid",
-    "username": "string"
-  }
+  "token": "eyJhbGciOiJIUzI1NiIs..."
 }
-````
+```
+
+Errores:
+- 400 → Faltan campos obligatorios
+- 401 → Credenciales inválidas
 
 ---
 
-## 🌍 Categorías / Tipos de juego
+## Categorías
 
 ### GET /categories
-Obtener categorías según idioma.
+Obtener categorías disponibles según idioma.
 
 Query params:
-- language (ES | EN | FR)
+- `language` (ES | EN | FR) — obligatorio
 
 Response 200:
-````
+```json
 [
   {
     "id": 1,
@@ -73,124 +95,212 @@ Response 200:
     "type": "theme"
   }
 ]
-````
+```
+
 ---
 
-## 🔤 Rosco (partida)
+## Rosco
 
 ### GET /rosco
-Obtener un rosco de preguntas.
+Obtener un set de preguntas para jugar. Devuelve una pregunta por letra disponible.
 
 Query params:
-- language
-- categoryId
-- difficulty (easy | medium | hard)
-
-Body: 
-````
-{
-  "language": "ES",
-  "difficulty": "MEDIUM",
-  "categoryId": 1
-}
-````
+- `language` (ES | EN | FR) — obligatorio
+- `categoryId` (entero) — obligatorio
+- `difficulty` (easy | medium | hard) — obligatorio
 
 Response 200:
-````
+```json
 {
   "gameId": "uuid",
   "questions": [
     {
       "letter": "A",
+      "questionId": "uuid",
       "question": "Empieza con A: Capital de Grecia"
     }
   ]
 }
-````
----
-## 🕹️ Iniciar partida
+```
 
-### POST /api/games/start (opcional)
+---
+
+## Partidas
+
+### POST /games/start
+Iniciar una partida. Si se envía token, la partida queda vinculada al usuario. Sin token, la partida es anónima.
+
+Headers:
+```
+Authorization: Bearer <token>  (opcional)
+```
 
 Body:
-````
+```json
 {
   "language": "ES",
   "difficulty": "medium",
-  "categoryId": 1,
-  "userId": "uuid-opcional"
+  "categoryId": 1
 }
-````
+```
 
-## 🏁 Finalizar partida
+Response 201:
+```json
+{
+  "gameId": "uuid",
+  "game": {
+    "id": "uuid",
+    "language": "ES",
+    "difficulty": "medium",
+    "categoryId": 1,
+    "startedAt": "2026-03-30T13:00:00.000Z"
+  }
+}
+```
+
+Errores:
+- 400 → Faltan campos o valores inválidos
+- 404 → Categoría no encontrada
+
+---
 
 ### POST /games/:gameId/finish
-Guardar resultado de una partida.
+Finalizar una partida y calcular la puntuación. La duración se calcula automáticamente en el servidor.
+
+Si la partida pertenece a un usuario registrado, es obligatorio enviar su token. Sin token o con token de otro usuario se devuelve 403.
 
 Headers:
-Authorization: Bearer <token> (opcional si invitado)
+```
+Authorization: Bearer <token>  (obligatorio si la partida es de un usuario registrado)
+```
 
 Body:
-````
+```json
 {
   "correct": 20,
-  "wrong": 6,
-  "duration": 185
+  "wrong": 6
 }
-````
+```
+
 Response 201:
-````
+```json
 {
-  "score": 1940
+  "updatedGame": {
+    "id": "uuid",
+    "endedAt": "2026-03-30T13:10:00.000Z",
+    "duration": 600
+  },
+  "score": {
+    "id": "uuid",
+    "correct": 20,
+    "wrong": 6,
+    "duration": 600,
+    "score": 1885,
+    "createdAt": "2026-03-30T13:10:00.000Z",
+    "gameId": "uuid"
+  }
 }
-````
+```
+
+Fórmula de puntuación: `(correct × 100) - (wrong × 25) - duration`
+
+Errores:
+- 400 → Faltan campos o valores inválidos
+- 403 → Sin permiso para finalizar esta partida
+- 404 → Partida no encontrada
+- 409 → La partida ya fue finalizada
+
 ---
 
-## 🏆 Ranking
+## Ranking
 
 ### GET /ranking
-Obtener ranking filtrado.
+Obtener el top 15 de puntuaciones, filtrado por idioma y opcionalmente por categoría.
 
 Query params:
-- language
-- categoryId
-- difficulty
+- `language` (ES | EN | FR) — obligatorio
+- `category` (entero) — opcional
 
 Response 200:
-````
+```json
 [
-  { 
-    "score": 1745, 
-  "correct": 18, 
-  "duration": 30, 
-  "createdAt": "2026-01-23T22:22:02.545Z" }
+  {
+    "score": 1885,
+    "correct": 20,
+    "duration": 600,
+    "createdAt": "2026-03-30T13:10:00.000Z"
+  }
 ]
-````
-
-## 🙎 Añadir usuario
-
-### POST /api/auth/register
-Creamos usuario con contraseña y autentificación. 
-{
-  "username": "Anchan",
-  "email": "anchan@test.com",
-  "password": "12345678"
-}
-
-
-### POST /api/auth/login
-{
-  "email": "anchan@test.com",
-  "password": "12345678"
-}
-
+```
 
 ---
 
-## ⚠️ Códigos de error comunes
+## Usuario
 
-- 400 → Datos inválidos
-- 401 → No autenticado
-- 403 → No autorizado
+### GET /users/me
+Obtener el perfil del usuario autenticado.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio)
+```
+
+Response 200:
+```json
+{
+  "id": "uuid",
+  "username": "string",
+  "email": "string",
+  "createdAt": "2026-01-13T..."
+}
+```
+
+Errores:
+- 401 → Token no proporcionado o inválido
+- 404 → Usuario no encontrado
+
+---
+
+### GET /users/me/games
+Obtener el historial de partidas finalizadas del usuario autenticado, ordenadas por puntuación descendente.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio)
+```
+
+Response 200:
+```json
+[
+  {
+    "id": "uuid",
+    "language": "ES",
+    "difficulty": "medium",
+    "categoryId": 1,
+    "startedAt": "2026-03-30T13:00:00.000Z",
+    "endedAt": "2026-03-30T13:10:00.000Z",
+    "duration": 600,
+    "score": {
+      "correct": 20,
+      "wrong": 6,
+      "duration": 600,
+      "score": 1885,
+      "createdAt": "2026-03-30T13:10:00.000Z"
+    }
+  }
+]
+```
+
+Errores:
+- 401 → Token no proporcionado o inválido
+
+---
+
+## Códigos de error comunes
+
+- 400 → Datos inválidos o campos obligatorios ausentes
+- 401 → No autenticado (token ausente o inválido)
+- 403 → No autorizado (token de otro usuario)
 - 404 → Recurso no encontrado
+- 409 → Conflicto (recurso duplicado o acción ya realizada)
 - 500 → Error interno del servidor
