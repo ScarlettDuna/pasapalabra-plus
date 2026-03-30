@@ -13,32 +13,37 @@ http://localhost:5000/api
 ### POST /auth/register
 Registrar un usuario.
 
+
 Body:
+````
 {
   "username": "string",
   "email": "string",
   "password": "string"
 }
-
+````
 Response 201:
+````
 {
   "id": "uuid",
   "username": "string",
   "email": "string"
 }
-
+````
 ---
 
 ### POST /auth/login
 Iniciar sesión.
 
 Body:
+````
 {
   "email": "string",
   "password": "string"
 }
-
+````
 Response 200:
+````
 {
   "token": "jwt-token",
   "user": {
@@ -46,6 +51,7 @@ Response 200:
     "username": "string"
   }
 }
+````
 
 ---
 
@@ -58,6 +64,7 @@ Query params:
 - language (ES | EN | FR)
 
 Response 200:
+````
 [
   {
     "id": 1,
@@ -66,7 +73,7 @@ Response 200:
     "type": "theme"
   }
 ]
-
+````
 ---
 
 ## 🔤 Rosco (partida)
@@ -79,7 +86,17 @@ Query params:
 - categoryId
 - difficulty (easy | medium | hard)
 
+Body: 
+````
+{
+  "language": "ES",
+  "difficulty": "MEDIUM",
+  "categoryId": 1
+}
+````
+
 Response 200:
+````
 {
   "gameId": "uuid",
   "questions": [
@@ -89,19 +106,21 @@ Response 200:
     }
   ]
 }
-
+````
 ---
 ## 🕹️ Iniciar partida
 
 ### POST /api/games/start (opcional)
 
+Body:
+````
 {
   "language": "ES",
   "difficulty": "medium",
   "categoryId": 1,
   "userId": "uuid-opcional"
 }
-
+````
 
 ## 🏁 Finalizar partida
 
@@ -112,17 +131,19 @@ Headers:
 Authorization: Bearer <token> (opcional si invitado)
 
 Body:
+````
 {
   "correct": 20,
   "wrong": 6,
   "duration": 185
 }
-
+````
 Response 201:
+````
 {
   "score": 1940
 }
-
+````
 ---
 
 ## 🏆 Ranking
@@ -136,6 +157,7 @@ Query params:
 - difficulty
 
 Response 200:
+````
 [
   { 
     "score": 1745, 
@@ -143,7 +165,7 @@ Response 200:
   "duration": 30, 
   "createdAt": "2026-01-23T22:22:02.545Z" }
 ]
-Más adelante se añadirá usuario
+````
 
 ## 🙎 Añadir usuario
 
