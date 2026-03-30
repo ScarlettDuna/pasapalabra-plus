@@ -31,7 +31,7 @@ export const getRosco = async (req, res, next) => {
         // Trae preguntas filtradas
         const all = await prisma.question.findMany({
             where: { language: lang, difficulty: diff, categoryId: catId },
-            select: { id: true, letter: true, question: true },
+            select: { id: true, letter: true, question: true, answer: true },
         });
 
         // Agrupa por letra
@@ -51,7 +51,7 @@ export const getRosco = async (req, res, next) => {
                 const candidates = byLetter.get(L);
                 if (!candidates || candidates.length === 0) return null;
                 const pick = candidates[Math.floor(Math.random() * candidates.length)];
-                return { letter: L, questionId: pick.id, question: pick.question };
+                return { letter: L, questionId: pick.id, question: pick.question, answer: pick.answer };
             })
             .filter(Boolean);
 

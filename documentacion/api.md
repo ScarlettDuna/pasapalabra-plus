@@ -165,7 +165,7 @@ Errores:
 ---
 
 ### POST /games/:gameId/finish
-Finalizar una partida y calcular la puntuación. La duración se calcula automáticamente en el servidor.
+Finalizar una partida. El backend verifica cada respuesta contra la base de datos, calcula `correct` y `wrong`, y genera la puntuación. La duración se calcula automáticamente en el servidor.
 
 Si la partida pertenece a un usuario registrado, es obligatorio enviar su token. Sin token o con token de otro usuario se devuelve 403.
 
@@ -177,8 +177,10 @@ Authorization: Bearer <token>  (obligatorio si la partida es de un usuario regis
 Body:
 ```json
 {
-  "correct": 20,
-  "wrong": 6
+  "answers": [
+    { "questionId": "uuid", "answer": "Atenas" },
+    { "questionId": "uuid", "answer": "Berlín" }
+  ]
 }
 ```
 
@@ -205,7 +207,7 @@ Response 201:
 Fórmula de puntuación: `(correct × 100) - (wrong × 25) - duration`
 
 Errores:
-- 400 → Faltan campos o valores inválidos
+- 400 → Body ausente o `answers` no proporcionado
 - 403 → Sin permiso para finalizar esta partida
 - 404 → Partida no encontrada
 - 409 → La partida ya fue finalizada

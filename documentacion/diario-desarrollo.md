@@ -156,3 +156,13 @@ A continuación se ha implementado el endpoint `GET /api/users/me`, protegido co
 Por último, se ha añadido el endpoint `GET /api/users/me/games`, que devuelve el historial de partidas finalizadas del usuario autenticado, incluyendo la puntuación asociada a cada una. Los resultados se devuelven ordenados por puntuación descendente. Se utiliza `findMany` con `include: { score: true }` para obtener los datos relacionados en una sola consulta.
 
 Los tres endpoints han sido probados con Thunder Client, verificando el comportamiento correcto en todos los casos.
+
+### Validación de respuestas en el backend
+
+Durante la misma sesión se ha rediseñado el endpoint `POST /api/games/:gameId/finish` para que el backend valide las respuestas del usuario en lugar de confiar en los totales enviados por el cliente.
+
+Anteriormente el frontend enviaba `{ correct, wrong }` y el backend los almacenaba directamente. Esto permitía manipular el ranking enviando valores arbitrarios al endpoint. Con el nuevo diseño, el frontend envía el array completo de respuestas `[{ questionId, answer }]` y el backend verifica cada una contra la base de datos, calculando él mismo los totales y la puntuación.
+
+Para la verificación se obtienen todas las preguntas relevantes en una sola consulta (`findMany` con `id: { in: [...] }`) y se construye un `Map` para acceso en tiempo constante, evitando hacer una query por cada respuesta. La comparación de respuestas es case-insensitive y elimina espacios extra con `.trim().toLowerCase()`.
+
+El frontend sigue teniendo acceso a las respuestas correctas (se incluyen en `GET /rosco`) para dar feedback inmediato al usuario durante el juego. Esto no es una duplicación de lógica sino una separación de responsabilidades: el frontend valida para la experiencia de usuario, el backend valida para la integridad de los datos. Esta decisión queda documentada en `decisiones-tecnicas.md`.

@@ -67,17 +67,30 @@ export const startGame = async (req, res, next) => {
 export const finishGame = async (req, res, next) => {
     try {
         const { gameId } = req.params;
-        const { correct, wrong } = req.body;
+        const { answers } = req.body;
 
-        if (correct === undefined || wrong === undefined) {
-            return res.status(400).json({ message: "Body obligatorio: correct, wrong" });
+        if (answers === undefined ) {
+            return res.status(400).json({ message: "Body obligatorio: array de answers" });
         }
 
-        const c = Number(correct);
-        const w = Number(wrong);
+        let correct = 0;
+        let wrong = 0;
 
-        if (!Number.isInteger(c) || c < 0 || !Number.isInteger(w) || w < 0) {
-            return res.status(400).json({ message: "correct y wrong deben ser enteros >= 0" });
+        const questionIds = answers.map(a => a.questionId);
+        const dbQuestions = await prisma.question.findMany({
+            where: { id: { in: questionIds } },
+            select: { id: true, answer: true }
+        });
+        // Convertir a mapa para acceso rápido
+        const answerMap = new Map(dbQuestions.map(q => [q.id, q.answer]));
+
+        for (let answer of answers) {
+            const correctAnswer = answerMap.get(answer.questionId);
+            if (answer.answer.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
+                correct += 1;
+            } else {
+                wrong += 1;
+            }
         }
 
         // Traemos la partida
@@ -104,7 +117,7 @@ export const finishGame = async (req, res, next) => {
             Math.round((endedAt.getTime() - new Date(game.startedAt).getTime()) / 1000)
         );
 
-        const points = calcScore({ correct: c, wrong: w, duration });
+        const points = calcScore({ correct: correct, wrong: wrong, duration });
 
         // Transacción: actualizar Game + crear Score (1–1)
         const result = await prisma.$transaction(async (tx) => {
@@ -117,8 +130,8 @@ export const finishGame = async (req, res, next) => {
             const score = await tx.score.create({
                 data: {
                     gameId,
-                    correct: c,
-                    wrong: w,
+                    correct: correct,
+                    wrong: wrong,
                     duration,
                     score: points,
                 },
