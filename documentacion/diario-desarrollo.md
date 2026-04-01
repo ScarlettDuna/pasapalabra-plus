@@ -166,3 +166,20 @@ Anteriormente el frontend enviaba `{ correct, wrong }` y el backend los almacena
 Para la verificación se obtienen todas las preguntas relevantes en una sola consulta (`findMany` con `id: { in: [...] }`) y se construye un `Map` para acceso en tiempo constante, evitando hacer una query por cada respuesta. La comparación de respuestas es case-insensitive y elimina espacios extra con `.trim().toLowerCase()`.
 
 El frontend sigue teniendo acceso a las respuestas correctas (se incluyen en `GET /rosco`) para dar feedback inmediato al usuario durante el juego. Esto no es una duplicación de lógica sino una separación de responsabilidades: el frontend valida para la experiencia de usuario, el backend valida para la integridad de los datos. Esta decisión queda documentada en `decisiones-tecnicas.md`.
+
+## Diario de desarrollo - Día 6
+
+### Población de la base de datos y preparación para el equipo de frontend
+
+**Nombre:** Arantxa
+**Fecha:** *1 abril 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+
+Con motivo de una reunión con el equipo de frontend, se ha preparado el entorno para que puedan levantar el backend en local de forma autónoma.
+
+Se ha reescrito el script `prisma/seed.js` para importar preguntas desde un CSV externo (`Preguntas pasapalabra + - Español.csv`). El script parsea el fichero línea a línea usando el módulo nativo `readline` de Node, sin dependencias externas. Por cada fila construye el texto de la pregunta combinando la condición (`Empieza`/`Contiene`) con la letra y la definición, mapea el nivel (`Fácil`/`Medio`/`Difícil`) al formato interno (`easy`/`medium`/`hard`), y asocia la pregunta a la categoría correspondiente mediante un `Map` en memoria para evitar queries repetidas. Las inserciones se realizan en lotes de 100 con `skipDuplicates: true`. El resultado ha sido la inserción de 567 preguntas en español sin errores.
+
+También se ha corregido un problema estructural del seed anterior, donde parte del código estaba fuera de la función `main()`, lo que podía causar errores en entornos ES modules.
+
+Por último, se ha creado el fichero `backend/README.md` con las instrucciones completas para levantar el proyecto en local: instalación de dependencias, configuración del `.env`, creación de la base de datos, ejecución de migraciones, seed y arranque del servidor.
