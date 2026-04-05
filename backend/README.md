@@ -26,6 +26,13 @@ DATABASE_URL="postgresql://pasapalabra_user:pasapalabra_pass@localhost:5432/pasa
 JWT_SECRET="super_clave_larga_y_aleatoria_123"
 JWT_EXPIRES_IN="7d"
 CORS_ORIGIN="http://localhost:5173"
+FRONTEND_URL="http://localhost:5173"
+
+# OAuth — obtener las credenciales en Google Cloud Console y GitHub Developer Settings
+GOOGLE_CLIENT_ID=tu_google_client_id
+GOOGLE_CLIENT_SECRET=tu_google_client_secret
+GITHUB_CLIENT_ID=tu_github_client_id
+GITHUB_CLIENT_SECRET=tu_github_client_secret
 ```
 
 ### 3. Crear la base de datos en PostgreSQL
@@ -44,6 +51,12 @@ npx prisma migrate deploy
 ```
 
 Esto crea todas las tablas en la base de datos.
+
+**Para abrir la interfaz de prima:**
+
+```bash
+npx prisma studio
+```
 
 ### 5. Popular la base de datos (seed)
 
@@ -93,6 +106,8 @@ backend/
     ├── controllers/           # Lógica de negocio
     ├── routes/                # Rutas de la API
     ├── middlewares/           # Autenticación JWT
+    ├── config/
+    │   └── passport.js        # Estrategias OAuth (Google, GitHub)
     └── db/
         └── prisma.js          # Cliente Prisma
 ```
@@ -113,5 +128,7 @@ backend/
 | GET | `/api/ranking?language=ES` | No | Top 15 scores |
 | GET | `/api/users/me` | Sí | Perfil del usuario |
 | GET | `/api/users/me/games` | Sí | Historial de partidas |
+| GET | `/api/auth/google` | No | Login con Google (OAuth) |
+| GET | `/api/auth/github` | No | Login con GitHub (OAuth) |
 
 La documentación completa de la API está en `documentacion/api.md`.

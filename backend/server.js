@@ -7,7 +7,8 @@ import roscoRoutes from "./src/routes/rosco.routes.js";
 import gamesRoutes from "./src/routes/games.routes.js";
 import rankingRoutes from "./src/routes/ranking.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
-import userRoutes from "./src/routes/users.routes.js"
+import userRoutes from "./src/routes/users.routes.js";
+import passport from "./src/config/passport.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use(
 );
 
 app.use(express.json({ limit: "1mb" }));
+app.use(passport.initialize())
 
 // Routes
 app.get("/api/health", (_req, res) => {
