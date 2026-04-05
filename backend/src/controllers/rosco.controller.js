@@ -35,8 +35,8 @@ export const getRosco = async (req, res, next) => {
                 difficulty: diff, 
                 categoryId: catId,
                 OR: [
-                    { status: "approved", isPersonal: false},
-                    ...(req.user ? [{ isPersonal: true, createdBy: req.user.userId}] : [])
+                    { status: "approved", isPersonal: false },
+                    ...(req.user ? [{ isPersonal: true, createdBy: req.user.userId }] : [])
                 ]
             },
             select: { id: true, letter: true, question: true, answer: true },

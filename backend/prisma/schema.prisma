@@ -40,6 +40,7 @@ model Question {
   isPersonal  Boolean   @default(false)
   createdBy   String?   
   creator     User?     @relation(fields: [createdBy], references: [id])
+  answers     GameAnswer[]
 
   @@unique([letter, language, difficulty, categoryId, question])
   @@index([language, difficulty])
@@ -62,6 +63,7 @@ model Game {
   duration   Int?
   
   score      Score?
+  answers    GameAnswer[]
   
   @@index([language, difficulty, categoryId])
 }
@@ -86,6 +88,27 @@ model User {
   role          String   @default("user")
   createdQuestions    Question[]
 
-  games     Game[]
+  games         Game[]
+  achievement   UserAchievement[]
 }
 
+model GameAnswer {
+  id            String    @id @default(uuid())
+  gameId        String
+  game          Game      @relation(fields: [gameId], references: [id])
+  questionId    String
+  question      Question  @relation(fields: [questionId], references: [id])
+  letter        String
+  isCorrect     Boolean
+}
+
+model UserAchievement {
+  id          String      @id @default(uuid())
+  userId      String      
+  user        User        @relation(fields: [userId], references: [id])
+  achievement String
+  unlockedAt  DateTime    @default(now())
+  revokedAt   DateTime?
+
+  @@index([userId, achievement])
+}

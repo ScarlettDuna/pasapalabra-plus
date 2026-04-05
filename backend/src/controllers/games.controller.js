@@ -1,4 +1,5 @@
 import { prisma } from "../db/prisma.js";
+import { checkAndGrantAchievements } from "../utils/achievements.js";
 
 const ALLOWED_LANG = new Set(["ES", "EN", "FR"]);
 const ALLOWED_DIFF = new Set(["easy", "medium", "hard"]);
@@ -79,14 +80,14 @@ export const finishGame = async (req, res, next) => {
         const questionIds = answers.map(a => a.questionId);
         const dbQuestions = await prisma.question.findMany({
             where: { id: { in: questionIds } },
-            select: { id: true, answer: true }
+            select: { id: true, answer: true, letter: true }
         });
         // Convertir a mapa para acceso rápido
-        const answerMap = new Map(dbQuestions.map(q => [q.id, q.answer]));
+        const answerMap = new Map(dbQuestions.map(q => [q.id, { answer: q.answer, letter: q.letter}]));
 
         for (let answer of answers) {
             const correctAnswer = answerMap.get(answer.questionId);
-            if (answer.answer.trim().toLowerCase() === correctAnswer.trim().toLowerCase()) {
+            if (answer.answer.trim().toLowerCase() === correctAnswer.answer.trim().toLowerCase()) {
                 correct += 1;
             } else {
                 wrong += 1;
@@ -138,8 +139,21 @@ export const finishGame = async (req, res, next) => {
                 select: { id: true, correct: true, wrong: true, duration: true, score: true, createdAt: true, gameId: true },
             });
 
+            await tx.gameAnswer.createMany({
+                data: answers.map(a => ({
+                    gameId,
+                    questionId: a.questionId,
+                    letter: answerMap.get(a.questionId).letter,
+                    isCorrect: a.answer.trim().toLowerCase() === answerMap.get(a.questionId).answer.trim().toLowerCase()
+                }))
+            });
+
             return { updatedGame, score };
         });
+
+        if (req.user) {
+            await checkAndGrantAchievements(req.user.userId)
+        }
 
         return res.status(201).json(result);
     } catch (err) {

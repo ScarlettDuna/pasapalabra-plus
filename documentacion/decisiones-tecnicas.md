@@ -67,6 +67,49 @@ El endpoint `GET /rosco` devuelve preguntas aprobadas públicas más las pregunt
 
 ---
 
+## Estadísticas personales — modelo GameAnswer
+
+Para implementar estadísticas detalladas por letra (como "letra con la que más errores cometes") se necesita persistir el resultado de cada respuesta individual, no solo los totales de la partida.
+
+Se ha añadido el modelo `GameAnswer` que guarda una fila por cada respuesta del usuario durante una partida: la letra, si fue correcta o no, y referencias a la partida y la pregunta. Esto se rellena en el endpoint `/games/:gameId/finish` aprovechando que ya recibimos el array de respuestas y las verificamos contra la BD.
+
+La alternativa habría sido guardar solo los totales (como se hacía antes) y no poder ofrecer estadísticas por letra. Se optó por el modelo completo porque:
+
+- El coste de almacenamiento es bajo (máximo 26 filas por partida).
+- Los datos ya están disponibles en el momento del finish — no requiere trabajo extra del frontend.
+- Permite estadísticas mucho más ricas: letra más fallada, progreso por letra a lo largo del tiempo, etc.
+- Es una funcionalidad diferencial que aporta valor al proyecto.
+
+---
+
+## Sistema de logros — diseño e implementación
+
+Se ha implementado un sistema de logros que se desbloquean automáticamente al finalizar cada partida, sin necesidad de que el usuario los reclame manualmente.
+
+### Modelo de datos
+
+Se ha creado el modelo `UserAchievement` con los campos `userId`, `achievement` (código del logro), `unlockedAt` y `revokedAt` (nullable). Se ha decidido **no añadir** `@@unique([userId, achievement])` para permitir múltiples registros históricos del mismo logro. Esto es necesario para `DICTIONARY_KING`, que puede ganarse y perderse varias veces — el historial completo de reinados queda registrado con sus fechas de concesión y revocación.
+
+### Desbloqueo automático vs bajo demanda
+
+Se optó por desbloquear los logros automáticamente al terminar cada partida (`POST /games/:gameId/finish`) en lugar de tener un endpoint separado que el usuario llame para "reclamarlos". Las razones:
+
+- **Mejor experiencia de usuario**: el frontend puede mostrar la notificación del logro inmediatamente tras la partida sin necesidad de una petición adicional.
+- **Consistencia**: los logros siempre están al día, no dependen de que el usuario consulte su perfil.
+- **Simplicidad**: no hay estado intermedio de "logro pendiente de reclamar".
+
+### DICTIONARY_KING — logro dinámico
+
+`DICTIONARY_KING` es el único logro que puede revocarse. Al finalizar cada partida se comprueba si el score es el más alto global. Si lo es, se revoca el logro al poseedor anterior (se pone `revokedAt`) y se crea un nuevo registro para el nuevo rey. Un logro activo es aquel con `revokedAt: null`.
+
+Esta implementación permite mantener el historial completo de quién ha sido rey del diccionario y cuándo, lo que añade valor narrativo al ranking.
+
+### Separación en fichero de utilidades
+
+La lógica de logros se ha extraído a `src/utils/achievements.js` en lugar de ponerla directamente en el controlador de partidas. Esto mantiene `games.controller.js` limpio y hace que la lógica de logros sea fácilmente extensible sin tocar el flujo principal de la partida.
+
+---
+
 ## Por qué Render para el despliegue
 
 *(pendiente de completar cuando se realice el despliegue)*

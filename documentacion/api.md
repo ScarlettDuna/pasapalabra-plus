@@ -446,6 +446,98 @@ Errores (approve y reject):
 
 ---
 
+## Logros
+
+### GET /users/me/achievements
+Devuelve todos los logros del usuario autenticado, incluyendo los revocados.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio)
+```
+
+Response 200:
+```json
+[
+  {
+    "id": "uuid",
+    "userId": "uuid",
+    "achievement": "FIRST_GAME",
+    "unlockedAt": "2026-04-06T...",
+    "revokedAt": null
+  },
+  {
+    "id": "uuid",
+    "userId": "uuid",
+    "achievement": "DICTIONARY_KING",
+    "unlockedAt": "2026-04-06T...",
+    "revokedAt": "2026-04-06T..."
+  }
+]
+```
+
+Logros disponibles:
+| Código | Descripción |
+|--------|-------------|
+| `FIRST_GAME` | Primera partida completada |
+| `NEWBIE` | 5 partidas completadas |
+| `SENIOR` | 25 partidas completadas |
+| `ADDICTED` | 50 partidas completadas |
+| `LORD_OF_THE_WORDS` | 200 partidas completadas |
+| `PERFECT_GAME` | Rosco sin ningún fallo (26/26) |
+| `SHARPSHOOTER` | Más de 2000 puntos en una partida |
+| `SPEED_DEMON` | Rosco completado en menos de 3 minutos |
+| `POLYGLOT` | Jugar en los 3 idiomas disponibles |
+| `EXPLORER` | Jugar en 3 categorías diferentes |
+| `CONTRIBUTOR` | Primera pregunta personalizada añadida |
+| `EDITOR` | 5 preguntas personalizadas añadidas |
+| `DICTIONARY_KING` | Puntuación más alta del ranking global (revocable) |
+
+Errores:
+- 401 → Token no proporcionado o inválido
+
+---
+
+## Estadísticas personales
+
+### GET /users/me/stats
+Devuelve estadísticas agregadas de todas las partidas finalizadas del usuario autenticado.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio)
+```
+
+Response 200:
+```json
+{
+  "totalGames": 10,
+  "totalCorrect": 180,
+  "totalWrong": 40,
+  "avgScore": 1650,
+  "bestScore": 2100,
+  "perfectGames": 2,
+  "bestGame": {
+    "id": "uuid",
+    "correct": 24,
+    "score": 2100,
+    "createdAt": "2026-04-05T..."
+  },
+  "hardestLetter": "Ñ",
+  "byLanguage": [
+    { "language": "ES", "games": 8, "avgScore": 1700 }
+  ],
+  "byCategory": [
+    { "categoryId": 1, "name": "Música", "games": 5, "avgScore": 1800 }
+  ]
+}
+```
+
+Errores:
+- 401 → Token no proporcionado o inválido
+
+---
+
 ## Códigos de error comunes
 
 - 400 → Datos inválidos o campos obligatorios ausentes

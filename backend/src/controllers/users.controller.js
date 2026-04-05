@@ -74,3 +74,102 @@ export const getMyGames = async (req, res, next) => {
         next(err)
     }
 }
+
+export const getMyStats = async (req, res, next) => {
+
+    try {
+        // totales generados 
+    const totals = await prisma.score.aggregate({
+        where: { game: { userId: req.user.userId } },
+        _sum: { correct: true, wrong: true },
+        _avg: { score: true },
+        _max: { score: true },
+        _count: true
+    });
+
+    // partidas perfectas
+    const perfectGames = await prisma.score.count({
+        where: {
+            game: { userId: req.user.userId },
+            correct: 26
+        }
+    });
+
+    // mejor partida
+    const bestGame = await prisma.score.findFirst({
+        where: { game: { userId: req.user.userId } },
+        orderBy: { score: "desc" },
+        select: { id: true, correct: true, score: true, createdAt: true, gameId: true }
+    });
+
+    // letra más fallada
+    const hardestLetter = await prisma.gameAnswer.groupBy({
+        by: ["letter"],
+        where: { game: { userId: req.user.userId }, isCorrect: false },
+        _count: { letter: true },
+        orderBy: { _count: { letter: "desc" } },
+        take: 1
+    });
+
+    // por categoría
+    const gamesByCategory = await prisma.game.findMany({
+        where: { userId: req.user.userId, endedAt: { not: null } },
+        include: {
+            category: { select: { id: true, name: true } },
+            score: { select: { score: true } }
+        }
+    });
+
+    const byCategory = Object.values(
+        gamesByCategory.reduce((acc, game) => {
+            const key = game.categoryId;
+            if (!acc[key]) {
+                acc[key] = { categoryId: key, name: game.category.name, games: 0, totalScore: 0 };
+            }
+            acc[key].games += 1;
+            acc[key].totalScore += game.score?.score ?? 0;
+            return acc;
+        }, {})
+    ).map(c => ({ ...c, avgScore: Math.round(c.totalScore / c.games), totalScore: undefined }));
+    
+    // por idioma
+    const byLanguage = Object.values(
+        gamesByCategory.reduce((acc, game) => {
+            const key = game.language;
+            if (!acc[key]) acc[key] = { language: key, games: 0, totalScore: 0 };
+            acc[key].games += 1;
+            acc[key].totalScore += game.score?.score ?? 0;
+            return acc;
+        }, {})
+    ).map(l => ({ ...l, avgScore: Math.round(l.totalScore / l.games), totalScore: undefined }));
+
+    res.status(200).json({
+        totalGames: totals._count,
+        totalCorrect: totals._sum.correct ?? 0,
+        totalWrong: totals._sum.wrong ?? 0,
+        avgScore: Math.round(totals._avg.score ?? 0),
+        bestScore: totals._max.score ?? 0,
+        perfectGames,
+        bestGame,
+        hardestLetter: hardestLetter[0]?.letter ?? null,
+        byCategory,
+        byLanguage
+    });
+
+    } catch (err) {
+        next(err)
+    }
+    
+}
+
+export const getMyAchievements = async (req, res, next) => {
+    try {
+        const achievements = await prisma.userAchievement.findMany({
+            where: { userId: req.user.userId },
+            orderBy: { unlockedAt: "asc" }
+        });
+        return res.status(200).json(achievements)
+    } catch (err) {
+        next(err)
+    }
+}

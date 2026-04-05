@@ -128,6 +128,8 @@ backend/
 | GET | `/api/ranking?language=ES` | No | Top 15 scores |
 | GET | `/api/users/me` | Sí | Perfil del usuario |
 | GET | `/api/users/me/games` | Sí | Historial de partidas |
+| GET | `/api/users/me/stats` | Sí | Estadísticas personales |
+| GET | `/api/users/me/achievements` | Sí | Logros del usuario |
 | GET | `/api/auth/google` | No | Login con Google (OAuth) |
 | GET | `/api/auth/github` | No | Login con GitHub (OAuth) |
 | POST | `/api/questions` | Sí | Crear pregunta personalizada |

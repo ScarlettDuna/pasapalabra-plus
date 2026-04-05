@@ -227,3 +227,51 @@ Se han creado los siguientes endpoints:
 Se ha actualizado `GET /rosco` para filtrar correctamente las preguntas: devuelve preguntas públicas aprobadas más las preguntas personales del usuario autenticado (si hay token). Para ello se ha añadido `optionalAuth` a la ruta del rosco y se usa el operador `OR` de Prisma en el `where` del `findMany`.
 
 Se ha detectado y corregido un problema en la validación del campo `isPersonal`: al ser booleano, el valor `false` era interpretado como campo ausente por la validación `!isPersonal`. Se ha corregido usando `isPersonal === undefined` para distinguir ausencia de valor `false`.
+
+## Diario de desarrollo - Día 8
+
+### Estadísticas personales y modelo GameAnswer
+
+**Nombre:** Arantxa
+**Fecha:** *6 abril 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+Durante esta sesión se ha implementado el endpoint de estadísticas personales `GET /api/users/me/stats` y el modelo auxiliar `GameAnswer` necesario para calcular estadísticas por letra.
+
+Se ha añadido el modelo `GameAnswer` al esquema de Prisma mediante la migración `add_game_answer`. Este modelo guarda una fila por cada respuesta del usuario durante una partida, incluyendo la letra, si fue correcta o no, y referencias a la partida y la pregunta. Se ha actualizado el endpoint `POST /api/games/:gameId/finish` para que, dentro de la transacción existente, cree los registros de `GameAnswer` aprovechando que el array de respuestas ya está disponible y verificado.
+
+Se ha corregido un bug en la construcción del `answerMap` en `finishGame` — el campo se llamaba `anwser` en lugar de `answer`, lo que provocaba errores 500 al intentar finalizar partidas.
+
+Se ha corregido también un problema en la base de datos: las preguntas insertadas por el seed tenían el valor `"aproved"` (con errata) en el campo `status` debido a un typo en el schema original. Se ha corregido con una query SQL directa: `UPDATE "Question" SET "status" = 'approved' WHERE "status" = 'aproved'`.
+
+El endpoint `GET /api/users/me/stats` devuelve las siguientes estadísticas agregadas:
+- `totalGames`, `totalCorrect`, `totalWrong`, `avgScore`, `bestScore` — calculados con `prisma.score.aggregate`
+- `perfectGames` — partidas con 26 respuestas correctas, calculado con `prisma.score.count`
+- `bestGame` — mejor partida con `findFirst` ordenado por score descendente
+- `hardestLetter` — letra con más fallos, calculada con `prisma.gameAnswer.groupBy`
+- `byLanguage` y `byCategory` — estadísticas agrupadas calculadas en JavaScript sobre los resultados de un único `findMany` de partidas
+
+
+### Sistema de logros (Achievements)
+
+También se ha implementado el sistema de logros, que desbloquea automáticamente insignias para los usuarios en función de su actividad y rendimiento.
+
+Se ha añadido el modelo `UserAchievement` al esquema de Prisma mediante la migración `add_achievements`. El modelo guarda el código del logro, la fecha de desbloqueo y una fecha de revocación opcional (`revokedAt`), necesaria para el logro especial `DICTIONARY_KING`. Se ha optado por no añadir `@@unique([userId, achievement])` para permitir múltiples registros históricos del mismo logro, ya que un usuario puede ganar y perder `DICTIONARY_KING` varias veces.
+
+Se ha creado el fichero `src/utils/achievements.js` con dos funciones:
+- `checkAndGrantAchievements(userId)` — se llama automáticamente al finalizar cada partida y comprueba todos los logros excepto `DICTIONARY_KING`
+- `checkDictionaryKing(userId)` — revoca el logro al poseedor anterior y lo otorga al nuevo si el score de la partida es el más alto global
+
+Los logros implementados son:
+
+**Por partidas jugadas:** `FIRST_GAME`, `NEWBIE` (5), `SENIOR` (25), `ADDICTED` (50), `LORD_OF_THE_WORDS` (200)
+
+**Por rendimiento:** `PERFECT_GAME` (26/26), `SHARPSHOOTER` (>2000 pts), `SPEED_DEMON` (<3 minutos)
+
+**Por exploración:** `POLYGLOT` (3 idiomas), `EXPLORER` (3 categorías)
+
+**Por contribución:** `CONTRIBUTOR` (1 pregunta), `EDITOR` (5 preguntas)
+
+**Especial:** `DICTIONARY_KING` — puntuación más alta global, dinámico y revocable
+
+Se ha añadido el endpoint `GET /api/users/me/achievements` que devuelve todos los logros del usuario autenticado ordenados por fecha de desbloqueo, incluyendo los revocados para mantener el historial completo.
