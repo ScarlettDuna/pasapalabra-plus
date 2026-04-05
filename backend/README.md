@@ -138,3 +138,17 @@ backend/
 | PATCH | `/api/admin/questions/:id/reject` | Sí (admin) | Rechazar pregunta |
 
 La documentación completa de la API está en `documentacion/api.md`.
+
+---
+
+## Mejoras planificadas
+
+Las siguientes funcionalidades están diseñadas y pendientes de implementar:
+
+| # | Descripción | Notas |
+|---|-------------|-------|
+| 1 | **Ranking con username** | `GET /ranking` actualmente no devuelve el nombre del jugador. Para partidas anónimas se generará un nombre a partir de fecha + categoría (ej. `Ciencia-30abr`). |
+| 2 | **Unificar `POST /games/start` con la carga del rosco** | `startGame` llamará internamente a la lógica de selección de preguntas y las devolverá en la misma respuesta. El frontend necesitará una sola llamada en vez de dos. `GET /rosco` seguirá existiendo. Ver justificación en `documentacion/decisiones-tecnicas.md`. |
+| 3 | **Limpieza de partidas no terminadas** | Las partidas sin `endedAt` acumulan ruido en la BD. Se implementará un mecanismo (setTimeout / cron) que marque como abandonadas las partidas con más de 10 minutos de antigüedad sin finalizar. |
+| 4 | **`GET /questions/mine`** | Endpoint para que el usuario consulte sus propias preguntas personalizadas con su estado de moderación (aprobada, pendiente, rechazada). |
+| 5 | **Refresh tokens** | Sistema de tokens de corta duración + refresh token. Baja prioridad, solo si hay tiempo antes de la entrega. |

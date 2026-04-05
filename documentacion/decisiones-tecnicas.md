@@ -146,3 +146,38 @@ Esta doble presencia de las respuestas correctas es una decisión deliberada que
 - **Backend**: verifica las respuestas de forma independiente para garantizar la integridad de los datos almacenados en el ranking. Sin esto, cualquiera podría enviar `{ correct: 26, wrong: 0 }` directamente al endpoint y manipular el ranking.
 
 No es duplicar lógica — es aplicar el principio de que el cliente no es de confianza. El hecho de que las respuestas sean visibles en las DevTools del navegador es una limitación aceptable para un juego educativo sin incentivos económicos. En un contexto competitivo con premios, la solución sería no enviar las respuestas al frontend y validar cada respuesta en tiempo real mediante un endpoint dedicado.
+
+---
+
+## Unificación de `POST /games/start` con la carga del rosco
+
+*(pendiente de implementar)*
+
+Actualmente el flujo de inicio de partida requiere dos llamadas HTTP desde el frontend:
+
+1. `POST /games/start` — crea la partida y devuelve el `gameId`.
+2. `GET /rosco?language=...&categoryId=...&difficulty=...` — carga las preguntas.
+
+Se ha diseñado un cambio para que `POST /games/start` devuelva también las preguntas del rosco en la misma respuesta, reduciendo el flujo a una sola llamada.
+
+### Implementación
+
+La lógica de selección de preguntas se extrae de `rosco.controller.js` a una función reutilizable `getRoscoQuestions(language, categoryId, difficulty, userId)`. Esta función es usada tanto por el endpoint `GET /rosco` (que permanece sin cambios) como por `startGame` al final de su ejecución.
+
+La respuesta de `POST /games/start` pasará a incluir el campo `questions`:
+
+```json
+{
+  "gameId": "uuid",
+  "game": { "..." },
+  "questions": [
+    { "letter": "A", "questionId": "uuid", "question": "...", "answer": "Atenas" }
+  ]
+}
+```
+
+### Por qué este cambio
+
+- **Menos latencia percibida**: el frontend carga todo en una sola petición en lugar de encadenar dos.
+- **Menos superficie de error**: no puede darse el caso de que `start` tenga éxito pero `GET /rosco` falle dejando al usuario con un `gameId` inútil.
+- **`GET /rosco` no desaparece**: sigue siendo útil para previsualizaciones o tests sin necesidad de crear una partida.
