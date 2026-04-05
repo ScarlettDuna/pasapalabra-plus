@@ -9,6 +9,8 @@ import rankingRoutes from "./src/routes/ranking.routes.js";
 import authRoutes from "./src/routes/auth.routes.js";
 import userRoutes from "./src/routes/users.routes.js";
 import passport from "./src/config/passport.js";
+import adminRoutes from "./src/routes/admin.routes.js";
+import questionRoutes from "./src/routes/questions.routes.js"
 
 dotenv.config();
 
@@ -44,6 +46,8 @@ app.use("/api/games", gamesRoutes);
 app.use("/api/ranking", rankingRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes)
+app.use("/api/admin", adminRoutes);
+app.use("/api/questions", questionRoutes);
 
 // 404
 app.use((_req, res) => {

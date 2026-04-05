@@ -148,6 +148,22 @@ async function main() {
     }
 
     console.log(`✅ ${inserted} preguntas insertadas`);
+
+    // ── Admin por defecto ────────────────────────────────────────────────────────
+    const bcrypt = await import("bcrypt");
+    const adminPassword = await bcrypt.default.hash("admin1234", 10);
+
+    await prisma.user.upsert({
+        where: { email: "admin@pasapalabra.com" },
+        update: {},
+        create: {
+            username: "admin",
+            email: "admin@pasapalabra.com",
+            passwordHash: adminPassword,
+            role: "admin"
+        }
+    });
+    console.log("✅ Usuario admin creado");
 }
 
 main()

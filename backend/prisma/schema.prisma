@@ -36,6 +36,11 @@ model Question {
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
+  status    String  @default("approved")
+  isPersonal  Boolean   @default(false)
+  createdBy   String?   
+  creator     User?     @relation(fields: [createdBy], references: [id])
+
   @@unique([letter, language, difficulty, categoryId, question])
   @@index([language, difficulty])
   @@index([letter])
@@ -78,6 +83,8 @@ model User {
   email         String   @unique
   passwordHash  String
   createdAt     DateTime @default(now())
+  role          String   @default("user")
+  createdQuestions    Question[]
 
   games     Game[]
 }

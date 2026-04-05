@@ -17,7 +17,10 @@ passport.use(
 
         // Buscamos si ya existe un usuario con ese email
         // Si no existe, lo creamos. Si existe, lo devolvemos tal cual
-        let user = await prisma.user.findUnique({ where: { email }});
+        let user = await prisma.user.findUnique({ 
+          where: { email },
+          select: { id: true, username: true, email: true, role: true }
+        });
         if (!user) {
           user = await prisma.user.create({
             data: { username, email}
@@ -46,7 +49,10 @@ passport.use(
 
         // Buscamos si ya existe un usuario con ese email
         // Si no existe, lo creamos. Si existe, lo devolvemos tal cual
-        let user = await prisma.user.findUnique({ where: { email }});
+        let user = await prisma.user.findUnique({ 
+          where: { email },
+          select: { id: true, username: true, email: true, role: true }
+        });
         if (!user) {
           user = await prisma.user.create({
             data: { username, email}

@@ -130,5 +130,9 @@ backend/
 | GET | `/api/users/me/games` | Sí | Historial de partidas |
 | GET | `/api/auth/google` | No | Login con Google (OAuth) |
 | GET | `/api/auth/github` | No | Login con GitHub (OAuth) |
+| POST | `/api/questions` | Sí | Crear pregunta personalizada |
+| GET | `/api/admin/questions/pending` | Sí (admin) | Ver preguntas pendientes |
+| PATCH | `/api/admin/questions/:id/approve` | Sí (admin) | Aprobar pregunta |
+| PATCH | `/api/admin/questions/:id/reject` | Sí (admin) | Rechazar pregunta |
 
 La documentación completa de la API está en `documentacion/api.md`.

@@ -183,3 +183,47 @@ Se ha reescrito el script `prisma/seed.js` para importar preguntas desde un CSV 
 También se ha corregido un problema estructural del seed anterior, donde parte del código estaba fuera de la función `main()`, lo que podía causar errores en entornos ES modules.
 
 Por último, se ha creado el fichero `backend/README.md` con las instrucciones completas para levantar el proyecto en local: instalación de dependencias, configuración del `.env`, creación de la base de datos, ejecución de migraciones, seed y arranque del servidor.
+
+## Diario de desarrollo - Día 7
+
+### Implementación de autenticación OAuth (Google y GitHub)
+
+**Nombre:** Arantxa
+**Fecha:** *5 abril 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+Durante esta sesión se ha implementado autenticación OAuth como método alternativo al registro clásico con email y contraseña, integrando los proveedores Google y GitHub.
+
+Se ha instalado `passport`, `passport-google-oauth20` y `passport-github2`. La configuración de ambas estrategias se ha centralizado en un nuevo fichero `src/config/passport.js`, separándola del resto de la lógica de autenticación. Cada estrategia recibe el perfil del usuario desde el proveedor y aplica el patrón find-or-create: busca si ya existe un usuario con ese email en la base de datos y, si no existe, lo crea automáticamente. Para GitHub se ha añadido un email de fallback (`username@github.local`) para los casos en que el usuario tenga el email en privado.
+
+Se han añadido cuatro rutas nuevas en `auth.routes.js`:
+- `GET /api/auth/google` — inicia el flujo OAuth con Google
+- `GET /api/auth/google/callback` — Google redirige aquí tras autorizar
+- `GET /api/auth/github` — inicia el flujo OAuth con GitHub
+- `GET /api/auth/github/callback` — GitHub redirige aquí tras autorizar
+
+En ambos callbacks, una vez que Passport ha verificado la identidad del usuario, el backend genera un JWT propio con el mismo formato que el login clásico y redirige al frontend con el token en la URL (`/auth/callback?token=...`). De esta forma el frontend puede procesarlo de la misma manera independientemente del método de autenticación usado.
+
+Passport se ha inicializado en `server.js` con `app.use(passport.initialize())`. Se usa `session: false` en todas las estrategias ya que la sesión la gestiona el JWT, no Passport.
+
+Las variables `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` y `FRONTEND_URL` se han añadido al `.env`.
+
+### Panel de preguntas personalizadas y sistema de moderación
+
+Durante esta sesión se ha implementado el sistema de preguntas personalizadas, permitiendo a los usuarios registrados contribuir preguntas al juego con un flujo de moderación.
+
+Se ha realizado una nueva migración (`add_question_moderation`) que añade tres campos al modelo `Question`: `status` (estado de moderación: `approved`, `pending`, `rejected`), `isPersonal` (booleano que indica si la pregunta es solo para su creador) y `createdBy` (FK opcional a `User`). Al modelo `User` se le ha añadido el campo `role` (`user` | `admin`) para distinguir usuarios normales de administradores. Las preguntas del seed tienen `status: "approved"` por defecto.
+
+Se ha añadido un usuario administrador por defecto al seed (`admin@pasapalabra.com`) usando `upsert` para que sea idempotente.
+
+Se ha implementado un nuevo middleware `adminMiddleware` que verifica que el usuario autenticado tiene `role: "admin"`. Se encadena tras `authMiddleware` en las rutas protegidas.
+
+Se han creado los siguientes endpoints:
+- `POST /api/questions` — permite a usuarios registrados crear preguntas. Si `isPersonal: true` la pregunta se aprueba automáticamente y es solo visible para su creador. Si `isPersonal: false` entra en estado `pending` para revisión del admin.
+- `GET /api/admin/pending` — devuelve todas las preguntas pendientes con los datos del creador.
+- `PATCH /api/admin/questions/:id/approve` — aprueba una pregunta pendiente.
+- `PATCH /api/admin/questions/:id/reject` — rechaza una pregunta pendiente.
+
+Se ha actualizado `GET /rosco` para filtrar correctamente las preguntas: devuelve preguntas públicas aprobadas más las preguntas personales del usuario autenticado (si hay token). Para ello se ha añadido `optionalAuth` a la ruta del rosco y se usa el operador `OR` de Prisma en el `where` del `findMany`.
+
+Se ha detectado y corregido un problema en la validación del campo `isPersonal`: al ser booleano, el valor `false` era interpretado como campo ausente por la validación `!isPersonal`. Se ha corregido usando `isPersonal === undefined` para distinguir ausencia de valor `false`.

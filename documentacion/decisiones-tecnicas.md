@@ -1,7 +1,77 @@
-Por qué PostgreSQL y no Mongo
-Por qué monorepo
-Por qué Node + Express
-Por qué AWS / Render / Vercel
+## Por qué PostgreSQL y no MongoDB
+
+Para este proyecto se evaluaron dos opciones principales de base de datos: PostgreSQL (relacional) y MongoDB (documental).
+
+Se eligió PostgreSQL por las siguientes razones:
+
+- **Los datos tienen estructura fija y relaciones claras.** Un `Game` pertenece a un `User`, tiene una `Category` y un `Score`. Estas relaciones son naturales en un modelo relacional y se benefician de las restricciones de integridad referencial (claves foráneas, `@@unique`, etc.).
+- **La consistencia es importante.** El ranking y las puntuaciones deben ser fiables. PostgreSQL garantiza transacciones ACID, lo que permite operaciones como actualizar un `Game` y crear un `Score` de forma atómica (lo que se usa en `/games/finish`).
+- **Prisma tiene soporte excelente para PostgreSQL.** El ORM elegido ofrece migraciones, tipado y queries complejas de forma más madura con bases de datos relacionales.
+
+MongoDB habría sido una buena opción si los datos fueran heterogéneos o si la estructura cambiara con frecuencia, lo cual no es el caso en un juego con esquema estable.
+
+---
+
+## Por qué monorepo
+
+El proyecto agrupa frontend, backend y documentación en un único repositorio en lugar de tener repositorios separados.
+
+Razones:
+
+- **Coordinación entre equipos.** Con un único repositorio, los cambios en el contrato de la API (rutas, formatos de respuesta) son visibles inmediatamente para todo el equipo sin necesidad de sincronizar entre repos.
+- **Simplicidad para un proyecto de esta escala.** Un monorepo tiene sentido cuando el proyecto no es suficientemente grande como para justificar la infraestructura de un sistema multi-repo (pipelines independientes, versionado separado, etc.).
+- **Documentación centralizada.** La carpeta `documentacion/` es compartida y accesible desde cualquier parte del proyecto.
+
+En proyectos más grandes con equipos independientes, la separación en repositorios distintos (o un monorepo con herramientas como Turborepo o Nx) sería la opción más adecuada.
+
+---
+
+## Por qué Node.js + Express
+
+Para el backend se valoraron varias opciones: Node.js con Express, Node.js con Fastify, y Python con FastAPI.
+
+Se eligió Node.js + Express por las siguientes razones:
+
+- **JavaScript en frontend y backend.** Al usar el mismo lenguaje en ambas capas se reduce la carga cognitiva del equipo y se pueden compartir conceptos y utilidades entre ambas partes del proyecto.
+- **Express es el framework más conocido del ecosistema Node.** Su documentación es extensa, la comunidad es grande y la curva de aprendizaje es baja, lo que es relevante en un contexto educativo.
+- **Ecosistema compatible.** Librerías clave del proyecto como Prisma, Passport, jsonwebtoken y bcrypt tienen soporte nativo y maduro en Node.js.
+- **Express 5** (versión usada en este proyecto) mejora el manejo de errores asíncronos respecto a Express 4, reduciendo la necesidad de bloques `try/catch` en situaciones simples.
+
+Fastify habría ofrecido mejor rendimiento, pero la diferencia no es relevante para la escala de este proyecto. FastAPI (Python) habría requerido cambiar de lenguaje respecto al frontend.
+
+---
+
+## Panel de preguntas personalizadas — diseño y moderación
+
+Los usuarios registrados pueden contribuir preguntas al juego a través de un formulario. Al enviar una pregunta, el usuario elige entre dos modalidades:
+
+- **Personal**: la pregunta solo es visible para el propio usuario que la creó. No pasa por moderación.
+- **Pública (pendiente de revisión)**: la pregunta se envía para su revisión por un administrador. Si es aprobada, se incorpora al banco de preguntas general y aparece mezclada con el resto en el rosco.
+
+Esta decisión de diseño responde a varios objetivos:
+
+- **Calidad del contenido**: permitir que cualquiera añada preguntas públicas sin control llevaría a preguntas incorrectas, inapropiadas o mal formuladas en el juego. La moderación garantiza la calidad del banco de preguntas compartido.
+- **Valor diferencial del proyecto**: la posibilidad de contribuir preguntas convierte el juego en una plataforma colaborativa, no solo un juego estático.
+- **Privacidad opcional**: el modo personal permite al usuario crear sets de preguntas para su propio uso sin necesidad de compartirlas.
+
+Para implementar esto se han añadido los siguientes cambios al modelo de datos:
+
+- `User.role` (`"user"` | `"admin"`, por defecto `"user"`) — distingue usuarios normales de administradores
+- `Question.status` (`"approved"` | `"pending"` | `"rejected"`, por defecto `"approved"`) — estado de moderación
+- `Question.isPersonal` (booleano, por defecto `false`) — indica si la pregunta es solo para su creador
+- `Question.createdBy` (UUID nullable, FK → User) — referencia al usuario que creó la pregunta
+
+Las preguntas del seed tienen `status: "approved"`, `createdBy: null` e `isPersonal: false`.
+
+El endpoint `GET /rosco` devuelve preguntas aprobadas públicas más las preguntas personales del usuario autenticado (si hay token). Las preguntas pendientes o rechazadas nunca aparecen en el rosco.
+
+---
+
+## Por qué Render para el despliegue
+
+*(pendiente de completar cuando se realice el despliegue)*
+
+---
 
 ---
 

@@ -35,3 +35,5 @@ coverage/
 # Build tools / caches
 .cache/
 .eslintcache
+
+google_oath.json

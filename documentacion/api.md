@@ -54,7 +54,7 @@ Errores:
 ---
 
 ### POST /auth/login
-Iniciar sesión. Devuelve un token JWT con validez de 1 hora.
+Iniciar sesión. Devuelve un token JWT con validez de 7 días.
 
 Body:
 ```json
@@ -117,7 +117,8 @@ Response 200:
     {
       "letter": "A",
       "questionId": "uuid",
-      "question": "Empieza con A: Capital de Grecia"
+      "question": "Empieza con A: Capital de Grecia",
+      "answer": "Atenas"
     }
   ]
 }
@@ -214,6 +215,27 @@ Errores:
 
 ---
 
+### GET /auth/google
+Inicia el flujo de autenticación con Google. Redirige al usuario a la pantalla de autorización de Google. No requiere body ni headers.
+
+Al completar la autorización, Google redirige a `/auth/google/callback`, que genera un JWT y redirige al frontend:
+```
+http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1NiIs...
+```
+
+El frontend debe leer el token de la URL y guardarlo en `localStorage`.
+
+---
+
+### GET /auth/github
+Mismo flujo que Google pero con GitHub. Redirige a `/auth/github/callback` tras la autorización.
+
+```
+http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1NiIs...
+```
+
+---
+
 ## Ranking
 
 ### GET /ranking
@@ -295,6 +317,132 @@ Response 200:
 
 Errores:
 - 401 → Token no proporcionado o inválido
+
+---
+
+## Preguntas personalizadas
+
+### POST /questions
+Crear una pregunta personalizada. Solo usuarios registrados.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio)
+```
+
+Body:
+```json
+{
+  "letter": "A",
+  "question": "Empieza con A: Capital de Grecia",
+  "answer": "Atenas",
+  "language": "ES",
+  "difficulty": "easy",
+  "categoryId": 1,
+  "isPersonal": false
+}
+```
+
+- `isPersonal: false` → la pregunta se envía a revisión (`status: "pending"`)
+- `isPersonal: true` → la pregunta es solo para el creador (`status: "approved"` automáticamente)
+
+Response 201:
+```json
+{
+  "id": "uuid",
+  "letter": "A",
+  "question": "Empieza con A: Capital de Grecia",
+  "answer": "Atenas",
+  "language": "ES",
+  "difficulty": "easy",
+  "categoryId": 1,
+  "isPersonal": false,
+  "status": "pending",
+  "createdBy": "uuid"
+}
+```
+
+Errores:
+- 400 → Faltan campos obligatorios o valores inválidos
+- 401 → Token no proporcionado o inválido
+
+---
+
+## Administración
+
+Rutas protegidas exclusivamente para usuarios con `role: "admin"`.
+
+### GET /admin/questions/pending
+Obtener todas las preguntas pendientes de revisión.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio, rol admin)
+```
+
+Response 200:
+```json
+[
+  {
+    "id": "uuid",
+    "letter": "A",
+    "question": "Empieza con A: Capital de Grecia",
+    "answer": "Atenas",
+    "language": "ES",
+    "difficulty": "easy",
+    "status": "pending",
+    "createdBy": {
+      "id": "uuid",
+      "username": "string"
+    }
+  }
+]
+```
+
+Errores:
+- 401 → Token no proporcionado o inválido
+- 403 → El usuario no es admin
+
+---
+
+### PATCH /admin/questions/:id/approve
+Aprobar una pregunta pendiente. Pasa a `status: "approved"` y queda disponible en el rosco general.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio, rol admin)
+```
+
+Response 200:
+```json
+{
+  "id": "uuid",
+  "status": "approved"
+}
+```
+
+---
+
+### PATCH /admin/questions/:id/reject
+Rechazar una pregunta pendiente. Pasa a `status: "rejected"`.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio, rol admin)
+```
+
+Response 200:
+```json
+{
+  "id": "uuid",
+  "status": "rejected"
+}
+```
+
+Errores (approve y reject):
+- 401 → Token no proporcionado o inválido
+- 403 → El usuario no es admin
+- 404 → Pregunta no encontrada
 
 ---
 

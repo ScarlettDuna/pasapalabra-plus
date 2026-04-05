@@ -30,7 +30,15 @@ export const getRosco = async (req, res, next) => {
 
         // Trae preguntas filtradas
         const all = await prisma.question.findMany({
-            where: { language: lang, difficulty: diff, categoryId: catId },
+            where: { 
+                language: lang, 
+                difficulty: diff, 
+                categoryId: catId,
+                OR: [
+                    { status: "approved", isPersonal: false},
+                    ...(req.user ? [{ isPersonal: true, createdBy: req.user.userId}] : [])
+                ]
+            },
             select: { id: true, letter: true, question: true, answer: true },
         });
 
