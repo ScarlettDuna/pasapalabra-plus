@@ -64,7 +64,12 @@ npx prisma studio
 node prisma/seed.js
 ```
 
-Inserta las categorías y las preguntas del rosco en español.
+Inserta las categorías, las preguntas del rosco en los tres idiomas (ES, EN, FR) y los siguientes usuarios de prueba:
+
+| Usuario | Email | Contraseña | Rol |
+|---------|-------|-----------|-----|
+| admin | admin@pasapalabra.com | admin1234 | admin |
+| user | user@pasapalabra.com | user1234 | user |
 
 ### 6. Arrancar el servidor
 

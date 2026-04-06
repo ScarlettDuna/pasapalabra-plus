@@ -171,7 +171,12 @@ La respuesta de `POST /games/start` pasará a incluir el campo `questions`:
   "gameId": "uuid",
   "game": { "..." },
   "questions": [
-    { "letter": "A", "questionId": "uuid", "question": "...", "answer": "Atenas" }
+    { 
+      "letter": "A", 
+      "questionId": "uuid", 
+      "question": "...", 
+      "answer": "Atenas" 
+    }, {"..."}
   ]
 }
 ```

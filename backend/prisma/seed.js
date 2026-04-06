@@ -14,7 +14,7 @@ const DIFFICULTY_MAP = {
     "difícil": "hard",
 };
 
-function parseCSV(filePath) {
+function parseTSV(filePath) {
     return new Promise((resolve, reject) => {
         const rows = [];
         const rl = createInterface({
@@ -27,23 +27,7 @@ function parseCSV(filePath) {
 
         rl.on("line", (line) => {
             if (!line.trim()) return;
-
-            // Parseo simple que respeta campos entre comillas
-            const fields = [];
-            let current = "";
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const ch = line[i];
-                if (ch === '"') {
-                    inQuotes = !inQuotes;
-                } else if (ch === "," && !inQuotes) {
-                    fields.push(current.trim());
-                    current = "";
-                } else {
-                    current += ch;
-                }
-            }
-            fields.push(current.trim());
+            const fields = line.split("\t").map(f => f.trim());
 
             if (isFirst) {
                 headers = fields;
@@ -74,28 +58,27 @@ async function main() {
             { name: "Deporte", language: "ES", type: "theme" },
             { name: "Cine y TV", language: "ES", type: "theme" },
 
-            { name: "Vocabulary (translation)", language: "EN", type: "learning" },
-            { name: "Vocabulary (definition)", language: "EN", type: "learning" },
-            { name: "Local culture", language: "EN", type: "learning" },
-
-            { name: "Vocabulaire (traduction)", language: "FR", type: "learning" },
-            { name: "Vocabulaire (définition)", language: "FR", type: "learning" },
-            { name: "Culture locale", language: "FR", type: "learning" },
+            { name: "General", language: "EN", type: "theme" },
+            { name: "Definición", language: "EN", type: "learning" },
+            { name: "Traducción", language: "EN", type: "learning" },
+            { name: "General", language: "FR", type: "theme" },
+            { name: "Definición", language: "FR", type: "learning" },
+            { name: "Traducción", language: "FR", type: "learning" },
         ],
         skipDuplicates: true,
     });
     console.log("✅ Categorías insertadas");
 
-    // ── 2. Cargar categorías ES en un mapa para lookup rápido ────────────────
-    const categories = await prisma.category.findMany({
-        where: { language: "ES" },
-    });
-    const categoryMap = new Map(categories.map((c) => [c.name.toLowerCase(), c]));
+    // ── 2. Cargar todas las categorías en un mapa para lookup rápido ─────────
+    const categories = await prisma.category.findMany();
+    const categoryMap = new Map(
+        categories.map((c) => [`${c.language}:${c.name.toLowerCase()}`, c])
+    );
 
-    // ── 3. Leer CSV ──────────────────────────────────────────────────────────
-    const csvPath = path.join(__dirname, "..", "Preguntas pasapalabra + - Español.csv");
-    const rows = await parseCSV(csvPath);
-    console.log(`📄 ${rows.length} filas leídas del CSV`);
+    // ── 3. Leer TSV ──────────────────────────────────────────────────────────
+    const csvPath = path.join(__dirname, "..", "Preguntas pasapalabra + allLang.tsv");
+    const rows = await parseTSV(csvPath);
+    console.log(`📄 ${rows.length} filas leídas del TSV`);
 
     // ── 4. Construir preguntas ───────────────────────────────────────────────
     const questions = [];
@@ -108,8 +91,9 @@ async function main() {
         const respuesta = row["Respuesta"]?.trim();
         const tema = row["Tema"]?.trim();
         const nivel = row["Nivel"]?.trim().toLowerCase();
+        const idioma = row["Idioma"]?.trim().toUpperCase();
 
-        if (!letra || !condicion || !definicion || !respuesta || !tema || !nivel) {
+        if (!letra || !condicion || !definicion || !respuesta || !tema || !nivel || !idioma) {
             skipped++;
             continue;
         }
@@ -120,7 +104,7 @@ async function main() {
             continue;
         }
 
-        const category = categoryMap.get(tema.toLowerCase());
+        const category = categoryMap.get(`${idioma}:${tema.toLowerCase()}`);
         if (!category) {
             skipped++;
             continue;
@@ -128,9 +112,9 @@ async function main() {
 
         questions.push({
             letter: letra,
-            question: `${condicion} con ${letra}: ${definicion}`,
+            question: `${condicion} ${letra}: ${definicion}`,
             answer: respuesta,
-            language: "ES",
+            language: idioma,
             difficulty,
             categoryId: category.id,
         });
@@ -163,7 +147,19 @@ async function main() {
             role: "admin"
         }
     });
-    console.log("✅ Usuario admin creado");
+
+    const userPassword = await bcrypt.default.hash("user1234", 10);
+    await prisma.user.upsert({
+        where: { email: "user@pasapalabra.com" },
+        update: {},
+        create: {
+            username: "user",
+            email: "user@pasapalabra.com",
+            passwordHash: userPassword,
+            role: "user"
+        }
+    });
+    console.log("✅ Usuarios de prueba creados (admin / user)");
 }
 
 main()

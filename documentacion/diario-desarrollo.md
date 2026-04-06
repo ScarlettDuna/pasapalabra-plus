@@ -275,3 +275,26 @@ Los logros implementados son:
 **Especial:** `DICTIONARY_KING` — puntuación más alta global, dinámico y revocable
 
 Se ha añadido el endpoint `GET /api/users/me/achievements` que devuelve todos los logros del usuario autenticado ordenados por fecha de desbloqueo, incluyendo los revocados para mantener el historial completo.
+
+
+### Banco de preguntas multiidioma y refactorización del seed
+
+Se ha creado un nuevo fichero de preguntas en formato TSV (`Preguntas pasapalabra + allLang.tsv`) que unifica los tres idiomas del juego (ES, EN, FR) en un único archivo, sustituyendo al CSV original solo en español.
+
+El fichero TSV incluye 1747 preguntas repartidas entre los tres idiomas y distintas categorías y niveles de dificultad. Se ha optado por TSV en lugar de CSV para evitar problemas de parseo con campos que contienen comas.
+
+Se han actualizado los valores de la columna `Condición` para que la pregunta generada sea gramaticalmente correcta en cada idioma:
+- ES: `Empieza por` / `Contiene la`
+- EN: `Starts with` / `Contains`
+- FR: `Commence par` / `Contient la`
+
+El formato de pregunta en el seed ha pasado de `${condicion} con ${letra}: ${definicion}` (que generaba frases incorrectas para preguntas de tipo "Contiene") a `${condicion} ${letra}: ${definicion}`.
+
+Se ha refactorizado el seed:
+- La función `parseCSV` se ha sustituido por `parseTSV`, que simplemente separa por tabuladores sin necesidad de lógica para campos entre comillas.
+- El `categoryMap` ahora incluye categorías de los tres idiomas, usando la clave `${idioma}:${nombre}` para evitar colisiones entre idiomas.
+- Se lee el campo `Idioma` de cada fila para asignar correctamente el idioma a cada pregunta.
+
+Se han actualizado las categorías del seed: se han eliminado los placeholders de EN/FR que no se usaban (`Vocabulary`, `Vocabulaire`, etc.) y se han añadido las categorías reales que aparecen en el TSV: `General` (type `theme`) y `Definición` y `Traducción` (type `learning`) para EN y FR.
+
+Se ha añadido un usuario de prueba básico al seed (`user@pasapalabra.com` / `user1234`) para facilitar las pruebas del equipo de frontend, junto al usuario admin ya existente.
