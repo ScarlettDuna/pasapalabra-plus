@@ -5,6 +5,7 @@ on:
     branches:
       - frontend-jaime
       - frontend
+      - main
 
 jobs:
   send-email:
