@@ -1,4 +1,5 @@
 # Pasapalabra+ — Backend
+## Última actualización: 6 de abril de 2026.
 
 API REST desarrollada con Node.js + Express + PostgreSQL.
 
