@@ -1,4 +1,5 @@
 import { prisma } from "../db/prisma.js";
+import { checkAndGrantAchievements } from "../utils/achievements.js";
 
 const ALLOWED_LANG = new Set(["ES", "EN", "FR"]);
 const ALLOWED_DIFF = new Set(["easy", "medium", "hard"]);
@@ -11,6 +12,7 @@ function calcScore({ correct, wrong, duration }) {
 
 export const startGame = async (req, res, next) => {
     try {
+        console.log("Usuario autenticado:", req.user);
         const { language, difficulty, categoryId } = req.body;
 
         if (!language || !difficulty || !categoryId) {
@@ -33,7 +35,7 @@ export const startGame = async (req, res, next) => {
         if (!Number.isInteger(catId) || catId <= 0) {
             return res.status(400).json({ message: "categoryId debe ser un entero positivo" });
         }
-
+        
         // Verifica que la categoría exista (evita FK error)
         const category = await prisma.category.findUnique({ where: { id: catId } });
         if (!category) {
@@ -45,6 +47,7 @@ export const startGame = async (req, res, next) => {
                 language: lang,
                 difficulty: diff,
                 categoryId: catId,
+                userId: req.user?.userId ?? null,
                 // startedAt lo pone Prisma con @default(now())
             },
             select: {
@@ -65,27 +68,44 @@ export const startGame = async (req, res, next) => {
 export const finishGame = async (req, res, next) => {
     try {
         const { gameId } = req.params;
-        const { correct, wrong } = req.body;
+        const { answers } = req.body;
 
-        if (correct === undefined || wrong === undefined) {
-            return res.status(400).json({ message: "Body obligatorio: correct, wrong" });
+        if (answers === undefined ) {
+            return res.status(400).json({ message: "Body obligatorio: array de answers" });
         }
 
-        const c = Number(correct);
-        const w = Number(wrong);
+        let correct = 0;
+        let wrong = 0;
 
-        if (!Number.isInteger(c) || c < 0 || !Number.isInteger(w) || w < 0) {
-            return res.status(400).json({ message: "correct y wrong deben ser enteros >= 0" });
+        const questionIds = answers.map(a => a.questionId);
+        const dbQuestions = await prisma.question.findMany({
+            where: { id: { in: questionIds } },
+            select: { id: true, answer: true, letter: true }
+        });
+        // Convertir a mapa para acceso rápido
+        const answerMap = new Map(dbQuestions.map(q => [q.id, { answer: q.answer, letter: q.letter}]));
+
+        for (let answer of answers) {
+            const correctAnswer = answerMap.get(answer.questionId);
+            if (answer.answer.trim().toLowerCase() === correctAnswer.answer.trim().toLowerCase()) {
+                correct += 1;
+            } else {
+                wrong += 1;
+            }
         }
 
         // Traemos la partida
         const game = await prisma.game.findUnique({
             where: { id: gameId },
-            select: { id: true, startedAt: true, endedAt: true, duration: true, categoryId: true, language: true, difficulty: true },
+            select: { id: true, startedAt: true, endedAt: true, userId: true, duration: true, categoryId: true, language: true, difficulty: true },
         });
 
         if (!game) {
             return res.status(404).json({ message: "Partida no encontrada" });
+        }
+        // Si la partida pertenece a alguien y o no hay token o el token es de otro usuario -> error 403
+        if (game.userId && (!req.user || game.userId !== req.user.userId)){   
+            return res.status(403).json({ message: "No tienes permiso para finalizar esta partida" });
         }
 
         if (game.endedAt) {
@@ -98,7 +118,7 @@ export const finishGame = async (req, res, next) => {
             Math.round((endedAt.getTime() - new Date(game.startedAt).getTime()) / 1000)
         );
 
-        const points = calcScore({ correct: c, wrong: w, duration });
+        const points = calcScore({ correct: correct, wrong: wrong, duration });
 
         // Transacción: actualizar Game + crear Score (1–1)
         const result = await prisma.$transaction(async (tx) => {
@@ -111,16 +131,29 @@ export const finishGame = async (req, res, next) => {
             const score = await tx.score.create({
                 data: {
                     gameId,
-                    correct: c,
-                    wrong: w,
+                    correct: correct,
+                    wrong: wrong,
                     duration,
                     score: points,
                 },
                 select: { id: true, correct: true, wrong: true, duration: true, score: true, createdAt: true, gameId: true },
             });
 
+            await tx.gameAnswer.createMany({
+                data: answers.map(a => ({
+                    gameId,
+                    questionId: a.questionId,
+                    letter: answerMap.get(a.questionId).letter,
+                    isCorrect: a.answer.trim().toLowerCase() === answerMap.get(a.questionId).answer.trim().toLowerCase()
+                }))
+            });
+
             return { updatedGame, score };
         });
+
+        if (req.user) {
+            await checkAndGrantAchievements(req.user.userId)
+        }
 
         return res.status(201).json(result);
     } catch (err) {

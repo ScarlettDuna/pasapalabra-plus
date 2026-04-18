@@ -36,6 +36,12 @@ model Question {
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
+  status    String  @default("approved")
+  isPersonal  Boolean   @default(false)
+  createdBy   String?   
+  creator     User?     @relation(fields: [createdBy], references: [id])
+  answers     GameAnswer[]
+
   @@unique([letter, language, difficulty, categoryId, question])
   @@index([language, difficulty])
   @@index([letter])
@@ -48,11 +54,17 @@ model Game {
 
   categoryId Int
   category   Category  @relation(fields: [categoryId], references: [id])
+  
+  userId     String?
+  user       User? @relation(fields: [userId], references: [id])
+  
   startedAt  DateTime  @default(now())
   endedAt    DateTime?
   duration   Int?
+  
   score      Score?
-
+  answers    GameAnswer[]
+  
   @@index([language, difficulty, categoryId])
 }
 
@@ -65,4 +77,38 @@ model Score {
   gameId    String   @unique
   game      Game     @relation(fields: [gameId], references: [id])
   createdAt DateTime @default(now())
+}
+
+model User {
+  id            String   @id @default(uuid())
+  username      String   @unique
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  role          String   @default("user")
+  createdQuestions    Question[]
+
+  games         Game[]
+  achievement   UserAchievement[]
+}
+
+model GameAnswer {
+  id            String    @id @default(uuid())
+  gameId        String
+  game          Game      @relation(fields: [gameId], references: [id])
+  questionId    String
+  question      Question  @relation(fields: [questionId], references: [id])
+  letter        String
+  isCorrect     Boolean
+}
+
+model UserAchievement {
+  id          String      @id @default(uuid())
+  userId      String      
+  user        User        @relation(fields: [userId], references: [id])
+  achievement String
+  unlockedAt  DateTime    @default(now())
+  revokedAt   DateTime?
+
+  @@index([userId, achievement])
 }
