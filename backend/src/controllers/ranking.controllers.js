@@ -44,11 +44,44 @@ export const getRanking = async (req, res, next) => {
             where,
             orderBy: [{ score: "desc" }, { duration: "asc"}],
             take: 15,
-            select: { score: true, correct: true, duration: true, createdAt: true }
+            select: { 
+                score: true, 
+                correct: true, 
+                duration: true, 
+                createdAt: true,
+                game: {
+                    select: {
+                        startedAt: true,
+                        user: { select: { username: true }},
+                        category: { select: { name: true }}
+                    }
+                }
+            }
             
         });
 
-        res.status(200).json(scores)
+        const ranking = scores.map((s, i) => {
+            let playerName;
+            if (s.game.user) {
+                playerName = s.game.user.username;
+            } else {
+                const date = new Date(s.game.startedAt);
+                const day = date.getDate();
+                const month = date.toLocaleString('es-ES', { month: "short" });
+                playerName = `${s.game.category.name}-${day}${month}`;
+            }
+
+            return {
+                position: i + 1,
+                playerName,
+                score: s.score,
+                correct: s.correct,
+                duration: s.duration,
+                createdAt: s.createdAt
+            }
+        })
+
+        res.status(200).json(ranking)
     } catch (err) {
         next(err)
     }

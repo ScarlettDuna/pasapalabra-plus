@@ -129,7 +129,7 @@ backend/
 | POST | `/api/auth/login` | No | Login, devuelve JWT |
 | GET | `/api/categories?language=ES` | No | Categorías por idioma |
 | GET | `/api/rosco?language=ES&categoryId=3&difficulty=easy` | No | Preguntas del rosco |
-| POST | `/api/games/start` | Opcional | Iniciar partida |
+| POST | `/api/games/start` | Opcional | Iniciar partida y preguntas del rosco|
 | POST | `/api/games/:gameId/finish` | Opcional | Finalizar partida |
 | GET | `/api/ranking?language=ES` | No | Top 15 scores |
 | GET | `/api/users/me` | Sí | Perfil del usuario |
@@ -153,8 +153,8 @@ Las siguientes funcionalidades están diseñadas y pendientes de implementar:
 
 | # | Descripción | Notas |
 |---|-------------|-------|
-| 1 | **Ranking con username** | `GET /ranking` actualmente no devuelve el nombre del jugador. Para partidas anónimas se generará un nombre a partir de fecha + categoría (ej. `Ciencia-30abr`). |
-| 2 | **Unificar `POST /games/start` con la carga del rosco** | `startGame` llamará internamente a la lógica de selección de preguntas y las devolverá en la misma respuesta. El frontend necesitará una sola llamada en vez de dos. `GET /rosco` seguirá existiendo. Ver justificación en `documentacion/decisiones-tecnicas.md`. |
+| 1 | ~~**Ranking con username**~~ | ✅ Implementado. `GET /ranking` devuelve `playerName` con el username del jugador registrado o un nombre generado `Categoría-DDmmm` para partidas anónimas. |
+| 2 | ~~**Unificar `POST /games/start` con la carga del rosco**~~ | ✅ Implementado. `startGame` devuelve ya las preguntas en la misma respuesta. `GET /rosco` sigue disponible. |
 | 3 | **Limpieza de partidas no terminadas** | Las partidas sin `endedAt` acumulan ruido en la BD. Se implementará un mecanismo (setTimeout / cron) que marque como abandonadas las partidas con más de 10 minutos de antigüedad sin finalizar. |
 | 4 | **`GET /questions/mine`** | Endpoint para que el usuario consulte sus propias preguntas personalizadas con su estado de moderación (aprobada, pendiente, rechazada). |
 | 5 | **Refresh tokens** | Sistema de tokens de corta duración + refresh token. Baja prioridad, solo si hay tiempo antes de la entrega. |

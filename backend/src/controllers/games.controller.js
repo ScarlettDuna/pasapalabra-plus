@@ -1,5 +1,6 @@
 import { prisma } from "../db/prisma.js";
 import { checkAndGrantAchievements } from "../utils/achievements.js";
+import { getRoscoQuestions } from "./rosco.controller.js";
 
 const ALLOWED_LANG = new Set(["ES", "EN", "FR"]);
 const ALLOWED_DIFF = new Set(["easy", "medium", "hard"]);
@@ -58,8 +59,9 @@ export const startGame = async (req, res, next) => {
                 startedAt: true,
             },
         });
+        const questions = await getRoscoQuestions(lang, catId, diff, req.user?.userId);
 
-        return res.status(201).json({ gameId: game.id, game });
+        return res.status(201).json({ gameId: game.id, game, questions });
     } catch (err) {
         next(err);
     }

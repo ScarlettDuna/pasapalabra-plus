@@ -102,7 +102,7 @@ Response 200:
 ## Rosco
 
 ### GET /rosco
-Obtener un set de preguntas para jugar. Devuelve una pregunta por letra disponible.
+Obtener un set de preguntas para jugar sin crear partida. Útil para previsualizaciones o pruebas. **Para iniciar una partida real usar `POST /games/start`**, que devuelve las preguntas y el gameId en una sola llamada.
 
 Query params:
 - `language` (ES | EN | FR) — obligatorio
@@ -112,12 +112,11 @@ Query params:
 Response 200:
 ```json
 {
-  "gameId": "uuid",
   "questions": [
     {
       "letter": "A",
       "questionId": "uuid",
-      "question": "Empieza con A: Capital de Grecia",
+      "question": "Empieza por A: Capital de Grecia",
       "answer": "Atenas"
     }
   ]
@@ -129,7 +128,9 @@ Response 200:
 ## Partidas
 
 ### POST /games/start
-Iniciar una partida. Si se envía token, la partida queda vinculada al usuario. Sin token, la partida es anónima.
+Iniciar una partida y obtener las preguntas del rosco en una sola llamada. Si se envía token, la partida queda vinculada al usuario. Sin token, la partida es anónima.
+
+**Este es el endpoint principal para comenzar a jugar.** Devuelve el `gameId` necesario para el finish y las preguntas listas para mostrar.
 
 Headers:
 ```
@@ -155,7 +156,15 @@ Response 201:
     "difficulty": "medium",
     "categoryId": 1,
     "startedAt": "2026-03-30T13:00:00.000Z"
-  }
+  },
+  "questions": [
+    {
+      "letter": "A",
+      "questionId": "uuid",
+      "question": "Empieza por A: Capital de Grecia",
+      "answer": "Atenas"
+    }
+  ]
 }
 ```
 
@@ -243,19 +252,34 @@ Obtener el top 15 de puntuaciones, filtrado por idioma y opcionalmente por categ
 
 Query params:
 - `language` (ES | EN | FR) — obligatorio
-- `category` (entero) — opcional
+- `category` (entero) — opcional, filtra por categoría concreta
 
 Response 200:
 ```json
 [
   {
-    "score": 1885,
-    "correct": 20,
-    "duration": 600,
-    "createdAt": "2026-03-30T13:10:00.000Z"
+    "position": 1,
+    "playerName": "arantxa",
+    "score": 2264,
+    "correct": 24,
+    "duration": 86,
+    "createdAt": "2026-04-18T19:01:18.027Z"
+  },
+  {
+    "position": 2,
+    "playerName": "Ciencia-18abr",
+    "score": 1500,
+    "correct": 18,
+    "duration": 200,
+    "createdAt": "2026-04-18T20:00:00.000Z"
   }
 ]
 ```
+
+`playerName` es el username si la partida pertenece a un usuario registrado. Para partidas anónimas se genera automáticamente como `"Categoría-DDmmm"` (ej. `"Ciencia-18abr"`).
+
+Errores:
+- 400 → `language` ausente o inválido, `category` no es número o no existe
 
 ---
 
