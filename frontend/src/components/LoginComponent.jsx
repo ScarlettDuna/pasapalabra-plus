@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginComponent.css";
 import { login } from "../services/auth";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -24,10 +26,14 @@ export default function LoginComponent() {
             console.error(error);
             alert("Error conectando con el servidor");
         }
+
+        navigate("/gamemode");
     };
 
     const handleGuest = () => {
         alert("Entrando como invitado...");
+
+        navigate("/gamemode");
     };
 
     return (
