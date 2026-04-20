@@ -1,5 +1,4 @@
 import { prisma } from "../db/prisma.js";
-import crypto from "crypto";
 
 export const getRosco = async (req, res, next) => {
     try {
@@ -28,38 +27,45 @@ export const getRosco = async (req, res, next) => {
             return res.status(400).json({ message: "categoryId debe ser un entero positivo" });
         }
 
-        // Trae preguntas filtradas
-        const all = await prisma.question.findMany({
-            where: { language: lang, difficulty: diff, categoryId: catId },
-            select: { id: true, letter: true, question: true },
-        });
+        const questions = await getRoscoQuestions(lang, catId, diff, req.user?.userId);
 
-        // Agrupa por letra
-        const byLetter = new Map();
-        for (const q of all) {
-            const letter = String(q.letter).toUpperCase();
-            if (!byLetter.has(letter)) byLetter.set(letter, []);
-            byLetter.get(letter).push(q);
-        }
-
-        // Letras del rosco ES (A-Z)
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-        // Elige 1 pregunta por letra (si existe)
-        const questions = letters
-            .map((L) => {
-                const candidates = byLetter.get(L);
-                if (!candidates || candidates.length === 0) return null;
-                const pick = candidates[Math.floor(Math.random() * candidates.length)];
-                return { letter: L, questionId: pick.id, question: pick.question };
-            })
-            .filter(Boolean);
-
-        // De momento devolvemos un gameId temporal (luego lo persistimos en Game)
-        const gameId = crypto.randomUUID();
-
-        return res.status(200).json({ gameId, questions });
+        return res.status(200).json({ questions });
     } catch (err) {
         next(err);
     }
 };
+
+export async function getRoscoQuestions(lang, catId, diff, userId) {
+    // Trae preguntas filtradas
+    const all = await prisma.question.findMany({
+        where: {
+            language: lang,
+            difficulty: diff,
+            categoryId: catId,
+            OR: [
+                { status: "approved", isPersonal: false },
+                ...(userId ? [{ isPersonal: true, createdBy: userId}] : [])
+            ]
+        },
+        select: { id: true, letter: true, question: true, answer: true },
+    });
+
+    // Agrupa por letra
+    const byLetter = new Map();
+    for (const q of all) {
+        const letter = String(q.letter).toUpperCase();
+        if (!byLetter.has(letter)) byLetter.set(letter, []);
+        byLetter.get(letter).push(q);
+    }
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    // Elige 1 pregunta por letra (si existe)
+    return letters
+        .map((L) => {
+            const candidates = byLetter.get(L);
+            if (!candidates || candidates.length === 0) return null;
+            const pick = candidates[Math.floor(Math.random() * candidates.length)];
+            return { letter: L, questionId: pick.id, question: pick.question, answer: pick.answer };
+        })
+        .filter(Boolean)
+}

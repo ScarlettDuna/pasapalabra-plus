@@ -1,0 +1,30 @@
+name: Notify on push
+
+on:
+  push:
+    branches:
+      - frontend-jaime
+      - frontend
+
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send email notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_PASSWORD }}
+          subject: "[${{ github.repository }}] Push en ${{ github.ref_name }} por ${{ github.actor }}"
+          to: arg91trad@gmail.com
+          from: ${{ secrets.GMAIL_USER }}
+          body: |
+            🔔 Nuevo push en el repositorio ${{ github.repository }}
+
+            👤 Autor: ${{ github.actor }}
+            🌿 Rama: ${{ github.ref_name }}
+            💬 Commit: ${{ github.event.head_commit.message }}
+            🔗 Ver cambios: ${{ github.event.compare }}
