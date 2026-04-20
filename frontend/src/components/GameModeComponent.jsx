@@ -1,7 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./GameModeComponent.css";
+import { getHealth } from "../services/health";
 
 export default function GameModeComponent() {
+
+  const [healthStatus, setHealthStatus] = useState("loading");
+
+  useEffect(() => {
+    async function comprobarBackend() {
+      try {
+        await getHealth();
+        setHealthStatus("success");
+      } catch (error) {
+        setHealthStatus("error");
+        console.error(error);
+      }
+    }
+
+    comprobarBackend();
+  }, []);
+
+  let healthMessage = "Comprobando conexión con el backend...";
+
+  if (healthStatus === "success") {
+    healthMessage = "Backend conectado";
+  }
+
+  if (healthStatus === "error") {
+    healthMessage = "No se pudo conectar con el backend";
+  }
+
   const idiomas = ["ESPAÑOL", "INGLÉS", "FRANCES", "ALEMÁN"];
   const niveles = ["FÁCIL", "MEDIO", "DIFÍCIL"];
   const tematica = ["DEPORTES", "HISTORIA", "GEOGRAFÍA"];
@@ -23,6 +51,10 @@ export default function GameModeComponent() {
 
   return (
     <div className="contenedor-juego">
+      
+     <div className={`health-box health-${healthStatus}`}>
+        {healthMessage}
+      </div>
 
       {/* Fila de Idioma */}
       <div className="fila-selector">

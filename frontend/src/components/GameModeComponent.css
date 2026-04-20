@@ -61,3 +61,25 @@
 .btn-comenzar:hover {
   filter: brightness(1.3);
 }
+
+.health-box {
+  margin-bottom: 20px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.health-loading {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.health-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.health-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
