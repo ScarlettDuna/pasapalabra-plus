@@ -298,3 +298,27 @@ Se ha refactorizado el seed:
 Se han actualizado las categorías del seed: se han eliminado los placeholders de EN/FR que no se usaban (`Vocabulary`, `Vocabulaire`, etc.) y se han añadido las categorías reales que aparecen en el TSV: `General` (type `theme`) y `Definición` y `Traducción` (type `learning`) para EN y FR.
 
 Se ha añadido un usuario de prueba básico al seed (`user@pasapalabra.com` / `user1234`) para facilitar las pruebas del equipo de frontend, junto al usuario admin ya existente.
+
+## Diario de desarrollo - Día 10
+
+**Nombre:** Arantxa
+**Fecha:** *18 abril 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+### Unificación de `POST /games/start` con la carga del rosco
+
+Se ha refactorizado el controlador del rosco para extraer la lógica de selección de preguntas a una función reutilizable `getRoscoQuestions(lang, catId, diff, userId)`, exportada desde `rosco.controller.js`.
+
+Esta función encapsula la consulta a la BD con el filtro OR (preguntas públicas aprobadas + preguntas personales del usuario), la agrupación por letra y la selección aleatoria de una pregunta por letra.
+
+`GET /rosco` sigue existiendo y ahora delega en esta función, eliminando el `gameId` temporal que generaba antes (ya no tiene sentido, el gameId real viene de `startGame`).
+
+`POST /games/start` importa `getRoscoQuestions` y la llama al final del flujo, tras crear la partida en la BD. La respuesta ahora incluye el campo `questions` junto al `gameId` y los datos de la partida. El frontend puede iniciar una partida y obtener las preguntas en una sola llamada HTTP en lugar de dos.
+
+### Ranking con username
+
+Se ha actualizado `GET /ranking` para incluir el nombre del jugador en cada entrada. El campo `playerName` devuelve:
+- El `username` del usuario registrado si la partida está vinculada a un usuario.
+- Un nombre generado automáticamente con el formato `Categoría-DDmmm` (ej. `"Ciencia-18abr"`) para partidas anónimas.
+
+Para obtener estos datos se ha ampliado el `select` de Prisma para incluir el `user` y la `category` a través de la relación `game`, evitando consultas adicionales a la BD. El mapeo del nombre anónimo se realiza en JavaScript con `toLocaleString("es-ES", { month: "short" })` para el formato de mes abreviado.
