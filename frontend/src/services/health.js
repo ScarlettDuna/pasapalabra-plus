@@ -1,4 +1,4 @@
-import API_BASE_URL from "./api";
+import API_URL from "./api";
 
 export async function getHealth() {
   const response = await fetch(`${API_URL}/health`);
