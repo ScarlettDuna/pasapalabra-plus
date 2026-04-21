@@ -34,9 +34,7 @@ export const register = async (req, res, next) => {
             }
         });
 
-        return res.status(201).json( {
-            ok:true,
-            user});
+        return res.status(201).json({ user });
 
     } catch (err) {
         if (err.code === "P2002") {
@@ -80,9 +78,7 @@ export const login = async (req, res, next) => {
             { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
         );
 
-        return res.status(200).json({ 
-            ok: true,
-            token });
+        return res.status(200).json({ token });
 
     } catch (err) {
         next(err);

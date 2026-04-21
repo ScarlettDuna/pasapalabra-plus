@@ -10,7 +10,9 @@ export async function login(email, password) {
         body: JSON.stringify({ email, password }),
     });
 
-    return res.json();
+    const data = await res.json();
+
+    return { ok: res.ok, data }
 }
 
 // REGISTER
@@ -23,5 +25,7 @@ export async function register(username, email, password) {
         body: JSON.stringify({ username, email, password }),
     });
 
-    return res.json();
+    const data = await res.json();
+
+    return { ok: res.ok, data }
 }

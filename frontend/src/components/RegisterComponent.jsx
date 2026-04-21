@@ -13,22 +13,24 @@ export default function RegisterComponent() {
         e.preventDefault();
 
         try {
-            const data = await register(username, email, password);
+            const result = await register(username, email, password);
 
-            console.log("REGISTER RESPONSE:", data);
+            console.log("REGISTER RESPONSE:", result);
 
-            if (!data.ok) {
-                alert("Error al registrarse");
+            if (!result.ok) {
+                alert(result.data.message);
                 return;
             }
 
             alert("Usuario registrado correctamente");
+
+            navigate("/gamemode");
+
         } catch (error) {
             console.error(error);
             alert("Error conectando con el servidor");
         }
 
-        navigate("/gamemode");
     };
 
     const handleGuest = () => {

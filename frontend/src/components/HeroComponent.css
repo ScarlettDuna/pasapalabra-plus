@@ -1,0 +1,19 @@
+.menu {
+    display: flex;
+}
+
+.titulo {
+    font-size: larger;
+}
+
+button {
+    border: 1px solid white;
+}
+
+.botonJugar {
+    background-color: green;
+}
+
+.botonSalir {
+    background-color: red;
+}

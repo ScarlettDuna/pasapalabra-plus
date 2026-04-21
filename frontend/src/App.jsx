@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Login from './pages/Login'; 
 import Register from './pages/Register';
 import GameMode from './pages/GameMode'; 
+import Ranking from './pages/Ranking'; 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/gamemode" element={<GameMode />} />
+        <Route path="/ranking" element={<Ranking />} />
       </Routes>
     </BrowserRouter>
   )

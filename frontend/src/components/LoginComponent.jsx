@@ -12,22 +12,24 @@ export default function LoginComponent() {
         e.preventDefault();
 
         try {
-            const data = await login(email, password);
+            const result = await login(email, password);
 
-            console.log("LOGIN RESPONSE:", data);
+            console.log("LOGIN RESPONSE:", result);
 
-            if (!data.ok) {
-                alert("Credenciales incorrectas");
+            if (!result.ok) {
+                alert(result.data.message);
                 return;
             }
 
             alert("Login correcto");
+
+            navigate("/gamemode");
+
         } catch (error) {
             console.error(error);
             alert("Error conectando con el servidor");
         }
 
-        navigate("/gamemode");
     };
 
     const handleGuest = () => {
