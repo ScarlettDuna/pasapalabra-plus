@@ -8,9 +8,10 @@ import Home from './pages/Home';
 import Login from './pages/Login'; 
 import Register from './pages/Register';
 import GameMode from './pages/GameMode'; 
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>
@@ -22,7 +23,9 @@ function App() {
             </div>
             <h1>PASAPALABRAS-PLUS</h1>
             <h3>By Luis Sampedro, Arantxa Reinoso, Jaime Arenal</h3>
-
+            <Link to="/home">
+              <button className='botonIniciar'>Iniciar</button>
+            </Link>
           </>
         } />
 
