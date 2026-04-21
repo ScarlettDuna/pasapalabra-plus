@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./GameModeComponent.css";
 import { getHealth } from "../services/health";
+import { getCategories } from "../services/categories";
 
 export default function GameModeComponent() {
-
+ // MOSTRAR EL ESTADO DE CONEXION CON EL BACKEND 
   const [healthStatus, setHealthStatus] = useState("loading");
 
   useEffect(() => {
@@ -30,9 +31,33 @@ export default function GameModeComponent() {
     healthMessage = "No se pudo conectar con el backend";
   }
 
-  const idiomas = ["ESPAÑOL", "INGLÉS", "FRANCES", "ALEMÁN"];
+// CARGAR CATEGORIAS DE LA BBDD
+
+useEffect(() => {
+  async function cargarCategorias() {
+    const idiomaActual = idiomas[indice];
+    const languageMap = {
+      "ESPAÑOL": "ES",
+      "INGLÉS": "EN",
+      "FRANCES": "FR",
+    };
+
+    const languageCode = languageMap[idiomaActual];
+    const data = await getCategories(languageCode);
+    setCategorias(data);
+    setIndiceTematica(0);
+  }
+
+  cargarCategorias();
+}, [indice]);
+
+
+
+  const idiomas = ["ESPAÑOL", "INGLÉS", "FRANCES"];
   const niveles = ["FÁCIL", "MEDIO", "DIFÍCIL"];
-  const tematica = ["DEPORTES", "HISTORIA", "GEOGRAFÍA"];
+  //const tematica = ["DEPORTES", "HISTORIA", "GEOGRAFÍA"];
+  const [categorias, setCategorias] = useState([]);
+
   // definimos estado, indices empezando por 0
   const [indice, setIndice] = useState(0);
   function cambiarIdioma() {
