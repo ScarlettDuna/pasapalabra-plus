@@ -69,12 +69,12 @@
   font-weight: bold;
 }
 
-.health-loading {
+.health-cargando {
   background-color: #fff3cd;
   color: #856404;
 }
 
-.health-success {
+.health-bien {
   background-color: #d4edda;
   color: #155724;
 }

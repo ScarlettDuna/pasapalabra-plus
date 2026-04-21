@@ -4,102 +4,91 @@ import { getHealth } from "../services/health";
 import { getCategories } from "../services/categories";
 
 export default function GameModeComponent() {
- // MOSTRAR EL ESTADO DE CONEXION CON EL BACKEND 
-  const [healthStatus, setHealthStatus] = useState("loading");
+  const idiomas = ["ESPAÑOL", "INGLES", "FRANCES"];
+  const niveles = ["FACIL", "MEDIO", "DIFICIL"];
 
+  const [healthStatus, setHealthStatus] = useState("cargando"); //para saber como va la conexion con la bbdd
+  const [categorias, setCategorias] = useState([]);
+  const [indiceIdioma, setIndice] = useState(0); // indice del idioma , empeznado por 0 ES
+  const [indiceDificultad, setIndiceDificultad] = useState(0);
+  const [indiceTematica, setIndiceTematica] = useState(0);
+
+  // COMPROBAMOS QUE ESTÁ CORRECTAMENTE CONECTADO AL BACKEND Y MOSTRAMOS
   useEffect(() => {
     async function comprobarBackend() {
       try {
-        await getHealth();
-        setHealthStatus("success");
+        await getHealth(); // llamada a back para comprobar
+        setHealthStatus("bien"); // si funciona guardamos "bien"
       } catch (error) {
         setHealthStatus("error");
         console.error(error);
       }
     }
-
     comprobarBackend();
   }, []);
 
-  let healthMessage = "Comprobando conexión con el backend...";
+  // useffect  cargar categorias
+  useEffect(() => {
+    async function cargarCategorias() {
+      const codigosIdioma = ["ES", "EN", "FR"];
 
-  if (healthStatus === "success") {
-    healthMessage = "Backend conectado";
+      const languageCode = codigosIdioma[indiceIdioma];
+      const data = await getCategories(languageCode);
+      setCategorias(data); // se piden las categorias seleccionadas filtradas por idioma al backend y se guardan en data
+    }
+
+    cargarCategorias();
+  }, [indiceIdioma]); // ejecuntamos este effect cada vez que cambie el indice idioma
+
+  let mensajeConexion = "Comprobando conexion con el backend...";
+
+  if (healthStatus === "bien") {
+    mensajeConexion = "Backend conectado";
   }
 
   if (healthStatus === "error") {
-    healthMessage = "No se pudo conectar con el backend";
+    mensajeConexion = "No se pudo conectar con el backend";
   }
 
-// CARGAR CATEGORIAS DE LA BBDD
+  let nombreCategoria = "CARGANDO CATEGORIAS...";  // por defecto si no cargan
 
-useEffect(() => {
-  async function cargarCategorias() {
-    const idiomaActual = idiomas[indice];
-    const languageMap = {
-      "ESPAÑOL": "ES",
-      "INGLÉS": "EN",
-      "FRANCES": "FR",
-    };
-
-    const languageCode = languageMap[idiomaActual];
-    const data = await getCategories(languageCode);
-    setCategorias(data);
-    setIndiceTematica(0);
+  if (categorias.length > 0) {
+    nombreCategoria = categorias[indiceTematica].name; // http://localhost:5000/api/categories?language=ES
   }
 
-  cargarCategorias();
-}, [indice]);
-
-
-
-  const idiomas = ["ESPAÑOL", "INGLÉS", "FRANCES"];
-  const niveles = ["FÁCIL", "MEDIO", "DIFÍCIL"];
-  //const tematica = ["DEPORTES", "HISTORIA", "GEOGRAFÍA"];
-  const [categorias, setCategorias] = useState([]);
-
-  // definimos estado, indices empezando por 0
-  const [indice, setIndice] = useState(0);
   function cambiarIdioma() {
-    setIndice((indice + 1) % idiomas.length); // % hace que retorne a 0 cuando llegue al final
+    setIndice((indiceIdioma + 1) % idiomas.length);
   }
 
-  const [indiceDificultad, setIndiceDificultad] = useState(0);
   function cambiarDificultad() {
-    setIndiceDificultad((indiceDificultad + 1) % niveles.length); // % hace que retorne a 0 cuando llegue al final
+    setIndiceDificultad((indiceDificultad + 1) % niveles.length);
   }
 
-  const [indiceTematica, setIndiceTematica] = useState(0);
   function cambiarTematica() {
-    setIndiceTematica((indiceTematica + 1) % tematica.length); // % hace que retorne a 0 cuando llegue al final
+    if (categorias.length === 0) return;
+    setIndiceTematica((indiceTematica + 1) % categorias.length);
   }
 
   return (
     <div className="contenedor-juego">
-      
-     <div className={`health-box health-${healthStatus}`}>
-        {healthMessage}
-      </div>
+      <div className={`health-box health-${healthStatus}`}>{mensajeConexion}</div>
 
-      {/* Fila de Idioma */}
       <div className="fila-selector">
         <p className="etiqueta-idioma">IDIOMA</p>
         <span className="flecha">↔</span>
         <button className="btn-idioma" onClick={cambiarIdioma}>
-          {idiomas[indice]}
+          {idiomas[indiceIdioma]}
         </button>
       </div>
 
-      {/* Fila de Temática */}
       <div className="fila-selector">
-        <p className="etiqueta-tematica">TEMÁTICA</p>
+        <p className="etiqueta-tematica">TEMATICA</p>
         <span className="flecha">↔</span>
         <button className="btn-tematica" onClick={cambiarTematica}>
-          {tematica[indiceTematica]}
+          {nombreCategoria}
         </button>
       </div>
 
-      {/* Fila de Dificultad */}
       <div className="fila-selector">
         <p className="etiqueta-dificultad">DIFICULTAD</p>
         <span className="flecha">↔</span>
