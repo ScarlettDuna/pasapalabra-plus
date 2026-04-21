@@ -9,4 +9,4 @@ export async function getCategories(language) {
 
   return response.json();
 }
-// aqui cargamos las categorias en un json para luego leerlas desde el juego
+// funcion para cargar las categorias en un json para luego leerlas desde el juego
