@@ -1,4 +1,148 @@
-* {
-    color: white;
+.rosco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  padding: 20px;
+}
+
+.rosco-circulo {
+  position: relative;
+  width: 400px;
+  height: 400px;
+}
+
+.rosco-letra {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #0b63c9;
+  background-color: #ffd700;
+  color: black;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rosco-letra.activa {
+  background-color: #ff5722;
+  color: white;
+  border-color: #b93b15;
+}
+
+.rosco-centro {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background-color: #4caf50;
+  border: 4px solid #2f7d32;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.rosco-centro p,
+.rosco-centro h3,
+.rosco-centro span {
+  margin: 5px 0;
+  color: white;
+}
+
+.rosco-centro h3 {
+  font-size: 2.5rem;
+}
+
+.rosco-pregunta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.rosco-pregunta p {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 0;
+  width: 100%;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.rosco-pregunta input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 20px;
+  border: 2px solid #ffd700;
+  font-size: 1rem;
+  box-sizing: border-box;
+  color: black;
+}
+
+.rosco-botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+
+.rosco-botones button {
+  border: none;
+  border-radius: 25px;
+  padding: 12px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  min-width: 130px;
+}
+
+.rosco-botones button:first-child {
+  background-color: #ffd700;
+  color: black;
+}
+
+.rosco-botones button:nth-child(2) {
+  background-color: #4caf50;
+  color: white;
+}
+
+.rosco-botones button:last-child {
+  background-color: #ff5722;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .rosco-circulo {
+    width: 320px;
+    height: 320px;
+  }
+
+  .rosco-letra {
+    width: 34px;
+    height: 34px;
+    font-size: 0.85rem;
+  }
+
+  .rosco-centro {
+    width: 130px;
+    height: 130px;
+  }
+
+  .rosco-centro h3 {
+    font-size: 2rem;
+  }
 }
 
