@@ -118,19 +118,46 @@ La lógica de logros se ha extraído a `src/utils/achievements.js` en lugar de p
 
 ---
 
-## Expiración del token JWT — 7 días
+## Sistema de refresh tokens — access token 1h + refresh token 7 días
 
-El token JWT de sesión tiene una validez de 7 días.
+Se ha diseñado un sistema de doble token para equilibrar seguridad y experiencia de usuario:
 
-La alternativa habitual en aplicaciones con datos sensibles es usar tokens de corta duración (15-60 minutos) combinados con un sistema de refresh tokens: cuando el token de acceso expira, el cliente lo renueva automáticamente usando un refresh token de larga duración almacenado de forma segura.
+- **Access token** (JWT): validez de **1 hora**. Se adjunta en el header `Authorization: Bearer` en cada request autenticado. Al expirar, el servidor devuelve 401.
+- **Refresh token** (UUID opaco): validez de **7 días**, almacenado en la tabla `RefreshToken` de la BD. No contiene información del usuario — es solo un identificador que el servidor cruza contra la BD para emitir un nuevo access token.
 
-En Pasapalabra+ se ha optado por un token de 7 días por las siguientes razones:
+### Por qué 1h para el access token
 
-- La aplicación es un juego. No se almacenan datos sensibles como información bancaria, datos médicos o contraseñas en texto plano.
-- Obligar al usuario a hacer login cada hora rompe el flujo de juego sin aportar una mejora de seguridad relevante para este contexto.
-- Implementar un sistema de refresh tokens añade complejidad significativa (nuevo endpoint, tabla en base de datos, lógica de rotación y revocación) que no está justificada para el alcance de este proyecto.
+Un token de 7 días (la configuración anterior) significa que un token robado es válido durante una semana sin posibilidad de revocarlo, ya que los JWT son stateless. Con 1 hora, la ventana de exposición se reduce drásticamente.
 
-En una aplicación en producción con datos sensibles, se implementaría el patrón de refresh tokens.
+Se descartó un expiry muy corto (15 minutos) porque en una sesión de juego activa el usuario estaría renovando el token constantemente, lo que añade latencia perceptible. 1 hora cubre cualquier sesión de juego razonable sin interrupciones.
+
+### Por qué el refresh token es un UUID y no otro JWT
+
+Un refresh token JWT podría validarse sin consultar la BD, pero eso impide revocarlo (logout, cuenta comprometida). Al usar un UUID opaco almacenado en BD, el logout simplemente borra la fila — el token queda inválido de inmediato aunque no haya expirado.
+
+### Modelo de datos
+
+```prisma
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+```
+
+### Variables de entorno a añadir
+
+```env
+JWT_EXPIRES_IN="1h"
+REFRESH_TOKEN_EXPIRES_IN="7d"
+```
+
+### Estado de implementación
+
+> **Pendiente**. El diseño está completo. La implementación (backend + frontend) queda pendiente de coordinación. Ver `api.md` para el contrato de los endpoints y el patrón de interceptor recomendado para el frontend.
 
 ---
 
@@ -149,22 +176,55 @@ No es duplicar lógica — es aplicar el principio de que el cliente no es de co
 
 ---
 
+## Estados de partida y cron de limpieza
+
+Al finalizar una partida, el único indicador de que había terminado era `endedAt`. Las partidas que el usuario abandonaba (cerrar el navegador, perder conexión) quedaban sin `endedAt` indefinidamente, acumulando filas inútiles en la tabla `Game`.
+
+Se evaluaron dos enfoques para limpiarlas:
+
+- **Solo `endedAt`**: marcar `endedAt` al detectar inactividad. Simple, pero no permite distinguir semánticamente entre una partida terminada correctamente y una abandonada.
+- **Campo `status` + cron**: añadir un enum (`active` / `finished` / `abandoned`) y un proceso que revise periódicamente las partidas activas muy antiguas.
+
+Se eligió el campo `status` por las siguientes razones:
+
+- **Semántica explícita**: `status: 'abandoned'` comunica la razón del cierre, no solo el hecho. Esto es útil para estadísticas futuras (tasa de abandono, duración media antes de abandonar, etc.) y para el filtrado en queries.
+- **El cron es la solución correcta para limpieza periódica**: un timeout en memoria (setTimeout) se perdería si el servidor se reinicia. Un cron persiste entre reinicios porque actúa sobre el estado de la BD, no sobre el estado del proceso.
+- **`startGame` como segunda línea de defensa**: cuando el usuario vuelve a jugar, el controller abandona su partida activa anterior en el mismo request, sin esperar al cron. El cron solo es necesario para usuarios que no vuelven.
+
+El intervalo del cron es 10 minutos con un umbral de abandono de 15 minutos. Un rosco tiene 26 preguntas; 15 minutos es tiempo más que suficiente para terminarlo. Esta combinación garantiza que ninguna partida huérfana persiste más de 25 minutos en la BD.
+
+---
+
+## Validación de respuestas en `finishGame` — defensa en profundidad
+
+El endpoint `POST /games/:gameId/finish` recibe del frontend un array de respuestas `{ questionId, answer }`. El backend verifica cada respuesta contra la BD de forma independiente, pero el array en sí puede contener datos malformados o malintencionados.
+
+Se han implementado tres capas de validación antes de calcular el score:
+
+1. **Validación de forma de cada item**: se comprueba que cada elemento del array es un objeto con `questionId` y `answer` de tipo string. Esto previene crashes por `null.trim()` o por intentar acceder a propiedades de un valor primitivo.
+
+2. **Deduplicación por `questionId`**: un cliente podría enviar el mismo `questionId` dos veces (bug o manipulación). Sin deduplicar, esa respuesta contaría doble en `correct` y `wrong`, inflando la puntuación. Se deduplica quedándose con la primera ocurrencia.
+
+3. **Verificación de existencia en BD**: tras el `findMany` de preguntas, se comprueba que todos los `questionId` enviados tienen correspondencia en la BD. Un ID inventado no aparecería en el `answerMap` y la operación `.answer.trim()` produciría un crash. En lugar de un 500, se devuelve un 400 controlado.
+
+Estas validaciones no cambian el comportamiento para un cliente que opera correctamente — solo blindan el endpoint ante datos inesperados.
+
+---
+
 ## Unificación de `POST /games/start` con la carga del rosco
 
-*(pendiente de implementar)*
-
-Actualmente el flujo de inicio de partida requiere dos llamadas HTTP desde el frontend:
+El flujo original de inicio de partida requería dos llamadas HTTP desde el frontend:
 
 1. `POST /games/start` — crea la partida y devuelve el `gameId`.
 2. `GET /rosco?language=...&categoryId=...&difficulty=...` — carga las preguntas.
 
-Se ha diseñado un cambio para que `POST /games/start` devuelva también las preguntas del rosco en la misma respuesta, reduciendo el flujo a una sola llamada.
+Se ha refactorizado para que `POST /games/start` devuelva también las preguntas del rosco en la misma respuesta, reduciendo el flujo a una sola llamada.
 
 ### Implementación
 
-La lógica de selección de preguntas se extrae de `rosco.controller.js` a una función reutilizable `getRoscoQuestions(language, categoryId, difficulty, userId)`. Esta función es usada tanto por el endpoint `GET /rosco` (que permanece sin cambios) como por `startGame` al final de su ejecución.
+La lógica de selección de preguntas se extrajo de `rosco.controller.js` a una función reutilizable `getRoscoQuestions(language, categoryId, difficulty, userId)`. Esta función es usada tanto por `GET /rosco` (que permanece disponible) como por `startGame` al final de su ejecución.
 
-La respuesta de `POST /games/start` pasará a incluir el campo `questions`:
+La respuesta de `POST /games/start` incluye el campo `questions`:
 
 ```json
 {
@@ -176,7 +236,7 @@ La respuesta de `POST /games/start` pasará a incluir el campo `questions`:
       "questionId": "uuid", 
       "question": "...", 
       "answer": "Atenas" 
-    }, {"..."}
+    }
   ]
 }
 ```
