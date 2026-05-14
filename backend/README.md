@@ -1,5 +1,5 @@
 # Pasapalabra+ — Backend
-## Última actualización: 6 de abril de 2026.
+## Última actualización: 4 de mayo de 2026.
 
 API REST desarrollada con Node.js + Express + PostgreSQL.
 
@@ -25,7 +25,8 @@ Crea un archivo `.env` en la carpeta `backend/` con el siguiente contenido:
 PORT=5000
 DATABASE_URL="postgresql://pasapalabra_user:pasapalabra_pass@localhost:5432/pasapalabra_db"
 JWT_SECRET="super_clave_larga_y_aleatoria_123"
-JWT_EXPIRES_IN="7d"
+JWT_EXPIRES_IN="1h"
+REFRESH_TOKEN_EXPIRES_IN="7d"
 CORS_ORIGIN="http://localhost:5173"
 FRONTEND_URL="http://localhost:5173"
 
@@ -126,7 +127,9 @@ backend/
 |--------|------|------|-------------|
 | GET | `/api/health` | No | Estado del servidor |
 | POST | `/api/auth/register` | No | Registro de usuario |
-| POST | `/api/auth/login` | No | Login, devuelve JWT |
+| POST | `/api/auth/login` | No | Login, devuelve access token + refresh token |
+| POST | `/api/auth/refresh` | No | Renovar access token con el refresh token |
+| POST | `/api/auth/logout` | No | Invalidar refresh token |
 | GET | `/api/categories?language=ES` | No | Categorías por idioma |
 | GET | `/api/rosco?language=ES&categoryId=3&difficulty=easy` | No | Preguntas del rosco |
 | POST | `/api/games/start` | Opcional | Iniciar partida y preguntas del rosco|
@@ -139,6 +142,7 @@ backend/
 | GET | `/api/auth/google` | No | Login con Google (OAuth) |
 | GET | `/api/auth/github` | No | Login con GitHub (OAuth) |
 | POST | `/api/questions` | Sí | Crear pregunta personalizada |
+| GET | `/api/questions/mine` | Sí | Ver preguntas propias con estado de moderación |
 | GET | `/api/admin/questions/pending` | Sí (admin) | Ver preguntas pendientes |
 | PATCH | `/api/admin/questions/:id/approve` | Sí (admin) | Aprobar pregunta |
 | PATCH | `/api/admin/questions/:id/reject` | Sí (admin) | Rechazar pregunta |
@@ -147,14 +151,12 @@ La documentación completa de la API está en `documentacion/api.md`.
 
 ---
 
-## Mejoras planificadas
+## Pendiente
 
-Las siguientes funcionalidades están diseñadas y pendientes de implementar:
-
-| # | Descripción | Notas |
-|---|-------------|-------|
-| 1 | ~~**Ranking con username**~~ | ✅ Implementado. `GET /ranking` devuelve `playerName` con el username del jugador registrado o un nombre generado `Categoría-DDmmm` para partidas anónimas. |
-| 2 | ~~**Unificar `POST /games/start` con la carga del rosco**~~ | ✅ Implementado. `startGame` devuelve ya las preguntas en la misma respuesta. `GET /rosco` sigue disponible. |
-| 3 | **Limpieza de partidas no terminadas** | Las partidas sin `endedAt` acumulan ruido en la BD. Se implementará un mecanismo (setTimeout / cron) que marque como abandonadas las partidas con más de 10 minutos de antigüedad sin finalizar. |
-| 4 | **`GET /questions/mine`** | Endpoint para que el usuario consulte sus propias preguntas personalizadas con su estado de moderación (aprobada, pendiente, rechazada). |
-| 5 | **Refresh tokens** | Sistema de tokens de corta duración + refresh token. Baja prioridad, solo si hay tiempo antes de la entrega. |
+| | Tarea | Notas |
+|---|-------|-------|
+| ✅ | **ESLint** | Configurado con `eslint.config.js` |
+| ⬜ | **Helmet.js** | Headers de seguridad HTTP |
+| ⬜ | **Rate limiting en `/auth/login`** | Prevenir fuerza bruta con `express-rate-limit` |
+| ⬜ | **Limpiar refresh tokens expirados en el cron** | Añadir un `deleteMany` en `timeout.js` para tokens con `expiresAt < now` |
+| ⬜ | **Tests con Supertest** | Cubrir login, start/finish de partida y ranking |
