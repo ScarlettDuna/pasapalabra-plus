@@ -6,7 +6,7 @@ async function grantAchievement(userId, achievement, tx = prisma) {
       data: { userId, achievement }
     })
   } catch {
-
+    // El logro ya existe — ignorar duplicado
   }
 }
 
@@ -57,11 +57,11 @@ export async function checkAndGrantAchievements(userId) {
   if (questions >= 5) await grantAchievement(userId, "EDITOR");
 
   if (lastScore) {
-    await checkDictionaryKing(userId, lastScore.score);
+    await checkDictionaryKing(userId);
   }
 }
 
-async function checkDictionaryKing(userId, scoreValue) {
+async function checkDictionaryKing(userId) {
   // ¿Es este score el más alto global?
   const topScore = await prisma.score.findFirst({
     orderBy: { score: "desc" },

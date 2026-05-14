@@ -51,3 +51,20 @@ export const createQuestion = async (req, res, next) => {
     next(err)
   }
 }
+
+export const getMyQuestions = async (req, res, next) => {
+  try {
+    const questions = await prisma.question.findMany({
+      where: { createdBy: req.user.userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true, letter: true, question: true, answer: true, language: true, difficulty: true, categoryId: true,
+        isPersonal: true, status: true, createdAt: true
+      }
+    });
+
+    res.status(200).json(questions);
+  } catch (err) {
+    next(err)
+  }
+}

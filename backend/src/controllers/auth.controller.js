@@ -1,7 +1,24 @@
 import { prisma } from "../db/prisma.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
+export async function generateTokenPair(user) {
+    const token = jwt.sign(
+        { userId: user.id, username: user.username, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+    );
+
+    const refreshToken = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 días
+
+    await prisma.refreshToken.create({
+        data: { token: refreshToken, userId: user.id, expiresAt }
+    })
+
+    return { token, refreshToken };
+}
 
 export const register = async (req, res, next) => {
     try {
@@ -68,18 +85,55 @@ export const login = async (req, res, next) => {
             return res.status(401).json({ message: "Credenciales inválidas" });
         }
 
+        const tokens = await generateTokenPair(user);
+
+        return res.status(200).json(tokens);
+
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+export const refresh = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(400).json({ message: "refreshToken obligatorio" });
+        }
+
+        const stored = await prisma.refreshToken.findUnique({
+            where: { token: refreshToken },
+            include: { user: { select: { id: true, username: true, role: true } } }
+        });
+
+        if (!stored || stored.expiresAt < new Date()) {
+            return res.status(401).json({ message: "Refresh token inválido o expirado" });
+        }
+
         const token = jwt.sign(
-            {
-                userId: user.id,
-                username: user.username,
-                role: user.role
-            },
+            { userId: stored.user.id, username: stored.user.username, role: stored.user.role },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+            { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
         );
 
         return res.status(200).json({ token });
+    } catch (err) {
+        next(err);
+    }
+};
 
+export const logout = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.body;
+        if (!refreshToken) {
+            return res.status(400).json({ message: "refreshToken obligatorio" });
+        }
+
+        // deleteMany en lugar de delete: no falla si el token ya no existe
+        await prisma.refreshToken.deleteMany({ where: { token: refreshToken } });
+
+        return res.status(200).json({ message: "Sesión cerrada" });
     } catch (err) {
         next(err);
     }

@@ -47,6 +47,12 @@ model Question {
   @@index([letter])
 }
 
+enum GameStatus {
+  active
+  finished
+  abandoned
+}
+
 model Game {
   id         String @id @default(uuid())
   language   String // ES | EN | FR
@@ -64,6 +70,7 @@ model Game {
   
   score      Score?
   answers    GameAnswer[]
+  status     GameStatus @default(active) // 'active' | 'finished' | 'abandoned'
   
   @@index([language, difficulty, categoryId])
 }
@@ -90,6 +97,7 @@ model User {
 
   games         Game[]
   achievement   UserAchievement[]
+  refreshTokens    RefreshToken[]  
 }
 
 model GameAnswer {
@@ -111,4 +119,13 @@ model UserAchievement {
   revokedAt   DateTime?
 
   @@index([userId, achievement])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

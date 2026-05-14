@@ -12,9 +12,14 @@ import passport from "./src/config/passport.js";
 import adminRoutes from "./src/routes/admin.routes.js";
 import questionRoutes from "./src/routes/questions.routes.js"
 
+import { initCronJobs } from "./src/utils/timeout.js";
+
 dotenv.config();
 
 const app = express();
+
+// Inicia el cron que se encarga de limpiar partidas abandonadas
+initCronJobs();
 
 // Config
 const PORT = process.env.PORT || 5000;

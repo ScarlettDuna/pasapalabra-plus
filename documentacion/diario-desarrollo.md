@@ -322,3 +322,46 @@ Se ha actualizado `GET /ranking` para incluir el nombre del jugador en cada entr
 - Un nombre generado automáticamente con el formato `Categoría-DDmmm` (ej. `"Ciencia-18abr"`) para partidas anónimas.
 
 Para obtener estos datos se ha ampliado el `select` de Prisma para incluir el `user` y la `category` a través de la relación `game`, evitando consultas adicionales a la BD. El mapeo del nombre anónimo se realiza en JavaScript con `toLocaleString("es-ES", { month: "short" })` para el formato de mes abreviado.
+
+---
+
+## Diario de desarrollo - Día 11
+
+**Nombre:** Arantxa
+**Fecha:** *4 mayo 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+### Sistema de estados y limpieza de partidas huérfanas
+
+Se ha añadido el campo `status` al modelo `Game` con tres valores posibles mediante un enum de Prisma: `active`, `finished` y `abandoned`. Antes el único indicador de si una partida había terminado era la presencia de `endedAt`, lo que dejaba las partidas no completadas sin un estado explícito y acumulando ruido en la base de datos.
+
+Los cambios implementados son:
+
+- **Enum `GameStatus` en el schema**: `active` es el valor por defecto al crear una partida. `finished` se asigna al completarla con éxito en `finishGame`. `abandoned` marca las partidas que nunca se terminaron.
+- **Cron de limpieza** (`src/utils/timeout.js`): se ejecuta cada 10 minutos y marca como `abandoned` todas las partidas con `status: 'active'` cuyo `startedAt` tenga más de 15 minutos de antigüedad. Se inicializa en `server.js` con `initCronJobs()` al arrancar el servidor.
+- **Auto-cierre en `startGame`**: cuando un usuario registrado inicia una partida nueva, el controller abandona automáticamente cualquier partida `active` previa suya antes de crear la nueva. Esto cubre el caso de usuarios que cierran el navegador a mitad de partida y vuelven a jugar.
+- **Verificación de estado en `finishGame`**: el check de partida ya terminada ahora usa `status !== 'active'` en lugar de `endedAt !== null`, lo que también caza correctamente las partidas marcadas como `abandoned` por el cron.
+
+### Validación robusta de respuestas en `finishGame`
+
+Se han añadido tres capas de validación al array de respuestas que llega al endpoint `POST /games/:gameId/finish`:
+
+1. **Validación de forma**: cada item del array debe ser un objeto con `questionId` (string) y `answer` (string). Antes, un `answer: null` o un item que no fuera objeto provocaba un crash en `.trim()`.
+2. **Deduplicación por `questionId`**: si el cliente envía el mismo `questionId` dos veces, se queda solo con la primera ocurrencia. Sin esto, los duplicados inflaban `correct` y `wrong`.
+3. **Verificación de existencia en BD**: tras buscar las preguntas con `findMany`, se comprueba que todos los `questionId` enviados están en el mapa resultante. Si alguno no existe en la BD, se devuelve 400. Antes, `answerMap.get(id)` devolvía `undefined` y la operación siguiente crashaba con un error 500.
+
+Además se ha reorganizado el orden de las validaciones: la partida se busca y valida (404, 403, 409) **antes** de consultar las preguntas en BD, evitando queries innecesarias cuando la partida no existe o el usuario no tiene permiso.
+
+### Sistema de refresh tokens
+
+Se ha implementado el sistema de doble token para autenticación. El access token JWT pasa a tener una validez de **1 hora** (antes 7 días) y se introduce un refresh token de **7 días** almacenado en BD para renovarlo sin obligar al usuario a hacer login.
+
+Cambios realizados:
+
+- **Nuevo modelo `RefreshToken`** en el schema con campos `token` (UUID único), `userId`, `expiresAt` y `createdAt`. Migración: `add_refresh_tokens`.
+- **`generateTokenPair(user)`**: función helper exportada desde `auth.controller.js` que firma el JWT y crea el registro del refresh token en BD en una sola llamada. La usan tanto `login` como los callbacks de OAuth.
+- **`POST /auth/refresh`**: recibe el refresh token, lo busca en BD con su usuario relacionado, comprueba que no ha expirado y emite un nuevo access token. No rota el refresh token.
+- **`POST /auth/logout`**: elimina el refresh token de BD con `deleteMany` (no falla si ya no existe). A partir de ese momento el token queda inválido aunque no haya expirado.
+- **Callbacks OAuth** (Google y GitHub): actualizados para ser `async` y usar `generateTokenPair`. La URL de redirección ahora incluye ambos parámetros: `?token=...&refreshToken=...`.
+
+La documentación del flujo completo para el frontend (almacenamiento de tokens, patrón de interceptor con Axios, gestión de 401) está en `documentacion/api.md`.

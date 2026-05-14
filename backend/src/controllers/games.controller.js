@@ -43,6 +43,21 @@ export const startGame = async (req, res, next) => {
             return res.status(404).json({ message: "Categoría no encontrada" });
         }
 
+        // Verifica que no haya quedado una jugada empezada de ese mismo usuario
+        if (req.user?.userId) {
+            await prisma.game.updateMany({
+                where: {
+                    userId: req.user?.userId,
+                    status: 'active'
+                },
+                data: {
+                    status: 'abandoned',
+                    endedAt: new Date()
+                }
+            })
+        }
+        
+
         const game = await prisma.game.create({
             data: {
                 language: lang,
@@ -75,11 +90,25 @@ export const finishGame = async (req, res, next) => {
         if (answers === undefined ) {
             return res.status(400).json({ message: "Body obligatorio: array de answers" });
         }
+        if (!Array.isArray(answers)) {
+            return res.status(400).json({ message: "answers debe ser un array" });
+        }
+        for (const a of answers) {
+            if (!a || typeof a.questionId !== 'string' || typeof a.answer !== 'string') {
+                return res.status(400).json({ message: "Cada answer debe tener questionId (string) y answer (string)" })
+            }
+        }
 
+        const seen = new Set();
+        const dedupedAnswers = answers.filter(a => {
+            if (seen.has(a.questionId)) return false;
+            seen.add(a.questionId);
+            return true;
+        })
         let correct = 0;
         let wrong = 0;
 
-        const questionIds = answers.map(a => a.questionId);
+        const questionIds = dedupedAnswers.map(a => a.questionId);
         const dbQuestions = await prisma.question.findMany({
             where: { id: { in: questionIds } },
             select: { id: true, answer: true, letter: true }
@@ -87,7 +116,12 @@ export const finishGame = async (req, res, next) => {
         // Convertir a mapa para acceso rápido
         const answerMap = new Map(dbQuestions.map(q => [q.id, { answer: q.answer, letter: q.letter}]));
 
-        for (let answer of answers) {
+        const unknownIds = questionIds.filter(id => !answerMap.has(id));
+        if (unknownIds.length > 0) {
+            return res.status(400).json({ message: "Algunas preguntas no pertenecen a este rosco" })
+        }
+
+        for (let answer of dedupedAnswers) {
             const correctAnswer = answerMap.get(answer.questionId);
             if (answer.answer.trim().toLowerCase() === correctAnswer.answer.trim().toLowerCase()) {
                 correct += 1;
@@ -126,7 +160,7 @@ export const finishGame = async (req, res, next) => {
         const result = await prisma.$transaction(async (tx) => {
             const updatedGame = await tx.game.update({
                 where: { id: gameId },
-                data: { endedAt, duration },
+                data: { endedAt, duration, status: 'finished' },
                 select: { id: true, endedAt: true, duration: true },
             });
 

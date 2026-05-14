@@ -54,7 +54,7 @@ Errores:
 ---
 
 ### POST /auth/login
-Iniciar sesión. Devuelve un token JWT con validez de 7 días.
+Iniciar sesión. Devuelve un access token JWT (validez **1 hora**) y un refresh token (validez **7 días**).
 
 Body:
 ```json
@@ -67,13 +67,117 @@ Body:
 Response 200:
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs..."
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "refreshToken": "uuid-opaco"
 }
 ```
 
 Errores:
 - 400 → Faltan campos obligatorios
 - 401 → Credenciales inválidas
+
+---
+
+### POST /auth/refresh
+Obtener un nuevo access token usando el refresh token. Llamar cuando el servidor devuelva 401 con el access token caducado.
+
+Body:
+```json
+{
+  "refreshToken": "uuid-opaco"
+}
+```
+
+Response 200:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+Errores:
+- 400 → `refreshToken` ausente
+- 401 → Refresh token inválido o expirado
+
+---
+
+### POST /auth/logout
+Invalidar el refresh token del usuario. Llamar al cerrar sesión.
+
+Body:
+```json
+{
+  "refreshToken": "uuid-opaco"
+}
+```
+
+Response 200:
+```json
+{
+  "message": "Sesión cerrada"
+}
+```
+
+Errores:
+- 400 → `refreshToken` ausente
+
+---
+
+## Flujo de autenticación para el frontend
+
+> **Importante**: leer este apartado antes de implementar cualquier llamada autenticada.
+
+### Almacenamiento de tokens
+
+| Token | Dónde guardar | Por qué |
+|-------|---------------|---------|
+| `token` (access) | `localStorage` o memoria | Acceso rápido para adjuntar en headers |
+| `refreshToken` | `localStorage` | Persiste entre sesiones; no contiene datos sensibles, solo un UUID opaco |
+
+### Flujo normal
+
+1. El usuario hace login → guardar `token` y `refreshToken`.
+2. Cada request autenticado lleva el header `Authorization: Bearer <token>`.
+3. Si el servidor devuelve **401**, el access token ha expirado → llamar a `POST /auth/refresh` con el `refreshToken`.
+4. Si `/auth/refresh` devuelve un nuevo `token` → guardarlo y reintentar el request original.
+5. Si `/auth/refresh` devuelve **401** → el refresh token ha expirado o es inválido → redirigir al login y borrar ambos tokens de `localStorage`.
+
+### Patrón recomendado — interceptor con Axios
+
+```js
+// Ejemplo con Axios
+api.interceptors.response.use(
+  response => response,
+  async error => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) { /* redirigir a login */ return Promise.reject(error); }
+      try {
+        const { data } = await axios.post("/api/auth/refresh", { refreshToken });
+        localStorage.setItem("token", data.token);
+        original.headers["Authorization"] = `Bearer ${data.token}`;
+        return api(original);
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        /* redirigir a login */
+        return Promise.reject(error);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+### OAuth (Google / GitHub)
+
+El callback de OAuth también devuelve ambos tokens en la URL de redirección:
+```
+http://localhost:5173/auth/callback?token=...&refreshToken=...
+```
+El frontend debe leer y guardar ambos parámetros.
 
 ---
 
@@ -227,12 +331,12 @@ Errores:
 ### GET /auth/google
 Inicia el flujo de autenticación con Google. Redirige al usuario a la pantalla de autorización de Google. No requiere body ni headers.
 
-Al completar la autorización, Google redirige a `/auth/google/callback`, que genera un JWT y redirige al frontend:
+Al completar la autorización, Google redirige a `/auth/google/callback`, que genera ambos tokens y redirige al frontend:
 ```
-http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1NiIs...
+http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1NiIs...&refreshToken=uuid-opaco
 ```
 
-El frontend debe leer el token de la URL y guardarlo en `localStorage`.
+El frontend debe leer ambos tokens de la URL y guardarlos en `localStorage`.
 
 ---
 
@@ -240,7 +344,7 @@ El frontend debe leer el token de la URL y guardarlo en `localStorage`.
 Mismo flujo que Google pero con GitHub. Redirige a `/auth/github/callback` tras la autorización.
 
 ```
-http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1NiIs...
+http://localhost:5173/auth/callback?token=eyJhbGciOiJIUzI1NiIs...&refreshToken=uuid-opaco
 ```
 
 ---
@@ -388,6 +492,39 @@ Response 201:
 
 Errores:
 - 400 → Faltan campos obligatorios o valores inválidos
+- 401 → Token no proporcionado o inválido
+
+---
+
+### GET /questions/mine
+Obtener todas las preguntas creadas por el usuario autenticado, ordenadas de más reciente a más antigua.
+
+Headers:
+```
+Authorization: Bearer <token>  (obligatorio)
+```
+
+Response 200:
+```json
+[
+  {
+    "id": "uuid",
+    "letter": "A",
+    "question": "Empieza con A: Capital de Grecia",
+    "answer": "Atenas",
+    "language": "ES",
+    "difficulty": "easy",
+    "categoryId": 1,
+    "isPersonal": false,
+    "status": "pending",
+    "createdAt": "2026-05-04T..."
+  }
+]
+```
+
+`status` puede ser `"pending"`, `"approved"` o `"rejected"`.
+
+Errores:
 - 401 → Token no proporcionado o inválido
 
 ---
