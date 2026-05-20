@@ -401,3 +401,21 @@ Se han implementado 7 tests de integración en `tests/api.test.js` que cubren lo
 Los tests usan un usuario de test con email `vitest_user@test.internal` que se crea en `beforeAll` y se elimina en `afterAll`. Se eliminan primero los `UserAchievement` y `RefreshToken` del usuario antes de borrarlo, respetando las restricciones de clave foránea del schema.
 
 Se eligió Vitest en lugar de Jest por compatibilidad nativa con módulos ES (`"type": "module"` en `package.json`). Jest requiere configuración adicional para ESM; Vitest lo soporta sin configuración extra.
+
+### Primera contribución al frontend
+
+Con el backend completado y el equipo de frontend con poco tiempo, se ha comenzado a contribuir al frontend para desbloquear funcionalidades que dependen directamente del backend implementado.
+
+Se ha creado una rama `develop` mergeando `frontend-luisfer` (la rama de frontend más actualizada) con `main`, para tener backend y frontend juntos en una sola rama de trabajo.
+
+Los archivos añadidos, todos nuevos sin tocar los componentes existentes del equipo:
+
+- **`src/services/token.js`**: utilidades para gestionar los tokens de autenticación en `localStorage`. Expone `saveTokens`, `getAccessToken`, `getRefreshToken`, `clearTokens`, `getAuthHeader` e `isLoggedIn`. Es la única fuente de verdad para los tokens en el frontend.
+
+- **`src/services/api.js`** (reescrito): el archivo solo contenía la URL base. Se ha reescrito para exportar `apiFetch(url, options)`, un wrapper de `fetch` que añade el header `Authorization` automáticamente si hay token y gestiona el refresco transparente: si recibe 401, llama a `POST /auth/refresh`, guarda el nuevo access token y reintenta la request original. Si el refresh falla, limpia los tokens y redirige a `/login`. La URL base sigue exportándose como default para mantener compatibilidad con los servicios existentes del equipo.
+
+- **`src/pages/AuthCallback.jsx`**: página que recoge los parámetros `?token=...&refreshToken=...` de la URL tras el login con Google o GitHub, los guarda con `saveTokens` y redirige a `/home`. Sin esta página el flujo OAuth del backend no tenía destino en el frontend.
+
+- **`src/pages/Ranking.jsx`**: página de ranking global con selector de idioma (ES/EN/FR), tabla con posición, nombre del jugador, puntuación, aciertos y tiempo formateado (MM:SS), y estados de carga y error. Usa `apiFetch` para las llamadas a `GET /api/ranking`.
+
+- **`frontend/TODO.md`**: documento con todas las mejoras y correcciones pendientes en el frontend, ordenadas por impacto, para orientar al equipo.
