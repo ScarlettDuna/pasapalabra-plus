@@ -110,9 +110,17 @@ La lógica de logros se ha extraído a `src/utils/achievements.js` en lugar de p
 
 ---
 
-## Por qué Render para el despliegue
+## Despliegue en AWS EC2 + RDS
 
 *(pendiente de completar cuando se realice el despliegue)*
+
+Se ha decidido desplegar en AWS con la arquitectura EC2 + RDS en lugar de una plataforma PaaS como Render o Heroku. Las razones:
+
+- **Aprendizaje**: EC2 + RDS expone todas las capas de la infraestructura (segurity groups, gestión de procesos con PM2, proxy inverso con nginx), lo que es más didáctico para un TFG.
+- **Control**: es posible ajustar cualquier parámetro de la instancia o la BD sin estar limitado por los valores por defecto de la plataforma.
+- **Coste en el free tier**: las instancias `t2.micro` (EC2) y `db.t3.micro` (RDS) están incluidas en el free tier de AWS durante 12 meses.
+
+La alternativa Elastic Beanstalk se descartó porque abstrae demasiado la infraestructura, lo que dificulta entender qué está pasando cuando algo falla.
 
 ---
 
@@ -208,6 +216,35 @@ Se han implementado tres capas de validación antes de calcular el score:
 3. **Verificación de existencia en BD**: tras el `findMany` de preguntas, se comprueba que todos los `questionId` enviados tienen correspondencia en la BD. Un ID inventado no aparecería en el `answerMap` y la operación `.answer.trim()` produciría un crash. En lugar de un 500, se devuelve un 400 controlado.
 
 Estas validaciones no cambian el comportamiento para un cliente que opera correctamente — solo blindan el endpoint ante datos inesperados.
+
+---
+
+## Seguridad HTTP: Helmet, rate limiting y separación app/server
+
+### Helmet
+
+Se ha añadido `helmet` como primer middleware de la app. Helmet configura automáticamente un conjunto de cabeceras HTTP defensivas (`X-Frame-Options`, `X-Content-Type-Options`, `Strict-Transport-Security`, etc.) sin necesidad de configuración manual. Se coloca antes que CORS para que sus cabeceras se establezcan en todas las respuestas.
+
+### Rate limiting en login
+
+Se ha limitado `POST /api/auth/login` a 10 intentos por IP en 15 minutos con `express-rate-limit`. El límite se aplica solo a este endpoint porque es el único que acepta credenciales repetidamente. El resto de endpoints autenticados ya están protegidos por el JWT — un atacante necesitaría el token para llegar a ellos.
+
+Se eligió un límite de 10 en lugar de uno más restrictivo (3-5) para evitar falsos positivos en entornos donde varios usuarios comparten IP (NAT corporativo, aula), sin dejar el endpoint abierto a ataques de diccionario masivos.
+
+### Separación `src/app.js` / `server.js`
+
+La configuración de Express se ha extraído a `src/app.js`, que exporta la instancia `app` sin llamar a `listen()`. `server.js` importa `app`, lanza el cron y llama a `listen()`.
+
+Esta separación tiene un único objetivo práctico: los tests pueden importar `src/app.js` y obtener la app configurada sin arrancar el servidor ni el cron. Supertest gestiona su propio puerto internamente. Sin esta separación, cualquier `import` de `server.js` en los tests ejecutaría `listen()` y `initCronJobs()` como efectos secundarios.
+
+### Tests de integración: Vitest + Supertest
+
+Se eligió Vitest como test runner en lugar de Jest porque el proyecto usa `"type": "module"` en `package.json` (ES modules nativos). Jest requiere Babel o `--experimental-vm-modules` para ESM, lo que añade complejidad de configuración. Vitest soporta ESM de forma nativa.
+
+Se eligieron tests de integración (contra la BD real) en lugar de tests unitarios con mocks porque:
+- Los mocks de Prisma tienden a divergir del comportamiento real de PostgreSQL, especialmente en casos de restricciones de unicidad y transacciones.
+- El proyecto tuvo una experiencia directa de esto: un bug de typo en `answer`/`anwser` habría sido invisible para un mock que no ejecuta la query real.
+- El coste de mantener una BD de test es bajo — es la misma instancia local con datos de seed.
 
 ---
 
