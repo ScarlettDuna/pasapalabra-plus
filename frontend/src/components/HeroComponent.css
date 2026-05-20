@@ -1,0 +1,54 @@
+h2 {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.menu {
+    display: flex;
+    flex-direction:row;
+    gap: 400px;
+    justify-content: center;
+    align-items: center;
+}
+
+.titulo {
+    font-size:xx-large;
+}
+
+.titulo>:nth-child(2) {
+    color: yellow;
+}
+
+.opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.opciones button {
+    border: 1px solid white;
+    font-size: 25px;
+    border-radius: 30px;
+    color: white;
+}
+
+.dropdown button:hover {
+    background-color: grey;
+}
+
+.dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropdown button {
+    width: 100%;
+}
+
+.botonJugar {
+    background-color: green;
+}
+
+.botonSalir {
+    background-color: red;
+}

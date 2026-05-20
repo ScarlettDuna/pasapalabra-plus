@@ -1,0 +1,85 @@
+.contenedor-juego {
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.fila-selector {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.etiqueta-idioma, 
+.etiqueta-tematica, 
+.etiqueta-dificultad {
+  background-color: #4CAF50; 
+  color: black;
+  width: 120px;
+  padding: 10px;
+  border-radius: 25px; 
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.flecha {
+  color: #add8e6; 
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.btn-idioma, 
+.btn-tematica, 
+.btn-dificultad {
+  background-color: #FFD700; 
+  color: black;
+  width: 130px;
+  padding: 10px;
+  border-radius: 25px; 
+  border: none;
+  font-weight: bold;
+  cursor: pointer; 
+  font-size: 0.9rem;
+}
+
+
+.btn-comenzar {
+  background-color: #FF5722; /* Naranja llamativo */
+  color: white;
+  padding: 15px 50px;
+  border-radius: 30px;
+  border: none;
+  font-weight: bold;
+  margin-top: 30px;
+  cursor: pointer;
+}
+
+.btn-comenzar:hover {
+  filter: brightness(1.3);
+}
+
+.health-box {
+  margin-bottom: 20px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.health-cargando {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.health-bien {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.health-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}

@@ -51,7 +51,7 @@ export const register = async (req, res, next) => {
             }
         });
 
-        return res.status(201).json(user);
+        return res.status(201).json({ user });
 
     } catch (err) {
         if (err.code === "P2002") {
