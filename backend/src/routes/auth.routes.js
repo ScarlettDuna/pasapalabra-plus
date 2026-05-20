@@ -1,11 +1,21 @@
 import { Router } from "express";
 import { register, login, refresh, logout, generateTokenPair } from "../controllers/auth.controller.js";
 import passport from "../config/passport.js";
+import rateLimit from "express-rate-limit";
 
 const router = Router();
 
+// Limite de intentos de login, para evitar ataques de fuerza bruta
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // ventana de 15 minutos
+  max: 10,                    // máximo 10 intentos por IP en esa ventana
+  message: { message: "Demasiados intentos. Espera 15 minutos." },
+  standardHeaders: true,      // incluye cabeceras RateLimit-* en la respuesta
+  legacyHeaders: false,       // desactiva las cabeceras X-RateLimit-* antiguas
+});
+
 router.post("/register", register);
-router.post("/login", login);
+router.post("/login", loginLimiter, login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 
