@@ -1,5 +1,5 @@
 # Pasapalabra+ — Backend
-## Última actualización: 4 de mayo de 2026.
+## Última actualización: 20 de mayo de 2026.
 
 API REST desarrollada con Node.js + Express + PostgreSQL.
 
@@ -104,17 +104,23 @@ Respuesta esperada:
 
 ```
 backend/
-├── server.js                  # Entrada principal
+├── server.js                  # Entrada principal (listen + cron)
+├── tests/
+│   └── api.test.js            # Tests de integración (Vitest + Supertest)
 ├── prisma/
 │   ├── schema.prisma          # Esquema de la base de datos
 │   ├── seed.js                # Script para popular la BD
 │   └── migrations/            # Historial de migraciones
 └── src/
+    ├── app.js                 # App Express configurada (sin listen)
     ├── controllers/           # Lógica de negocio
     ├── routes/                # Rutas de la API
     ├── middlewares/           # Autenticación JWT
     ├── config/
     │   └── passport.js        # Estrategias OAuth (Google, GitHub)
+    ├── utils/
+    │   ├── achievements.js    # Lógica de logros
+    │   └── timeout.js         # Cron de limpieza
     └── db/
         └── prisma.js          # Cliente Prisma
 ```
@@ -151,12 +157,24 @@ La documentación completa de la API está en `documentacion/api.md`.
 
 ---
 
+## Scripts disponibles
+
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Arranca el servidor con nodemon (recarga automática) |
+| `npm start` | Arranca el servidor en producción |
+| `npm run lint` | Ejecuta ESLint sobre `src/` y `server.js` |
+| `npm test` | Ejecuta los tests de integración con Vitest |
+
+---
+
 ## Pendiente
 
 | | Tarea | Notas |
 |---|-------|-------|
-| ✅ | **ESLint** | Configurado con `eslint.config.js` |
-| ⬜ | **Helmet.js** | Headers de seguridad HTTP |
-| ⬜ | **Rate limiting en `/auth/login`** | Prevenir fuerza bruta con `express-rate-limit` |
-| ⬜ | **Limpiar refresh tokens expirados en el cron** | Añadir un `deleteMany` en `timeout.js` para tokens con `expiresAt < now` |
-| ⬜ | **Tests con Supertest** | Cubrir login, start/finish de partida y ranking |
+| ✅ | **ESLint** | Configurado con `eslint.config.js`, 0 errores |
+| ✅ | **Helmet.js** | Añadido como primer middleware en `src/app.js` |
+| ✅ | **Rate limiting en `/auth/login`** | 10 intentos / 15 min por IP con `express-rate-limit` |
+| ✅ | **Limpiar refresh tokens expirados en el cron** | `deleteMany` en `timeout.js` cada 10 min |
+| ✅ | **Tests de integración** | 7 tests con Vitest + Supertest en `tests/api.test.js` |
+| ⬜ | **Despliegue en AWS** | EC2 + RDS (pendiente activación cuenta estudiante) |

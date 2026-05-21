@@ -365,3 +365,57 @@ Cambios realizados:
 - **Callbacks OAuth** (Google y GitHub): actualizados para ser `async` y usar `generateTokenPair`. La URL de redirección ahora incluye ambos parámetros: `?token=...&refreshToken=...`.
 
 La documentación del flujo completo para el frontend (almacenamiento de tokens, patrón de interceptor con Axios, gestión de 401) está en `documentacion/api.md`.
+
+## Diario de desarrollo - Día 12
+
+**Nombre:** Arantxa
+**Fecha:** *20 mayo 2026*
+**Rol:** Backend / Base de datos / Lógica de juego
+
+### Seguridad HTTP: Helmet y rate limiting
+
+Se ha instalado `helmet` y añadido como primer middleware con `app.use(helmet())`, antes que CORS. Helmet inyecta automáticamente cabeceras HTTP de seguridad reconocidas por los navegadores: `X-Frame-Options` (evita clickjacking), `X-Content-Type-Options` (deshabilita MIME sniffing), cabeceras de política de referencia, y otras. Es una medida de mínimo esfuerzo con impacto de seguridad real.
+
+Se ha añadido rate limiting al endpoint `POST /api/auth/login` con `express-rate-limit`. La configuración elegida es 10 intentos por IP en una ventana de 15 minutos. Al superar el límite, la API devuelve 429 con un mensaje descriptivo. Las cabeceras `RateLimit-*` están activas para que los clientes puedan leer el estado del límite.
+
+### Limpieza de refresh tokens expirados en el cron
+
+Se ha añadido una segunda operación al cron de limpieza (`src/utils/timeout.js`). Junto a la limpieza de partidas abandonadas, el cron ahora también elimina con `deleteMany` todos los registros de `RefreshToken` cuya `expiresAt` sea anterior a la hora actual. Esto evita que la tabla crezca indefinidamente con tokens caducados que ya no pueden usarse.
+
+### Refactorización: separación de `app.js` y `server.js`
+
+Para poder importar la aplicación Express en los tests sin arrancar el servidor, se ha extraído toda la configuración de Express a un nuevo fichero `src/app.js`. Este fichero exporta la instancia `app` configurada con todos los middlewares y rutas, pero sin llamar a `app.listen()`.
+
+`server.js` queda reducido a tres responsabilidades: importar `app`, iniciar el cron y llamar a `listen()`. Los tests importan directamente `src/app.js` y Supertest gestiona el puerto internamente.
+
+Este patrón es estándar en proyectos Node.js y hace que la app sea completamente testable sin efectos secundarios.
+
+### Tests de integración con Vitest + Supertest
+
+Se han implementado 7 tests de integración en `tests/api.test.js` que cubren los flujos principales de la API:
+
+- **Auth (4 tests):** registro de usuario, login correcto (verifica token + refreshToken), login con contraseña incorrecta (401), y renovación de access token con refresh token.
+- **Games (2 tests):** inicio de partida autenticada (verifica gameId y array de questions), y finalización de partida con array de respuestas (verifica objeto score).
+- **Ranking (1 test):** GET con filtro por idioma devuelve 200 y array.
+
+Los tests usan un usuario de test con email `vitest_user@test.internal` que se crea en `beforeAll` y se elimina en `afterAll`. Se eliminan primero los `UserAchievement` y `RefreshToken` del usuario antes de borrarlo, respetando las restricciones de clave foránea del schema.
+
+Se eligió Vitest en lugar de Jest por compatibilidad nativa con módulos ES (`"type": "module"` en `package.json`). Jest requiere configuración adicional para ESM; Vitest lo soporta sin configuración extra.
+
+### Primera contribución al frontend
+
+Con el backend completado y el equipo de frontend con poco tiempo, se ha comenzado a contribuir al frontend para desbloquear funcionalidades que dependen directamente del backend implementado.
+
+Se ha creado una rama `develop` mergeando `frontend-luisfer` (la rama de frontend más actualizada) con `main`, para tener backend y frontend juntos en una sola rama de trabajo.
+
+Los archivos añadidos, todos nuevos sin tocar los componentes existentes del equipo:
+
+- **`src/services/token.js`**: utilidades para gestionar los tokens de autenticación en `localStorage`. Expone `saveTokens`, `getAccessToken`, `getRefreshToken`, `clearTokens`, `getAuthHeader` e `isLoggedIn`. Es la única fuente de verdad para los tokens en el frontend.
+
+- **`src/services/api.js`** (reescrito): el archivo solo contenía la URL base. Se ha reescrito para exportar `apiFetch(url, options)`, un wrapper de `fetch` que añade el header `Authorization` automáticamente si hay token y gestiona el refresco transparente: si recibe 401, llama a `POST /auth/refresh`, guarda el nuevo access token y reintenta la request original. Si el refresh falla, limpia los tokens y redirige a `/login`. La URL base sigue exportándose como default para mantener compatibilidad con los servicios existentes del equipo.
+
+- **`src/pages/AuthCallback.jsx`**: página que recoge los parámetros `?token=...&refreshToken=...` de la URL tras el login con Google o GitHub, los guarda con `saveTokens` y redirige a `/home`. Sin esta página el flujo OAuth del backend no tenía destino en el frontend.
+
+- **`src/pages/Ranking.jsx`**: página de ranking global con selector de idioma (ES/EN/FR), tabla con posición, nombre del jugador, puntuación, aciertos y tiempo formateado (MM:SS), y estados de carga y error. Usa `apiFetch` para las llamadas a `GET /api/ranking`.
+
+- **`frontend/TODO.md`**: documento con todas las mejoras y correcciones pendientes en el frontend, ordenadas por impacto, para orientar al equipo.

@@ -19,7 +19,15 @@ export function initCronJobs() {
       }
     })
 
-    console.log(`Partidas abandonadas marcadas: ${result.count}`)
+    console.log(`Partidas abandonadas marcadas: ${result.count}`);
+
+    const deleted = await prisma.refreshToken.deleteMany({
+      where: {
+        expiresAt: { lt: new Date() }
+      }
+    })
+
+    console.log(`Refresh tokens expirados eliminados: ${deleted.count}`)
   })
 }
 
