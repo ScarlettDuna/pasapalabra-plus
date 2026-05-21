@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./GameModeComponent.css";
+import { useNavigate } from "react-router-dom"; // para hacer redirecciones
 import { getHealth } from "../services/health";
 import { getCategories } from "../services/categories";
+import { startGame } from "../services/games"; 
+
 
 export default function GameModeComponent() {
-  const idiomas = ["ESPAÑOL", "INGLES", "FRANCES"];
-  const niveles = ["FACIL", "MEDIO", "DIFICIL"];
+const idiomas = ["Español", "Inglés", "Francés"];
+const niveles = ["Fácil", "Medio", "Difícil"];
 
   const [healthStatus, setHealthStatus] = useState("cargando"); //para saber como va la conexion con la bbdd
   const [categorias, setCategorias] = useState([]);
