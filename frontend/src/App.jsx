@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import reactLogo from './assets/logo-pasapalabra.png'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 // 1. Importamos Home y el Router
 import Home from './pages/Home'; 
@@ -9,7 +9,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import GameMode from './pages/GameMode';
 import Game from './pages/Game'; 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import AuthCallback from "./pages/AuthCallback";
+import Ranking from "./pages/Ranking";
 
 function App() {
 
@@ -36,6 +37,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/gamemode" element={<GameMode />} />
         <Route path="/game" element={<Game />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/ranking" element={<Ranking />} />
       </Routes>
     </BrowserRouter>
   )

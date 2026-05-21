@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "lint": "eslint src/ server.js"
+    "lint": "eslint src/ server.js",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "node-cron": "^4.2.1",
     "passport": "^0.7.0",
@@ -29,7 +32,9 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.3.0",
     "globals": "^17.6.0",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.7"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
