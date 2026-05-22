@@ -1,21 +1,20 @@
 import API_URL from "./api";
 
 export async function startGame(language, difficulty, categoryId) {
-  const response = await fetch(`${API_URL}/games/start`, { // pide al servidor y espera hasta que lo devuelva para continuar
+  const respuesta = await fetch(`${API_URL}/games/start`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      language,
-      difficulty,
-      categoryId,
-    }),
+      language: language,
+      difficulty: difficulty,
+      categoryId: categoryId
+    })
   });
 
-  if (!response.ok) {
-    throw new Error("No se pudo iniciar la partida");
-  }
-
-  return response.json();
+  const datos = await respuesta.json();
+  return datos;
 }
+
+// service para crear una partida y mandar idioma dificultad y categ. Y lo guardamso todo dentro de datos. 
