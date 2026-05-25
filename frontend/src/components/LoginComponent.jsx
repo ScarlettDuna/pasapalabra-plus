@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginComponent.css";
 import { login } from "../services/auth";
+import { saveTokens } from "../services/token";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
@@ -20,6 +21,11 @@ export default function LoginComponent() {
                 alert(result.data.message);
                 return;
             }
+
+            const token = result.data.token;
+            const refreshToken = result.data.refreshToken;
+
+            saveTokens(token, refreshToken);
 
             alert("Login correcto");
 

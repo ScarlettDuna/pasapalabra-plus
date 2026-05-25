@@ -24,7 +24,7 @@ export default function RegisterComponent() {
 
             alert("Usuario registrado correctamente");
 
-            navigate("/gamemode");
+            navigate("/login");
 
         } catch (error) {
             console.error(error);
