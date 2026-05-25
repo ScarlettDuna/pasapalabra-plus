@@ -45,8 +45,8 @@ export default function LoginComponent() {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className="login-container">
+            <form className="login-form" onSubmit={handleSubmit}>
                 <input
                     type="text"
                     placeholder="Correo Electrónico"
@@ -54,7 +54,6 @@ export default function LoginComponent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <br /><br />
 
                 <input
                     type="password"
@@ -63,19 +62,22 @@ export default function LoginComponent() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <br /><br />
 
-                <button type="submit" className="customButton btn-login">
-                    Iniciar sesión
-                </button>
+                <div className="buttons-container">
 
-                <button
-                    type="button"
-                    className="customButton btn-guest"
-                    onClick={handleGuest}
-                >
-                    Continuar como invitado
-                </button>
+                    <button type="submit" className="customButton btn-login">
+                        Iniciar Sesión
+                    </button>
+
+                    <button
+                        type="button"
+                        className="customButton btn-guest"
+                        onClick={handleGuest}
+                    >
+                        Invitado
+                    </button>
+
+                </div>
             </form>
         </div>
     );

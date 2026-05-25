@@ -6,7 +6,7 @@ import HeroComponent from '../components/HeroComponent';
 
 const Home = () => {
   return (
-    <main style={{ padding: '20px', textAlign: 'center' }}>
+    <main>
       <HeaderComponent></HeaderComponent>
       <HeroComponent></HeroComponent>
       <FooterComponent></FooterComponent>

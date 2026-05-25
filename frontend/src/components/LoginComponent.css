@@ -1,27 +1,73 @@
-.customButton {
-    margin: 10px;
+/* CONTENEDOR PRINCIPAL */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
-.customInput {
-    margin: 10px;
-    padding: 12px 16px;
-    border-radius: 20px;
-    font-size: 16px;
-    border: 2px solid #e1e1e1;
+/* FORMULARIO */
+.login-form {
     width: 100%;
-    max-width: 300px;
+    max-width: 420px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
 }
 
+/* INPUTS */
+.customInput {
+    width: 100%;
+    padding: 14px 18px;
+
+    border-radius: 25px;
+    border: 2px solid #e1e1e1;
+
+    font-size: 1rem;
+    outline: none;
+
+    box-sizing: border-box;
+
+    margin-bottom: 20px;
+}
+
+/* CONTENEDOR BOTONES */
+.buttons-container {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+/* BOTONES */
+.customButton {
+    flex: 1;
+
+    padding: 14px;
+
+    border: none;
+    border-radius: 25px;
+
+    font-size: 1.1rem;
+    font-weight: bold;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.customButton:hover {
+    filter: brightness(1.1);
+}
+
+/* LOGIN */
 .btn-login {
-    background-color: green;
+    background-color: #4CAF50;
     color: black;
-    font-style: italic;
-    border-radius: 20px;
 }
 
+/* INVITADO */
 .btn-guest {
-    background-color: yellow;
+    background-color: #FFD700;
     color: black;
-    font-style: italic;
-    border-radius: 20px;
 }
