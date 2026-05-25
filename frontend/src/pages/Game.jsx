@@ -1,6 +1,7 @@
 import React from "react";
 import HeaderComponent from '../components/HeaderComponent';
 import FooterComponent from '../components/FooterComponent';
+import RoscoComponent from '../components/RoscoComponent';
 
 const Game = () => {
   return (
@@ -14,6 +15,7 @@ const Game = () => {
         <p>
         </p>
       </section>
+      <RoscoComponent></RoscoComponent>
       <FooterComponent></FooterComponent>
     </main>
   );

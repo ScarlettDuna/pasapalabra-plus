@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "./GameModeComponent.css";
+import { useNavigate } from "react-router-dom"; // para hacer redirecciones
 import { getHealth } from "../services/health";
 import { getCategories } from "../services/categories";
+import { startGame } from "../services/games";
 
 export default function GameModeComponent() {
-  const idiomas = ["ESPAÑOL", "INGLES", "FRANCES"];
-  const niveles = ["FACIL", "MEDIO", "DIFICIL"];
+  const idiomas = ["Español", "Inglés", "Francés"];
+  const niveles = ["Fácil", "Medio", "Difícil"];
 
   const [healthStatus, setHealthStatus] = useState("cargando"); //para saber como va la conexion con la bbdd
   const [categorias, setCategorias] = useState([]);
   const [indiceIdioma, setIndice] = useState(0); // indice del idioma , empeznado por 0 ES
   const [indiceDificultad, setIndiceDificultad] = useState(0);
   const [indiceTematica, setIndiceTematica] = useState(0);
+  const navigate = useNavigate();
 
   // COMPROBAMOS QUE ESTÁ CORRECTAMENTE CONECTADO AL BACKEND Y MOSTRAMOS
   useEffect(() => {
@@ -50,7 +53,7 @@ export default function GameModeComponent() {
     mensajeConexion = "No se pudo conectar con el backend";
   }
 
-  let nombreCategoria = "CARGANDO CATEGORIAS...";  // por defecto si no cargan
+  let nombreCategoria = "CARGANDO CATEGORIAS..."; // por defecto si no cargan
 
   if (categorias.length > 0) {
     nombreCategoria = categorias[indiceTematica].name; // http://localhost:5000/api/categories?language=ES
@@ -69,9 +72,31 @@ export default function GameModeComponent() {
     setIndiceTematica((indiceTematica + 1) % categorias.length);
   }
 
+  async function handleComenzar() {
+    const idioma = ["ES", "EN", "FR"][indiceIdioma];
+    const dificultad = ["easy", "medium", "hard"][indiceDificultad];
+    const categoria = categorias[indiceTematica].id;
+
+    const datos = await startGame(idioma, dificultad, categoria);
+
+    const gameId = datos.gameId;
+    const game = datos.game;
+    const questions = datos.questions;
+
+    navigate("/game", { // redirige a game y lleva estas preguntas y estos datos. 
+      state: {
+        gameId,
+        game,
+        questions,
+      },
+    });
+  }
+
   return (
     <div className="contenedor-juego">
-      <div className={`health-box health-${healthStatus}`}>{mensajeConexion}</div>
+      <div className={`health-box health-${healthStatus}`}>
+        {mensajeConexion}
+      </div>
 
       <div className="fila-selector">
         <p className="etiqueta-idioma">IDIOMA</p>
@@ -97,7 +122,9 @@ export default function GameModeComponent() {
         </button>
       </div>
 
-      <button className="btn-comenzar">COMENZAR</button>
+      <button className="btn-comenzar" onClick={handleComenzar}>
+        COMENZAR
+      </button>
     </div>
   );
 }
