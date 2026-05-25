@@ -83,11 +83,9 @@ export default function GameModeComponent() {
     const game = datos.game;
     const questions = datos.questions;
 
-    navigate("/game", { // redirige a game y lleva estas preguntas y estos datos. 
+    navigate("/game", {
       state: {
-        gameId,
-        game,
-        questions,
+        questions: datos.questions,
       },
     });
   }
