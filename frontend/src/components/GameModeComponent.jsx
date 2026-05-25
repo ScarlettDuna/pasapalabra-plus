@@ -79,7 +79,17 @@ export default function GameModeComponent() {
 
     const datos = await startGame(idioma, dificultad, categoria);
 
-    navigate("/game");
+    const gameId = datos.gameId;
+    const game = datos.game;
+    const questions = datos.questions;
+
+    navigate("/game", { // redirige a game y lleva estas preguntas y estos datos. 
+      state: {
+        gameId,
+        game,
+        questions,
+      },
+    });
   }
 
   return (
