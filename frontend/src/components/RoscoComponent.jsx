@@ -34,9 +34,53 @@ export default function RoscoComponent({ questions }) {
   const [indicePregunta, setIndicePregunta] = useState(0); // indice empieza en 0 ---> "a"
   const preguntaActual = questions[indicePregunta];
 
-  function pasarPalabra() {
+  const [respuestaUsuario, setRespuestaUsuario] = useState("");
+  const [estadoLetras, setEstadoLetras] = useState({});
+
+function pasarPalabra() {
+  setEstadoLetras({
+    ...estadoLetras,
+    [preguntaActual.letter]: "pasada"
+  });
+
+  if (indicePregunta < questions.length - 1) {
     setIndicePregunta(indicePregunta + 1);
+  } else {
+    setIndicePregunta(0);
   }
+
+  setRespuestaUsuario("");
+}
+
+  function escribirRespuesta(evento) {
+    setRespuestaUsuario(evento.target.value); // target es el input
+  }
+
+ function responderPregunta() {
+  if (respuestaUsuario.toLowerCase() === preguntaActual.answer.toLowerCase()) {
+    alert("Respuesta correcta");
+
+    setEstadoLetras({
+      ...estadoLetras,
+      [preguntaActual.letter]: "correcta"
+    });
+  } else {
+    alert("Respuesta incorrecta");
+
+    setEstadoLetras({
+      ...estadoLetras,
+      [preguntaActual.letter]: "incorrecta"
+    });
+  }
+
+  setRespuestaUsuario("");
+
+  if (indicePregunta < questions.length - 1) {
+    setIndicePregunta(indicePregunta + 1);
+  } else {
+    setIndicePregunta(0);
+  }
+}
   return (
     <section className="rosco">
       <div className="rosco-circulo">
@@ -48,6 +92,19 @@ export default function RoscoComponent({ questions }) {
 
           // cambiar estilo de la letra segun activa o no
           let claseLetra = "rosco-letra";
+
+          if (estadoLetras[letra] === "correcta") {
+            claseLetra = "rosco-letra correcta";
+          }
+
+          if (estadoLetras[letra] === "incorrecta") {
+            claseLetra = "rosco-letra incorrecta";
+          }
+
+          if (estadoLetras[letra] === "pasada") {
+            claseLetra = "rosco-letra pasada";
+          }
+
           if (index === indicePregunta) {
             claseLetra = "rosco-letra activa";
           }
@@ -76,10 +133,17 @@ export default function RoscoComponent({ questions }) {
             ? preguntaActual.question
             : "No hay preguntas cargadas"}
         </p>
-        <input type="text" placeholder="Escribe tu respuesta" />
+        <input
+          type="text"
+          placeholder="Escribe tu respuesta"
+          value={respuestaUsuario}
+          onChange={escribirRespuesta}
+        />
 
         <div className="rosco-botones">
-          <button type="button">RESPONDER</button>
+          <button type="button" onClick={responderPregunta}>
+            RESPONDER
+          </button>
           <button type="button" onClick={pasarPalabra}>
             PASAPALABRA
           </button>
