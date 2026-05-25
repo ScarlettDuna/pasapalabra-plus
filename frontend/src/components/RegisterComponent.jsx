@@ -40,8 +40,9 @@ export default function RegisterComponent() {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        <div className="login-container">
+            <form className="login-form" onSubmit={handleSubmit}>
+
                 <input
                     type="text"
                     placeholder="Nombre de Usuario"
@@ -49,7 +50,6 @@ export default function RegisterComponent() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                 />
-                <br /><br />
 
                 <input
                     type="text"
@@ -58,7 +58,6 @@ export default function RegisterComponent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <br /><br />
 
                 <input
                     type="password"
@@ -67,19 +66,22 @@ export default function RegisterComponent() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <br /><br />
 
-                <button type="submit" className="customButton btn-login">
-                    Registrarse
-                </button>
+                <div className="buttons-container">
+                    <button type="submit" className="customButton btn-login">
+                        Registrarse
+                    </button>
 
-                <button
-                    type="button"
-                    className="customButton btn-guest"
-                    onClick={handleGuest}
-                >
-                    Continuar como invitado
-                </button>
+                    <button
+                        type="button"
+                        className="customButton btn-guest"
+                        onClick={handleGuest}
+                    >
+                        Invitado
+                    </button>
+
+                </div>
+
             </form>
         </div>
     );

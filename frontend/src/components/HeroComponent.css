@@ -1,54 +1,88 @@
-h2 {
+.menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+/* TITULO */
+.titulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.titulo h1 {
+    font-size: 5rem;
+    margin: 0;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.menu {
-    display: flex;
-    flex-direction:row;
-    gap: 400px;
-    justify-content: center;
-    align-items: center;
-}
-
-.titulo {
-    font-size:xx-large;
-}
-
-.titulo>:nth-child(2) {
+.titulo> :nth-child(2) {
     color: yellow;
 }
 
+/* OPCIONES */
 .opciones {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
 }
 
+/* BOTONES GENERALES */
 .opciones button {
-    border: 1px solid white;
-    font-size: 25px;
-    border-radius: 30px;
+    width: 250px;
+    padding: 14px 20px;
+    border-radius: 25px;
+    border: none;
     color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
 }
 
-.dropdown button:hover {
-    background-color: grey;
+.opciones button:hover {
+    filter: brightness(1.2);
 }
 
+/* ANIMACIÓN DROPDOWN */
 .dropdown {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    width: 100%;
+    align-items: center;
+
+    animation: dropdownAppear 1s ease;
+    transform-origin: top;
+}
+
+@keyframes dropdownAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scaleY(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
 }
 
 .dropdown button {
-    width: 100%;
+    background-color: #FFD700;
+    color: black;
 }
 
+/* BOTONES PRINCIPALES */
 .botonJugar {
-    background-color: green;
+    background-color: #4CAF50;
 }
 
 .botonSalir {
-    background-color: red;
+    background-color: #f44336;
 }

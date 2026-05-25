@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './HeroComponent.css';
 import { useNavigate } from 'react-router-dom';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 export default function HeroComponent() {
 
@@ -37,11 +36,9 @@ export default function HeroComponent() {
                             Registrarse
                         </button>
 
-                        <Link to='/gamemode'>
-                            <button onClick={() => navigate("/home")}>
-                                Continuar como invitado
-                            </button>
-                        </Link>
+                        <button onClick={() => navigate("/gamemode")}>
+                            Invitado
+                        </button>
                     </div>
                 )}
 

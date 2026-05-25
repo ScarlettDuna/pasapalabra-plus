@@ -23,7 +23,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-image: url(assets/image_9_1.png);
+  background-image: url(assets/fondo.png);
   background-size: cover;
   background-position: center;
 }
