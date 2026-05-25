@@ -1,14 +1,86 @@
-import React from 'react';
-import './RoscoComponent.css';
+import React, { useState } from "react";
+import "./RoscoComponent.css";
 
 const letrasRosco = [
-  'A', 'B', 'C', 'D', 'E', 'F', 'G',
-  'H', 'I', 'J', 'L', 'M', 'N', 'Ñ',
-  'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-  'V', 'X', 'Y', 'Z'
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "L",
+  "M",
+  "N",
+  "Ñ",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "X",
+  "Y",
+  "Z",
 ];
 
-export default function RoscoComponent() {
+export default function RoscoComponent({ questions }) {
+  //const preguntaActual = questions[0];
+  const [indicePregunta, setIndicePregunta] = useState(0); // indice empieza en 0 ---> "a"
+  const preguntaActual = questions[indicePregunta];
+
+  const [respuestaUsuario, setRespuestaUsuario] = useState("");
+  const [estadoLetras, setEstadoLetras] = useState({});
+
+function pasarPalabra() {
+  setEstadoLetras({
+    ...estadoLetras,
+    [preguntaActual.letter]: "pasada"
+  });
+
+  if (indicePregunta < questions.length - 1) {
+    setIndicePregunta(indicePregunta + 1);
+  } else {
+    setIndicePregunta(0);
+  }
+
+  setRespuestaUsuario("");
+}
+
+  function escribirRespuesta(evento) {
+    setRespuestaUsuario(evento.target.value); // target es el input
+  }
+
+ function responderPregunta() {
+  if (respuestaUsuario.toLowerCase() === preguntaActual.answer.toLowerCase()) {
+    alert("Respuesta correcta");
+
+    setEstadoLetras({
+      ...estadoLetras,
+      [preguntaActual.letter]: "correcta"
+    });
+  } else {
+    alert("Respuesta incorrecta");
+
+    setEstadoLetras({
+      ...estadoLetras,
+      [preguntaActual.letter]: "incorrecta"
+    });
+  }
+
+  setRespuestaUsuario("");
+
+  if (indicePregunta < questions.length - 1) {
+    setIndicePregunta(indicePregunta + 1);
+  } else {
+    setIndicePregunta(0);
+  }
+}
   return (
     <section className="rosco">
       <div className="rosco-circulo">
@@ -18,10 +90,29 @@ export default function RoscoComponent() {
           const x = 200 + radio * Math.cos((angulo * Math.PI) / 180);
           const y = 200 + radio * Math.sin((angulo * Math.PI) / 180);
 
+          // cambiar estilo de la letra segun activa o no
+          let claseLetra = "rosco-letra";
+
+          if (estadoLetras[letra] === "correcta") {
+            claseLetra = "rosco-letra correcta";
+          }
+
+          if (estadoLetras[letra] === "incorrecta") {
+            claseLetra = "rosco-letra incorrecta";
+          }
+
+          if (estadoLetras[letra] === "pasada") {
+            claseLetra = "rosco-letra pasada";
+          }
+
+          if (index === indicePregunta) {
+            claseLetra = "rosco-letra activa";
+          }
+
           return (
             <div
               key={letra}
-              className={`rosco-letra ${index === 0 ? 'activa' : ''}`}
+              className={claseLetra}
               style={{ left: `${x}px`, top: `${y}px` }}
             >
               {letra}
@@ -31,18 +122,31 @@ export default function RoscoComponent() {
 
         <div className="rosco-centro">
           <p>Letra actual</p>
-          <h3>A</h3>
+          <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
           <span>02:00</span>
         </div>
       </div>
 
       <div className="rosco-pregunta">
-        <p>Empieza por A: Comunidad autónoma situada al sur de la pensínsula ibérica</p>
-        <input type="text" placeholder="Escribe tu respuesta" />
+        <p>
+          {preguntaActual
+            ? preguntaActual.question
+            : "No hay preguntas cargadas"}
+        </p>
+        <input
+          type="text"
+          placeholder="Escribe tu respuesta"
+          value={respuestaUsuario}
+          onChange={escribirRespuesta}
+        />
 
         <div className="rosco-botones">
-          <button type="button">RESPONDER</button>
-          <button type="button">PASAPALABRA</button>
+          <button type="button" onClick={responderPregunta}>
+            RESPONDER
+          </button>
+          <button type="button" onClick={pasarPalabra}>
+            PASAPALABRA
+          </button>
           <button type="button">TERMINAR</button>
         </div>
       </div>

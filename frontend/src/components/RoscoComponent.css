@@ -31,6 +31,37 @@
   background-color: #ff5722;
   color: white;
   border-color: #b93b15;
+  animation: latido 1s infinite ease-in-out;
+}
+
+@keyframes latido {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.20);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+  
+.rosco-letra.correcta {
+  background-color: #4caf50;
+  color: white;
+  border-color: #2f7d32;
+}
+
+.rosco-letra.incorrecta {
+  background-color: #ff5722;
+  color: white;
+  border-color: #b93b15;
+}
+
+.rosco-letra.pasada {
+  background-color: #2d9cdb;
+  color: white;
+  border-color: #1b6f9b;
 }
 
 .rosco-centro {
