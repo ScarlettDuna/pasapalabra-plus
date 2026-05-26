@@ -8,7 +8,7 @@ const Login = () => {
   return (
     <main style={{ padding: '20px', textAlign: 'center' }}>
       <HeaderComponent></HeaderComponent>
-      <h2>INICIAR SESIÓN</h2>
+      <h2><span className='flechaSelección'>➥</span> INICIAR SESIÓN</h2>
       <section>
         <LoginComponent></LoginComponent>
       </section>

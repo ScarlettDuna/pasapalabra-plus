@@ -14,3 +14,35 @@
   filter: drop-shadow(0 0 1em #ffffff);
   cursor: pointer;
 }
+
+/* FLECHA SPAN */
+.flechaSelección {
+    color: #FFD700;
+    display: inline-block;
+    animation: moverFlecha 1s ease-in-out infinite;
+}
+
+@keyframes moverFlecha {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 1160px) {
+  .logo {
+    width: 130px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    width: 80px;
+  }
+}

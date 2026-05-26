@@ -7,7 +7,7 @@ export default function Register() {
   return (
     <div>
       <HeaderComponent></HeaderComponent>
-        <h2>REGISTRARSE</h2>
+        <h2><span className='flechaSelección'>➥</span> REGISTRARSE</h2>
       <RegisterComponent></RegisterComponent>
       <FooterComponent></FooterComponent>
     </div>

@@ -8,7 +8,7 @@
 
 .rosco-circulo {
   position: relative;
-  width: min(90vw, 420px);
+  width: min(90vw, 470px);
   aspect-ratio: 1 / 1;
   margin: 0 auto;
 }
@@ -20,7 +20,7 @@
   height: 42px;
   border-radius: 50%;
   border: 2px solid #0b63c9;
-  background-color: #ffd700;
+  background-color: #E2E8F0;
   color: black;
   font-weight: bold;
   display: flex;
@@ -70,8 +70,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 170px;
-  height: 170px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   background-color: #4caf50;
   border: 4px solid #2f7d32;
@@ -94,6 +94,19 @@
   font-size: 2.5rem;
 }
 
+.rosco-centro p {
+  font-size: 1.4rem;
+}
+
+.rosco-centro span {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: black;
+  background-color: #fdce15;
+  padding: 10px;
+  border-radius: 25px;
+}
+
 .rosco-pregunta {
   display: flex;
   flex-direction: column;
@@ -101,6 +114,7 @@
   gap: 15px;
   width: 100%;
   max-width: 450px;
+  margin: 0 auto;
 }
 
 .rosco-pregunta p {
@@ -156,16 +170,22 @@
   color: white;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1160px) {
 
   .rosco {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .rosco-circulo {
-    width: 320px;
-    height: 320px;
+    position: relative;
+
+    width: min(90vw, 400px);
+    aspect-ratio: 1 / 1;
+
+    margin: 0 auto;
   }
 
   .rosco-letra {
@@ -175,12 +195,68 @@
   }
 
   .rosco-centro {
-    width: 100px;
-    height: 100px;
+    width: 190px;
+    height: 190px;
   }
 
   .rosco-centro h3 {
-    font-size: 1rem;
+    font-size: 2rem;
   }
+
 }
 
+@media (max-width: 480px) {
+
+  .rosco {
+    padding: 10px;
+    gap: 20px;
+  }
+
+  .rosco-circulo {
+
+    width: 100%;
+    max-width: 300px;
+
+    aspect-ratio: 1 / 1;
+
+    margin: 0 auto;
+  }
+
+  .rosco-letra {
+    width: 28px;
+    height: 28px;
+
+    font-size: 0.7rem;
+  }
+
+  .rosco-centro {
+    width: 130px;
+    height: 130px;
+  }
+
+  .rosco-centro h3 {
+    font-size: 1.4rem;
+  }
+
+  .rosco-centro p,
+  .rosco-centro span {
+    font-size: 0.8rem;
+  }
+
+  .rosco-pregunta p {
+    font-size: 0.9rem;
+    padding: 14px;
+  }
+
+  .rosco-pregunta input {
+    font-size: 0.9rem;
+  }
+
+  .rosco-botones {
+    width: 100%;
+  }
+
+  .rosco-botones button {
+    width: 100%;
+  }
+}
