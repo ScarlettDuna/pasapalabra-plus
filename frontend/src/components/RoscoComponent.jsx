@@ -125,9 +125,9 @@ export default function RoscoComponent({ questions }) {
       <div className="rosco-circulo">
         {letrasRosco.map((letra, index) => {
           const angulo = (360 / letrasRosco.length) * index - 90;
-          const radio = 170;
-          const x = 200 + radio * Math.cos((angulo * Math.PI) / 180);
-          const y = 200 + radio * Math.sin((angulo * Math.PI) / 180);
+          const radio = 42;
+          const x = 50 + radio * Math.cos((angulo * Math.PI) / 180);
+          const y = 50 + radio * Math.sin((angulo * Math.PI) / 180);
 
           // cambiar estilo de la letra segun activa o no
           let claseLetra = "rosco-letra";
@@ -152,7 +152,10 @@ export default function RoscoComponent({ questions }) {
             <div
               key={letra}
               className={claseLetra}
-              style={{ left: `${x}px`, top: `${y}px` }}
+              style={{
+                left: `${x}%`,
+                top: `${y}%`,
+              }}
             >
               {letra}
             </div>

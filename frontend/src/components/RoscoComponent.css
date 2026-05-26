@@ -1,15 +1,16 @@
 .rosco {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 25px;
+  gap: 40px;
   padding: 20px;
 }
 
 .rosco-circulo {
   position: relative;
-  width: 400px;
-  height: 400px;
+  width: min(90vw, 420px);
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
 }
 
 .rosco-letra {
@@ -99,7 +100,7 @@
   align-items: center;
   gap: 15px;
   width: 100%;
-  max-width: 500px;
+  max-width: 450px;
 }
 
 .rosco-pregunta p {
@@ -155,7 +156,13 @@
   color: white;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 960px) {
+
+  .rosco {
+    display: flex;
+    flex-direction: column;
+  }
+
   .rosco-circulo {
     width: 320px;
     height: 320px;
@@ -168,12 +175,12 @@
   }
 
   .rosco-centro {
-    width: 130px;
-    height: 130px;
+    width: 100px;
+    height: 100px;
   }
 
   .rosco-centro h3 {
-    font-size: 2rem;
+    font-size: 1rem;
   }
 }
 
