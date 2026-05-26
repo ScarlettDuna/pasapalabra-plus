@@ -12,10 +12,10 @@ const letrasRosco = [
   "H",
   "I",
   "J",
+  "K", 
   "L",
   "M",
   "N",
-  "Ñ",
   "O",
   "P",
   "Q",
@@ -24,6 +24,7 @@ const letrasRosco = [
   "T",
   "U",
   "V",
+  "W",
   "X",
   "Y",
   "Z",
@@ -39,15 +40,11 @@ export default function RoscoComponent({ questions }) {
 
 function pasarPalabra() {
   setEstadoLetras({
-    ...estadoLetras,
+    ...estadoLetras, // usammos ... para añadir al obj la siguiente letra y no sobreescribir
     [preguntaActual.letter]: "pasada"
   });
 
-  if (indicePregunta < questions.length - 1) {
-    setIndicePregunta(indicePregunta + 1);
-  } else {
-    setIndicePregunta(0);
-  }
+  irASiguientePregunta();
 
   setRespuestaUsuario("");
 }
@@ -58,14 +55,14 @@ function pasarPalabra() {
 
  function responderPregunta() {
   if (respuestaUsuario.toLowerCase() === preguntaActual.answer.toLowerCase()) {
-    alert("Respuesta correcta");
+    //alert("respuesta correcta");
 
     setEstadoLetras({
       ...estadoLetras,
       [preguntaActual.letter]: "correcta"
     });
   } else {
-    alert("Respuesta incorrecta");
+    //alert("respuesta incorrecta");
 
     setEstadoLetras({
       ...estadoLetras,
@@ -75,11 +72,33 @@ function pasarPalabra() {
 
   setRespuestaUsuario("");
 
-  if (indicePregunta < questions.length - 1) {
-    setIndicePregunta(indicePregunta + 1);
-  } else {
-    setIndicePregunta(0);
+  irASiguientePregunta();
+}
+
+// funcion para no vovler a caer en las letras ya jugadas. 
+function irASiguientePregunta() {
+  let siguienteIndice = indicePregunta + 1;
+
+  if (siguienteIndice >= questions.length) {
+    siguienteIndice = 0;
   }
+
+  while (
+    estadoLetras[questions[siguienteIndice].letter] === "correcta" ||
+    estadoLetras[questions[siguienteIndice].letter] === "incorrecta"
+  ) {
+    siguienteIndice = siguienteIndice + 1;
+
+    if (siguienteIndice >= questions.length) {
+      siguienteIndice = 0;
+    }
+
+    if (siguienteIndice === indicePregunta) {
+      break;
+    }
+  }
+
+  setIndicePregunta(siguienteIndice);
 }
   return (
     <section className="rosco">
