@@ -29,9 +29,9 @@
 }
 
 .rosco-letra.activa {
-  background-color: #ff5722;
+  background-color: #fdce15;
   color: white;
-  border-color: #b93b15;
+  border-color: #ffa600;
   animation: latido 1s infinite ease-in-out;
 }
 

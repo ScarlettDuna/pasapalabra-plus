@@ -12,10 +12,10 @@ const letrasRosco = [
   "H",
   "I",
   "J",
+  "K",
   "L",
   "M",
   "N",
-  "Ñ",
   "O",
   "P",
   "Q",
@@ -24,6 +24,7 @@ const letrasRosco = [
   "T",
   "U",
   "V",
+  "W",
   "X",
   "Y",
   "Z",
@@ -34,53 +35,91 @@ export default function RoscoComponent({ questions }) {
   const [indicePregunta, setIndicePregunta] = useState(0); // indice empieza en 0 ---> "a"
   const preguntaActual = questions[indicePregunta];
 
+  // estado para guardar el input del user
   const [respuestaUsuario, setRespuestaUsuario] = useState("");
   const [estadoLetras, setEstadoLetras] = useState({});
 
-function pasarPalabra() {
-  setEstadoLetras({
-    ...estadoLetras,
-    [preguntaActual.letter]: "pasada"
-  });
+  // array para guardar las respuestas que va dando el user
+  const [answers, setAnswers] = useState([]);
 
-  if (indicePregunta < questions.length - 1) {
-    setIndicePregunta(indicePregunta + 1);
-  } else {
-    setIndicePregunta(0);
+  function pasarPalabra() {
+    setEstadoLetras({
+      ...estadoLetras, // usammos ... para añadir al obj la siguiente letra y no sobreescribir
+      [preguntaActual.letter]: "pasada",
+    });
+
+    irASiguientePregunta();
+
+    setRespuestaUsuario("");
   }
-
-  setRespuestaUsuario("");
-}
 
   function escribirRespuesta(evento) {
     setRespuestaUsuario(evento.target.value); // target es el input
   }
 
- function responderPregunta() {
-  if (respuestaUsuario.toLowerCase() === preguntaActual.answer.toLowerCase()) {
-    alert("Respuesta correcta");
+  function responderPregunta() {
+    // guardamos la questionid ej 1,2,3,4 y la respuesta del user ej. cerebro dentro del usestate answer
+    setAnswers([
+      ...answers, // usamos ... para no sobreescribir
+      {
+        questionId: preguntaActual.questionId,
+        answer: respuestaUsuario,
+      },
+    ]);
+    if (
+      respuestaUsuario.toLowerCase() === preguntaActual.answer.toLowerCase()
+    ) {
+      //alert("respuesta correcta");
 
-    setEstadoLetras({
-      ...estadoLetras,
-      [preguntaActual.letter]: "correcta"
-    });
-  } else {
-    alert("Respuesta incorrecta");
+      setEstadoLetras({
+        ...estadoLetras,
+        [preguntaActual.letter]: "correcta",
+      });
 
-    setEstadoLetras({
-      ...estadoLetras,
-      [preguntaActual.letter]: "incorrecta"
-    });
+      console.log("answers hasta ahora:", answers);
+    } else {
+      //alert("respuesta incorrecta");
+
+      setEstadoLetras({
+        ...estadoLetras,
+        [preguntaActual.letter]: "incorrecta",
+      });
+    }
+
+    setRespuestaUsuario("");
+
+    irASiguientePregunta();
   }
 
-  setRespuestaUsuario("");
+  // funcion para no vovler a caer en las letras ya jugadas.
+  function irASiguientePregunta() {
+    let siguienteIndice = indicePregunta + 1;
 
-  if (indicePregunta < questions.length - 1) {
-    setIndicePregunta(indicePregunta + 1);
-  } else {
-    setIndicePregunta(0);
+    if (siguienteIndice >= questions.length) {
+      siguienteIndice = 0;
+    }
+
+    while (
+      estadoLetras[questions[siguienteIndice].letter] === "correcta" ||
+      estadoLetras[questions[siguienteIndice].letter] === "incorrecta"
+    ) {
+      siguienteIndice = siguienteIndice + 1;
+
+      if (siguienteIndice >= questions.length) {
+        siguienteIndice = 0;
+      }
+
+      if (siguienteIndice === indicePregunta) {
+        break;
+      }
+    }
+
+    setIndicePregunta(siguienteIndice);
   }
-}
+
+  function terminarPartida() {
+    console.log("Respuestas finales:", answers);
+  }
   return (
     <section className="rosco">
       <div className="rosco-circulo">
@@ -150,7 +189,9 @@ function pasarPalabra() {
           <button type="button" onClick={pasarPalabra}>
             PASAPALABRA
           </button>
-          <button type="button">TERMINAR</button>
+          <button type="button" onClick={terminarPartida}>
+            TERMINAR
+          </button>
         </div>
       </div>
     </section>
