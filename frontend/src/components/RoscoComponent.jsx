@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./RoscoComponent.css";
 import { finishGame } from "../services/games";
 
@@ -46,7 +46,10 @@ export default function RoscoComponent({ questions, gameId }) {
   // estado para guardar resultado partida -- empieza en null
   const [resultadoFinal, setResultadoFinal] = useState(null);
 
-  // para comprobar si esta la partida terminada 
+  // estado para el crono
+  const [tiempoRestante, setTiempoRestante] = useState(120); // 120 seg
+
+  // para comprobar si esta la partida terminada
   let partidaTerminada = false;
   if (resultadoFinal !== null) {
     partidaTerminada = true;
@@ -133,7 +136,14 @@ export default function RoscoComponent({ questions, gameId }) {
     console.log("Partida finalizada:", datosFinales);
   }
 
+  //useffect para el cronómetro 
+  useEffect(() => {
+    const intervalo = setInterval(() => { // funcion de js que repite algo cada x tiempo
+      setTiempoRestante((tiempoAnterior) => tiempoAnterior - 1);
+    }, 1000);
 
+    return () => clearInterval(intervalo);
+  }, []);
 
   return (
     <section className="rosco">
@@ -180,7 +190,7 @@ export default function RoscoComponent({ questions, gameId }) {
         <div className="rosco-centro">
           <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
           <p>Tiempo restante:</p>
-          <span>02:00</span>
+          <span>{tiempoRestante}</span>
         </div>
       </div>
 
@@ -199,13 +209,25 @@ export default function RoscoComponent({ questions, gameId }) {
         />
 
         <div className="rosco-botones">
-          <button type="button" onClick={responderPregunta} disabled={partidaTerminada}>
+          <button
+            type="button"
+            onClick={responderPregunta}
+            disabled={partidaTerminada}
+          >
             RESPONDER
           </button>
-          <button type="button" onClick={pasarPalabra} disabled={partidaTerminada}>
+          <button
+            type="button"
+            onClick={pasarPalabra}
+            disabled={partidaTerminada}
+          >
             PASAPALABRA
           </button>
-          <button type="button" onClick={terminarPartida} disabled={partidaTerminada}>
+          <button
+            type="button"
+            onClick={terminarPartida}
+            disabled={partidaTerminada}
+          >
             TERMINAR
           </button>
         </div>
