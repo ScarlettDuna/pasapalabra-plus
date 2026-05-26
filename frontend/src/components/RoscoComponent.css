@@ -260,3 +260,54 @@
     width: 100%;
   }
 }
+
+
+.resultado-final {
+  width: 100%;
+  max-width: 420px;
+  margin: 20px auto 0;
+  padding: 20px;
+  background-color: #4caf50;
+  border: 3px solid #2f7d32;
+  border-radius: 25px;
+  text-align: center;
+  box-sizing: border-box;
+  animation: aparecerResultado 0.7s ease;
+}
+
+@keyframes aparecerResultado {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.resultado-final p {
+  margin: 10px 0;
+  color: white;
+  font-weight: bold;
+  font-size: 1.05rem;
+}
+
+.resultado-final p:first-child {
+  font-size: 1.3rem;
+  color: #ffd700;
+}
+
+.rosco-pregunta input:disabled {
+  color: #666;
+  opacity: 0.6;
+}
+
+.rosco-botones button:disabled {
+  opacity: 0.6;
+  filter: grayscale(0.2);
+}

@@ -43,6 +43,15 @@ export default function RoscoComponent({ questions, gameId }) {
   // array para guardar las respuestas que va dando el user
   const [answers, setAnswers] = useState([]);
 
+  // estado para guardar resultado partida -- empieza en null
+  const [resultadoFinal, setResultadoFinal] = useState(null);
+
+  // para comprobar si esta la partida terminada 
+  let partidaTerminada = false;
+  if (resultadoFinal !== null) {
+    partidaTerminada = true;
+  }
+
   function pasarPalabra() {
     setEstadoLetras({
       ...estadoLetras, // usammos ... para añadir al obj la siguiente letra y no sobreescribir
@@ -119,9 +128,13 @@ export default function RoscoComponent({ questions, gameId }) {
   }
 
   async function terminarPartida() {
-  const datosFinales = await finishGame(gameId, answers);
-  console.log("Partida finalizada:", datosFinales);
-}
+    const datosFinales = await finishGame(gameId, answers); // llama al backend
+    setResultadoFinal(datosFinales); // lo guarda en el estado
+    console.log("Partida finalizada:", datosFinales);
+  }
+
+
+
   return (
     <section className="rosco">
       <div className="rosco-circulo">
@@ -182,20 +195,30 @@ export default function RoscoComponent({ questions, gameId }) {
           placeholder="Escribe tu respuesta"
           value={respuestaUsuario}
           onChange={escribirRespuesta}
+          disabled={partidaTerminada} // para deshabilitarlo cuando partidaTerminada
         />
 
         <div className="rosco-botones">
-          <button type="button" onClick={responderPregunta}>
+          <button type="button" onClick={responderPregunta} disabled={partidaTerminada}>
             RESPONDER
           </button>
-          <button type="button" onClick={pasarPalabra}>
+          <button type="button" onClick={pasarPalabra} disabled={partidaTerminada}>
             PASAPALABRA
           </button>
-          <button type="button" onClick={terminarPartida}>
+          <button type="button" onClick={terminarPartida} disabled={partidaTerminada}>
             TERMINAR
           </button>
         </div>
       </div>
+
+      {resultadoFinal && (
+        <div className="resultado-final">
+          <p>Partida terminada</p>
+          <p>Aciertos: {resultadoFinal.score.correct}</p>
+          <p>Fallos: {resultadoFinal.score.wrong}</p>
+          <p>Puntuación: {resultadoFinal.score.score}</p>
+        </div>
+      )}
     </section>
   );
 }
