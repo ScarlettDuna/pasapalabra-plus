@@ -165,8 +165,8 @@ export default function RoscoComponent({ questions, gameId }) {
         })}
 
         <div className="rosco-centro">
-          <p>Letra actual</p>
           <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
+          <p>Tiempo restante:</p>
           <span>02:00</span>
         </div>
       </div>

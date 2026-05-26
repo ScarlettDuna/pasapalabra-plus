@@ -1,5 +1,6 @@
 import React from 'react'
 import './FooterComponent.css'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 export default function FooterComponent() {
   return (
@@ -8,8 +9,13 @@ export default function FooterComponent() {
 
             <div className="footer-section">
             <ul>
-                <li><a href="#">🌍 Ranking global</a></li>
-                <li><a href="#">🏆 Acerca de nosotros</a></li>
+              <Link to='/ranking'>
+                <li>🌍 Ranking global</li>
+              </Link>
+
+              <Link to='/#'>
+                <li>🏆 Acerca de nosotros</li>
+              </Link>  
             </ul>
             </div>
         </div>

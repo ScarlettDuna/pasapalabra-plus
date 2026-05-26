@@ -6,8 +6,8 @@ import { getCategories } from "../services/categories";
 import { startGame } from "../services/games";
 
 export default function GameModeComponent() {
-  const idiomas = ["Español", "Inglés", "Francés"];
-  const niveles = ["Fácil", "Medio", "Difícil"];
+  const idiomas = ["ESPAÑOL", "INGLÉS", "FRANCÉS"];
+  const niveles = ["FÁCIL", "MEDIO", "DIFÍCIL"];
 
   const [healthStatus, setHealthStatus] = useState("cargando"); //para saber como va la conexion con la bbdd
   const [categorias, setCategorias] = useState([]);
@@ -93,29 +93,37 @@ export default function GameModeComponent() {
 
   return (
     <div className="contenedor-juego">
+      <p className="enunciado">
+        CONFIGURE SU PARTIDA
+      </p>
+      
+      {/* PRUEBA CONEXIÓN CON BACKEND
+      
       <div className={`health-box health-${healthStatus}`}>
         {mensajeConexion}
       </div>
 
+      */}
+
       <div className="fila-selector">
         <p className="etiqueta-idioma">IDIOMA</p>
-        <span className="flecha">↔</span>
+        <span className="flecha">⇔</span>
         <button className="btn-idioma" onClick={cambiarIdioma}>
           {idiomas[indiceIdioma]}
         </button>
       </div>
 
       <div className="fila-selector">
-        <p className="etiqueta-tematica">TEMATICA</p>
-        <span className="flecha">↔</span>
+        <p className="etiqueta-tematica">TEMÁTICA</p>
+        <span className="flecha">⇔</span>
         <button className="btn-tematica" onClick={cambiarTematica}>
-          {nombreCategoria}
+          {nombreCategoria.toUpperCase()}
         </button>
       </div>
 
       <div className="fila-selector">
         <p className="etiqueta-dificultad">DIFICULTAD</p>
-        <span className="flecha">↔</span>
+        <span className="flecha">⇔</span>
         <button className="btn-dificultad" onClick={cambiarDificultad}>
           {niveles[indiceDificultad]}
         </button>
