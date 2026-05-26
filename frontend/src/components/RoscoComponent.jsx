@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./RoscoComponent.css";
+import { finishGame } from "../services/games";
 
 const letrasRosco = [
   "A",
@@ -30,7 +31,7 @@ const letrasRosco = [
   "Z",
 ];
 
-export default function RoscoComponent({ questions }) {
+export default function RoscoComponent({ questions, gameId }) {
   //const preguntaActual = questions[0];
   const [indicePregunta, setIndicePregunta] = useState(0); // indice empieza en 0 ---> "a"
   const preguntaActual = questions[indicePregunta];
@@ -117,9 +118,10 @@ export default function RoscoComponent({ questions }) {
     setIndicePregunta(siguienteIndice);
   }
 
-  function terminarPartida() {
-    console.log("Respuestas finales:", answers);
-  }
+  async function terminarPartida() {
+  const datosFinales = await finishGame(gameId, answers);
+  console.log("Partida finalizada:", datosFinales);
+}
   return (
     <section className="rosco">
       <div className="rosco-circulo">

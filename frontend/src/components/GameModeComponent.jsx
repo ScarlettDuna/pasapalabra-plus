@@ -86,6 +86,7 @@ export default function GameModeComponent() {
     navigate("/game", {
       state: {
         questions: datos.questions,
+        gameId: datos.gameId,
       },
     });
   }
