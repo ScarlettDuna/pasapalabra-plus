@@ -69,7 +69,7 @@ export default function RegisterComponent() {
 
                 <div className="buttons-container">
                     <button type="submit" className="customButton btn-login">
-                        Registrarse
+                        REGISTRARSE
                     </button>
 
                     <button
@@ -77,7 +77,7 @@ export default function RegisterComponent() {
                         className="customButton btn-guest"
                         onClick={handleGuest}
                     >
-                        Invitado
+                        INVITADO
                     </button>
 
                 </div>

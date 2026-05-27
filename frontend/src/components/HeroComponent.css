@@ -20,7 +20,7 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-.titulo > :nth-child(2) {
+.titulo span {
     color: yellow;
 }
 
@@ -38,9 +38,7 @@
     padding: 14px 20px;
     border-radius: 25px;
     border: none;
-    color: white;
     font-size: 1.2rem;
-    font-weight: bold;
     cursor: pointer;
     transition: 0.2s ease;
 }
@@ -76,20 +74,25 @@
 .dropdown button {
     background-color: #FFD700;
     color: black;
+    font-style: oblique;
 }
 
 /* BOTONES PRINCIPALES */
 .botonJugar {
     background-color: #4CAF50;
+    font-style: oblique;
+    color: black;
 }
 
 .botonSalir {
     background-color: #f44336;
+    font-style: oblique;
+    color: white;
 }
 
 
 /* =========================
-   RESPONSIVE 1160px
+    RESPONSIVE 1160px
 ========================= */
 @media (max-width: 1160px) {
 

@@ -66,7 +66,7 @@ export default function LoginComponent() {
                 <div className="buttons-container">
 
                     <button type="submit" className="customButton btn-login">
-                        Iniciar Sesión
+                        INICIAR SESIÓN
                     </button>
 
                     <button
@@ -74,7 +74,7 @@ export default function LoginComponent() {
                         className="customButton btn-guest"
                         onClick={handleGuest}
                     >
-                        Invitado
+                        INVITADO
                     </button>
 
                 </div>

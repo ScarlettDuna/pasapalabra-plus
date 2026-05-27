@@ -14,36 +14,35 @@ export default function HeroComponent() {
     return (
         <div className='menu'>
             <div className='titulo'>
-                <h1>Menú</h1>
-                <h1>Principal</h1>
+                <h1>Menú <span>Principal</span></h1>
             </div>
 
             <div className='opciones'>
                 
                 {/* BOTÓN PRINCIPAL */}
                 <button className='botonJugar' onClick={toggleMenu}>
-                    Jugar
+                    JUGAR
                 </button>
 
                 {/* MENU DESPLEGABLE */}
                 {open && (
                     <div className="dropdown">
                         <button onClick={() => navigate("/login")}>
-                            Iniciar sesión
+                            INICIAR SESIÓN
                         </button>
 
                         <button onClick={() => navigate("/register")}>
-                            Registrarse
+                            REGISTRARSE
                         </button>
 
                         <button onClick={() => navigate("/gamemode")}>
-                            Invitado
+                            INVITADO
                         </button>
                     </div>
                 )}
 
                 <button onClick={() => navigate("/")} className='botonSalir'>
-                    Salir
+                    SALIR
                 </button>
 
             </div>

@@ -50,7 +50,6 @@
     border-radius: 25px;
 
     font-size: 1.1rem;
-    font-weight: bold;
 
     cursor: pointer;
     transition: 0.2s ease;
@@ -64,10 +63,12 @@
 .btn-login {
     background-color: #4CAF50;
     color: black;
+    font-style: oblique;
 }
 
 /* INVITADO */
 .btn-guest {
     background-color: #FFD700;
     color: black;
+    font-style: oblique;
 }

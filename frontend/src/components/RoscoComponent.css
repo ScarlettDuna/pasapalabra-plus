@@ -156,19 +156,19 @@
   border: none;
   border-radius: 25px;
   padding: 12px 20px;
-  font-weight: bold;
   cursor: pointer;
   min-width: 130px;
+  font-style: oblique;
 }
 
 .rosco-botones button:first-child {
-  background-color: #ffd700;
+  background-color: #4caf50;
   color: black;
 }
 
 .rosco-botones button:nth-child(2) {
-  background-color: #4caf50;
-  color: white;
+  background-color: #ffd700;
+  color: black;
 }
 
 .rosco-botones button:last-child {

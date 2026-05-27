@@ -183,13 +183,13 @@ export default function RoscoComponent({ questions, gameId }) {
 
         <div className="opciones-fin">
           <button onClick={() => navigate("/ranking")}>
-            Ver ranking
+            VER RANKING
           </button>
           <button onClick={() => navigate("/gamemode")}>
-            Volver a jugar
+            VOLVER A JUGAR
           </button>
           <button onClick={() => navigate("/")}>
-            Salir
+            SALIR
           </button>
         </div>
       </div>
