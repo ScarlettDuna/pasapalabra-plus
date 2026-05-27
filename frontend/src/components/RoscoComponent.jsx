@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./RoscoComponent.css";
 import { finishGame } from "../services/games";
+import { useNavigate } from 'react-router-dom';
 
 const letrasRosco = [
   "A",
@@ -32,6 +33,8 @@ const letrasRosco = [
 ];
 
 export default function RoscoComponent({ questions, gameId }) {
+  const navigate = useNavigate();
+
   //const preguntaActual = questions[0];
   const [indicePregunta, setIndicePregunta] = useState(0); // indice empieza en 0 ---> "a"
   const preguntaActual = questions[indicePregunta];
@@ -133,10 +136,10 @@ export default function RoscoComponent({ questions, gameId }) {
   async function terminarPartida() {
     const datosFinales = await finishGame(gameId, answers); // llamada al backend
     if (datosFinales.score) {
-    setResultadoFinal(datosFinales); // lo guarda en el estado
-  } else {
-    alert(datosFinales.message); // si ya fue jugada la partida, lanza alert. 
-  }
+      setResultadoFinal(datosFinales); // lo guarda en el estado
+    } else {
+      alert(datosFinales.message); // si ya fue jugada la partida, lanza alert. 
+    }
   }
 
   function restarTiempo() {
@@ -169,101 +172,121 @@ export default function RoscoComponent({ questions, gameId }) {
   );
 
   return (
-    <section className="rosco">
-      <div className="rosco-circulo">
-        {letrasRosco.map((letra, index) => {
-          const angulo = (360 / letrasRosco.length) * index - 90;
-          const radio = 42;
-          const x = 50 + radio * Math.cos((angulo * Math.PI) / 180);
-          const y = 50 + radio * Math.sin((angulo * Math.PI) / 180);
-
-          // cambiar estilo de la letra segun activa o no
-          let claseLetra = "rosco-letra";
-
-          if (estadoLetras[letra] === "correcta") {
-            claseLetra = "rosco-letra correcta";
-          }
-
-          if (estadoLetras[letra] === "incorrecta") {
-            claseLetra = "rosco-letra incorrecta";
-          }
-
-          if (estadoLetras[letra] === "pasada") {
-            claseLetra = "rosco-letra pasada";
-          }
-
-          if (index === indicePregunta) {
-            claseLetra = "rosco-letra activa";
-          }
-
-          return (
-            <div
-              key={letra}
-              className={claseLetra}
-              style={{
-                left: `${x}%`,
-                top: `${y}%`,
-              }}
-            >
-              {letra}
-            </div>
-          );
-        })}
-
-        <div className="rosco-centro">
-          <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
-          <p>Tiempo restante:</p>
-          <span>{tiempoRestante}</span>
-        </div>
-      </div>
-
-      <div className="rosco-pregunta">
-        <p>
-          {preguntaActual
-            ? preguntaActual.question
-            : "No hay preguntas cargadas"}
-        </p>
-        <input
-          type="text"
-          placeholder="Escribe tu respuesta"
-          value={respuestaUsuario}
-          onChange={escribirRespuesta}
-          disabled={partidaTerminada} // para deshabilitarlo cuando partidaTerminada
-        />
-
-        <div className="rosco-botones">
-          <button
-            type="button"
-            onClick={responderPregunta}
-            disabled={partidaTerminada}
-          >
-            RESPONDER
-          </button>
-          <button
-            type="button"
-            onClick={pasarPalabra}
-            disabled={partidaTerminada}
-          >
-            PASAPALABRA
-          </button>
-          <button
-            type="button"
-            onClick={terminarPartida}
-            disabled={partidaTerminada}
-          >
-            TERMINAR
-          </button>
-        </div>
-      </div>
-
-      {resultadoFinal && (
+    resultadoFinal ? (
+      <div>
         <div className="resultado-final">
-          <p>Partida terminada</p>
+          <p>PARTIDA TERMINADA</p>
           <p>Aciertos: {resultadoFinal.score.correct}</p>
           <p>Fallos: {resultadoFinal.score.wrong}</p>
           <p>Puntuación: {resultadoFinal.score.score}</p>
         </div>
-      )}
-    </section>
+
+        <div className="opciones-fin">
+          <button onClick={() => navigate("/ranking")}>
+            Ver ranking
+          </button>
+          <button onClick={() => navigate("/gamemode")}>
+            Volver a jugar
+          </button>
+          <button onClick={() => navigate("/")}>
+            Salir
+          </button>
+        </div>
+      </div>
+    ) : (
+      <section className="rosco">
+        <div className="rosco-circulo">
+          {letrasRosco.map((letra, index) => {
+            const angulo = (360 / letrasRosco.length) * index - 90;
+            const radio = 42;
+            const x = 50 + radio * Math.cos((angulo * Math.PI) / 180);
+            const y = 50 + radio * Math.sin((angulo * Math.PI) / 180);
+
+            // cambiar estilo de la letra segun activa o no
+            let claseLetra = "rosco-letra";
+
+            if (estadoLetras[letra] === "correcta") {
+              claseLetra = "rosco-letra correcta";
+            }
+
+            if (estadoLetras[letra] === "incorrecta") {
+              claseLetra = "rosco-letra incorrecta";
+            }
+
+            if (estadoLetras[letra] === "pasada") {
+              claseLetra = "rosco-letra pasada";
+            }
+
+            if (index === indicePregunta) {
+              claseLetra = "rosco-letra activa";
+            }
+
+            return (
+              <div
+                key={letra}
+                className={claseLetra}
+                style={{
+                  left: `${x}%`,
+                  top: `${y}%`,
+                }}
+              >
+                {letra}
+              </div>
+            );
+          })}
+
+          <div className="rosco-centro">
+            <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
+            <p>Tiempo restante:</p>
+            <span>{tiempoRestante}</span>
+          </div>
+        </div>
+
+        <div className="rosco-pregunta">
+          <p>
+            {preguntaActual
+              ? preguntaActual.question
+              : "No hay preguntas cargadas"}
+          </p>
+          <input
+            type="text"
+            placeholder="Escribe tu respuesta"
+            value={respuestaUsuario}
+            onChange={escribirRespuesta}
+            disabled={partidaTerminada} // para deshabilitarlo cuando partidaTerminada
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !partidaTerminada) {
+                e.preventDefault();
+                responderPregunta();
+              }
+            }}
+          />
+
+          <div className="rosco-botones">
+            <button
+              type="button"
+              onClick={responderPregunta}
+              disabled={partidaTerminada}
+            >
+              RESPONDER
+            </button>
+            <button
+              type="button"
+              onClick={pasarPalabra}
+              disabled={partidaTerminada}
+            >
+              PASAPALABRA
+            </button>
+            <button
+              type="button"
+              onClick={terminarPartida}
+              disabled={partidaTerminada}
+            >
+              TERMINAR
+            </button>
+          </div>
+        </div>
+      </section>
+    )
   );
 }

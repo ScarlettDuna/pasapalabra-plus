@@ -5,6 +5,43 @@
   text-align: center;
 }
 
+.presentacion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding-bottom: 40px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+
+  width: min(800px, 90%);
+  margin: 0 auto 30px auto;
+}
+
+.presentacion h3 {
+  font-size: 1.5rem;
+}
+
+.botonIniciar {
+  background-color: #FFD700;
+  font-style: italic;
+  color: black;
+  border-radius: 25px;
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.botonIniciar:hover {
+  transform: scale(1.03);
+  filter: brightness(1.10);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
 .logo {
   padding: 1.5em;
   will-change: filter;
