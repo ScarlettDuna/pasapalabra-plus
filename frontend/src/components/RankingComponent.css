@@ -1,0 +1,102 @@
+
+.ranking-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.ranking-selector {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.ranking-etiqueta {
+  background-color: #4caf50;
+  color: black;
+  width: 120px;
+  padding: 10px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0;
+}
+
+.ranking-flecha {
+  color: #add8e6;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.ranking-btn-idioma {
+  background-color: #ffd700;
+  color: black;
+  width: 130px;
+  padding: 10px;
+  border-radius: 25px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.ranking-mensaje {
+  font-weight: bold;
+  color: white;
+}
+
+.ranking-error {
+  font-weight: bold;
+  color: #ff5722;
+}
+
+.ranking-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.ranking-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #4caf50;
+  border-radius: 20px;
+  padding: 15px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ranking-posicion,
+.ranking-nombre,
+.ranking-puntos {
+  margin: 0;
+  font-weight: bold;
+}
+
+.ranking-posicion {
+  color: #ffd700;
+  width: 80px;
+  text-align: left;
+}
+
+.ranking-nombre {
+  color: white;
+  flex: 1;
+  text-align: center;
+}
+
+.ranking-puntos {
+  color: black;
+  background-color: #ffd700;
+  padding: 8px 12px;
+  border-radius: 20px;
+  min-width: 100px;
+  text-align: center;
+}

@@ -47,7 +47,7 @@ export default function RoscoComponent({ questions, gameId }) {
   const [resultadoFinal, setResultadoFinal] = useState(null);
 
   // estado para el crono
-  const [tiempoRestante, setTiempoRestante] = useState(10); // 120 seg
+  const [tiempoRestante, setTiempoRestante] = useState(120); // 120 seg
 
   // para comprobar si esta la partida terminada
   let partidaTerminada = false;
