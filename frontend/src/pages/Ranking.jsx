@@ -9,7 +9,6 @@ export default function Ranking() {
       <HeaderComponent></HeaderComponent>
       <h2>RANKING</h2>
       <RankingComponent></RankingComponent>
-      <FooterComponent></FooterComponent>
     </main>
   );
 }

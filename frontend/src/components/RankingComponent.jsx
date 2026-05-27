@@ -34,6 +34,11 @@ export default function RankingComponent() {
     setIndiceIdioma((indiceIdioma + 1) % idiomas.length);
   }
 
+  function formatearFecha(fecha) {
+  const date = new Date(fecha);
+  return date.toLocaleDateString();
+}
+
   return (
     <div className="ranking-container">
       <div className="ranking-selector">
@@ -59,7 +64,7 @@ export default function RankingComponent() {
               <p className="ranking-posicion">#{jugador.position}</p>
               <p className="ranking-nombre">{jugador.playerName}</p>
               <p className="ranking-puntos">{jugador.score} pts</p>
-              <p className="ranking-fecha">{jugador.createdAt}</p>
+              <p className="ranking-fecha">{formatearFecha(jugador.createdAt)}</p>
             </div>
           ))}
         </div>
