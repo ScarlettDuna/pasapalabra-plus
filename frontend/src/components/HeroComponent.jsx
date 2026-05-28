@@ -11,6 +11,8 @@ export default function HeroComponent() {
         setOpen(!open);
     };
 
+    const [openPopup, setOpenPopup] = useState(false);
+
     return (
         <div className='menu'>
             <div className='titulo'>
@@ -18,7 +20,7 @@ export default function HeroComponent() {
             </div>
 
             <div className='opciones'>
-                
+
                 {/* BOTÓN PRINCIPAL */}
                 <button className='botonJugar' onClick={toggleMenu}>
                     JUGAR
@@ -38,6 +40,28 @@ export default function HeroComponent() {
                         <button onClick={() => navigate("/gamemode")}>
                             INVITADO
                         </button>
+                    </div>
+                )}
+
+                <button className='botonInstrucciones' onClick={() => setOpenPopup(true)}>
+                    INSTRUCCIONES
+                </button>
+
+                {openPopup && (
+                    <div className="popup-overlay">
+                        <div className="popup">
+
+                            <h2>Instrucciones del juego</h2>
+                                <p>1. Completar el Rosco: Responde correctamente a las definiciones de la A a la Z.</p>
+                                <p>2. Responder: Escribe tu respuesta y pulsa 'Enter' o el botón de enviar.</p>
+                                <p>3. Pasapalabra: Si no sabes una respuesta, usa 'Pasapalabra' para saltarla y volver a ella al final de la vuelta.</p>
+                                <p>4. Tiempo: El cronómetro medirá cuánto tardas en completar el juego. ¡Sé el más rápido para subir en el ranking!</p>
+                                <p>5. Colores: El verde indica acierto, el rojo fallo y el azul/amarillo letras pendientes.</p>
+                            <button onClick={() => setOpenPopup(false)}>
+                                Cerrar
+                            </button>
+
+                        </div>
                     </div>
                 )}
 
