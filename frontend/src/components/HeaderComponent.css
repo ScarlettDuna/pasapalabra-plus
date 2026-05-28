@@ -2,6 +2,26 @@
     display: flex;
 }
 
-img {
-    width: 115px;
+.logo:hover {
+    filter: drop-shadow(0 0 1em #ffffff);
+    cursor: pointer;
+}
+
+.logo {
+    padding: 1.2em;
+    will-change: filter;
+    transition: filter 300ms;
+    width: 250px;
+}
+
+@media (max-width: 1160px) {
+    .logo {
+        width: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        width: 200px;
+    }
 }

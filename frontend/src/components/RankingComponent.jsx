@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./RankingComponent.css";
 import { getRanking } from "../services/ranking";
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import FooterComponent from "./FooterComponent";
 
 export default function RankingComponent() {
   const idiomas = ["ES", "EN", "FR"];
@@ -19,6 +21,7 @@ export default function RankingComponent() {
         const idioma = idiomas[indiceIdioma];
         const data = await getRanking(idioma);
         setRanking(data);
+        console.log(data);
         console.log(ranking);
       } catch (err) {
         setError("No se pudo cargar el ranking");
@@ -35,9 +38,9 @@ export default function RankingComponent() {
   }
 
   function formatearFecha(fecha) {
-  const date = new Date(fecha);
-  return date.toLocaleDateString();
-}
+    const date = new Date(fecha);
+    return date.toLocaleDateString();
+  }
 
   return (
     <div className="ranking-container">
@@ -59,16 +62,54 @@ export default function RankingComponent() {
 
       {!cargando && !error && ranking.length > 0 && (
         <div className="ranking-lista">
-          {ranking.map((jugador, index) => (
-            <div className="ranking-fila" key={index}>
-              <p className="ranking-posicion">#{jugador.position}</p>
-              <p className="ranking-nombre">{jugador.playerName}</p>
-              <p className="ranking-puntos">{jugador.score} pts</p>
-              <p className="ranking-fecha">{formatearFecha(jugador.createdAt)}</p>
-            </div>
-          ))}
+          <table className="ranking-tabla">
+            <thead>
+              <tr>
+                <th>POS</th>
+                <th>JUGADOR</th>
+                <th>PUNTOS</th>
+                <th>FECHA</th>
+                <th>TIEMPO</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {ranking.map((jugador) => (
+                <tr
+                  key={jugador.position}
+                  className="ranking-fila"
+                >
+                  <td className="ranking-posicion">
+                    #{jugador.position}
+                  </td>
+
+                  <td className="ranking-nombre">
+                    {jugador.playerName}
+                  </td>
+
+                  <td className="ranking-puntos">
+                    {jugador.score} pts
+                  </td>
+
+                  <td className="ranking-fecha">
+                    {formatearFecha(jugador.createdAt)}
+                  </td>
+
+                  <td className="ranking-tiempo">
+                    {jugador.duration}s
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
+
+      <Link to="/home">
+          <button className='botonMenu'>MENÚ PRINCIPAL</button>
+      </Link>
+      <FooterComponent></FooterComponent>
+
     </div>
   );
 }

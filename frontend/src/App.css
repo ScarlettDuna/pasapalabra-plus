@@ -1,4 +1,7 @@
 #root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
@@ -14,26 +17,40 @@
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
+  padding: 20px;
   padding-bottom: 40px;
+
   backdrop-filter: blur(15px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
   text-align: center;
 
   width: min(800px, 90%);
   margin: 0 auto 30px auto;
+
+  box-sizing: border-box;
 }
 
 .presentacion h3 {
-  font-size: 1.5rem;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  margin-bottom: 15px;
 }
 
 .botonIniciar {
   background-color: #FFD700;
   font-style: italic;
   color: black;
+
+  border: none;
   border-radius: 25px;
-  font-size: 1.2rem;
+
+  font-size: clamp(1rem, 2vw, 1.2rem);
+
+  padding: 12px 24px;
   margin-top: 10px;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .botonIniciar:hover {
@@ -42,14 +59,39 @@
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 }
 
-.logo {
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* Tablets */
+@media (max-width: 768px) {
+  .presentacion {
+    width: 95%;
+    padding: 18px;
+    padding-bottom: 30px;
+    border-radius: 16px;
+  }
+
+  .botonIniciar {
+    width: 100%;
+    max-width: 300px;
+  }
 }
-.logo:hover {
-  filter: drop-shadow(0 0 1em #ffffff);
-  cursor: pointer;
+
+/* Móviles */
+@media (max-width: 480px) {
+  .presentacion {
+    width: 95%;
+    padding: 15px;
+    padding-bottom: 25px;
+    border-radius: 14px;
+  }
+
+  .presentacion h3 {
+    font-size: 1.1rem;
+  }
+
+  .botonIniciar {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 18px;
+  }
 }
 
 /* FLECHA SPAN */

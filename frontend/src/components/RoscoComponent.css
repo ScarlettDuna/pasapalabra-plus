@@ -115,9 +115,7 @@
   align-items: center;
   justify-content: center;
   gap: 15px;
-
   width: min(450px, 90%);
-
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
@@ -125,7 +123,6 @@
   backdrop-filter: blur(20px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   text-align: center;
-
   margin: 0 auto 30px auto;
 }
 
@@ -142,7 +139,8 @@
   border: 2px solid #ffd700;
   font-size: 1rem;
   box-sizing: border-box;
-  color: black;
+  color: white(255, 255, 255);
+  font-style: oblique;
 }
 
 .rosco-botones {
@@ -209,6 +207,10 @@
     font-size: 2rem;
   }
 
+  .rosco-centro p {
+    margin: 12px;
+  }
+
 }
 
 @media (max-width: 480px) {
@@ -247,6 +249,7 @@
   .rosco-centro p,
   .rosco-centro span {
     font-size: 0.8rem;
+    margin: 5px 0;
   }
 
   .rosco-pregunta {
@@ -277,7 +280,8 @@
   background: rgba(255, 255, 255, 0.08);
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
-  padding: 20px;
+  padding: 15px;
+  padding-top: 10px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   text-align: center;
@@ -302,7 +306,7 @@
 }
 
 .resultado-final p {
-  margin: 14px 0;
+  margin: 10px 0;
   color: white;
   font-weight: 700;
   font-size: 1.3rem;
@@ -331,15 +335,15 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  padding: 10px;
+  padding: 5px;
 }
 
 .opciones-fin button {
-  font-size: 18px;
+  font-size: 16px;
   font-style: italic;
-  padding: 10px;
-  width: 200px;
-  height: 50px;
+  padding: 1px;
+  width: 170px;
+  height: 45px;
   border: none;
   border-radius: 25px;
   color: white;

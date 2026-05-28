@@ -7,7 +7,7 @@ export default function Ranking() {
   return (
     <main style={{ padding: "20px", textAlign: "center" }}>
       <HeaderComponent></HeaderComponent>
-      <h2>RANKING</h2>
+      <h2><span className='flechaSelección'>➥</span> RANKING</h2>
       <RankingComponent></RankingComponent>
     </main>
   );
