@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import reactLogo from '../assets/logo-pasapalabra.png'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HeaderComponent from "../components/HeaderComponent";
 
