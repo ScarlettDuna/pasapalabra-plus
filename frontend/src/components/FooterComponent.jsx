@@ -15,7 +15,7 @@ export default function FooterComponent() {
 
               <Link to='/#'>
                 <li>🏆 Acerca de nosotros</li>
-              </Link>  
+              </Link>
             </ul>
             </div>
         </div>

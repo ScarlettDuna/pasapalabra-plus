@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./RoscoComponent.css";
 import { finishGame } from "../services/games";
 import { useNavigate } from 'react-router-dom';
@@ -49,8 +49,20 @@ export default function RoscoComponent({ questions, gameId }) {
   // estado para guardar resultado partida -- empieza en null
   const [resultadoFinal, setResultadoFinal] = useState(null);
 
+  const intervaloRef = useRef(null);
+
   // estado para el crono
-  const [tiempoRestante, setTiempoRestante] = useState(120); // 120 seg
+  const [tiempoEmpleado, setTiempoEmpleado] = useState(0); // 0 seg
+
+  useEffect(() => {
+
+    iniciarCronometro();
+
+    return () => {
+      pararCronometro();
+    };
+
+  }, []);
 
   // para comprobar si esta la partida terminada
   let partidaTerminada = false;
@@ -133,43 +145,36 @@ export default function RoscoComponent({ questions, gameId }) {
     setIndicePregunta(siguienteIndice);
   }
 
+  function iniciarCronometro() {
+
+    // evita crear varios intervalos
+    if (intervaloRef.current !== null) return;
+
+    intervaloRef.current = setInterval(() => {
+      setTiempoEmpleado((tiempoAnterior) => tiempoAnterior + 1);
+    }, 1000);
+  }
+
+  function pararCronometro() {
+
+    clearInterval(intervaloRef.current);
+
+    // importante: resetear la referencia
+    intervaloRef.current = null;
+  }
+
   async function terminarPartida() {
-    const datosFinales = await finishGame(gameId, answers); // llamada al backend
+
+    pararCronometro();
+
+    const datosFinales = await finishGame(gameId, answers);
+
     if (datosFinales.score) {
-      setResultadoFinal(datosFinales); // lo guarda en el estado
+      setResultadoFinal(datosFinales);
     } else {
-      alert(datosFinales.message); // si ya fue jugada la partida, lanza alert. 
+      alert(datosFinales.message);
     }
   }
-
-  function restarTiempo() {
-    setTiempoRestante(function (tiempoAnterior) {
-      if (tiempoAnterior > 0) {
-        return tiempoAnterior - 1;
-      } else {
-        return 0;
-      }
-    });
-  }
-
-  // useEffect para el cronómetro
-  useEffect(function () {
-    const intervalo = setInterval(restarTiempo, 1000);
-
-    return function () {
-      clearInterval(intervalo);
-    };
-  }, []);
-
-  //para terminar la partida cuando llegue a 0 el contador
-  useEffect(
-    function () {
-      if (tiempoRestante === 0) {
-        terminarPartida();
-      }
-    },
-    [tiempoRestante],
-  );
 
   return (
     resultadoFinal ? (
@@ -179,6 +184,7 @@ export default function RoscoComponent({ questions, gameId }) {
           <p>Aciertos: {resultadoFinal.score.correct}</p>
           <p>Fallos: {resultadoFinal.score.wrong}</p>
           <p>Puntuación: {resultadoFinal.score.score}</p>
+          <p>Tiempo empleado: {tiempoEmpleado} segundos</p>
         </div>
 
         <div className="opciones-fin">
@@ -238,7 +244,7 @@ export default function RoscoComponent({ questions, gameId }) {
           <div className="rosco-centro">
             <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
             <p>Tiempo restante:</p>
-            <span>{tiempoRestante}</span>
+            <span>{tiempoEmpleado}</span>
           </div>
         </div>
 
