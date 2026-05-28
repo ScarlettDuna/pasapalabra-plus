@@ -138,7 +138,7 @@ export default function RoscoComponent({ questions, gameId }) {
     if (datosFinales.score) {
       setResultadoFinal(datosFinales); // lo guarda en el estado
     } else {
-      alert(datosFinales.message); // si ya fue jugada la partida, lanza alert. 
+      alert("Esta partida ya fue terminada, vuelve al menú principal para comenzar una nueva."); // si ya fue jugada la partida, lanza alert. 
     }
   }
 
