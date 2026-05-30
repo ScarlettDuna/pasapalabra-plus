@@ -139,7 +139,9 @@ export default function CreateQuestion() {
         </button>
 
       </form>
-
+      <button type="button" onClick={() => navigate("/profile")} style={btnBack}>
+        Volver al perfil
+      </button>
       <FooterComponent />
     </main>
   );
@@ -155,4 +157,11 @@ const selectStyle = {
   background: "rgba(0,0,0,0.4)",
   color: "#fff",
   fontSize: "1rem",
+};
+
+const btnBack = {
+  background: "transparent", color: "#fff",
+  border: "1px solid rgba(255,255,255,0.4)", borderRadius: "8px",
+  padding: "0.6rem 1.4rem", cursor: "pointer", fontSize: "1rem",
+  marginTop: "1.5rem", marginBottom: "2rem",
 };

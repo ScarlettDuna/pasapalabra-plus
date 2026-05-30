@@ -78,6 +78,9 @@ export const login = async (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: "Credenciales inválidas" });
         }
+        if (!user.passwordHash) {
+            return res.status(401).json({ message: "Esta cuenta usa login con Google o GitHub" });
+        }
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
 

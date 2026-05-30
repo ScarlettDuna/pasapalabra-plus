@@ -92,7 +92,7 @@ export default function LoginComponent() {
                     >
                         <span className="social-button-content">
                             <img className="social-button-icon" src={googleLogo} alt="" />
-                            <span>ENTRAR CON GOOGLE</span>
+                            <span>Google</span>
                         </span>
                     </button>
 
@@ -103,7 +103,7 @@ export default function LoginComponent() {
                     >
                         <span className="social-button-content">
                             <img className="social-button-icon" src={githubLogo} alt="" />
-                            <span>ENTRAR CON GITHUB</span>
+                            <span>Github</span>
                         </span>
                     </button>
                 </div>

@@ -2,6 +2,17 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginComponent.css";
 import { register } from "../services/auth";
+import API_URL from "../services/api";
+import googleLogo from "../assets/google-logo.webp";
+import githubLogo from "../assets/github-logo.webp";
+
+const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/auth/google`;
+};
+
+const handleGithubLogin = () => {
+    window.location.href = `${API_URL}/auth/github`;
+};
 
 export default function RegisterComponent() {
     const [username, setUsername] = useState("");
@@ -80,6 +91,29 @@ export default function RegisterComponent() {
                         Invitado
                     </button>
 
+                </div>
+                <div className="social-buttons">
+                    <button
+                        type="button"
+                        className="customButton btn-google"
+                        onClick={handleGoogleLogin}
+                    >
+                        <span className="social-button-content">
+                            <img className="social-button-icon" src={googleLogo} alt="" />
+                            <span>Google</span>
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className="customButton btn-github"
+                        onClick={handleGithubLogin}
+                    >
+                        <span className="social-button-content">
+                            <img className="social-button-icon" src={githubLogo} alt="" />
+                            <span>Github</span>
+                        </span>
+                    </button>
                 </div>
 
             </form>

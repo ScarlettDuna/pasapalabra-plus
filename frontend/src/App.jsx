@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import CreateQuestion from "./pages/CreateQuestion";
 import Admin from './pages/Admin';
 import Achievements from "./pages/Achievements";
+import MyQuestions from './pages/MyQuestions';
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
         <Route path="/nueva-pregunta" element={<CreateQuestion />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/logros" element={<Achievements />} />
+        <Route path="/mis-preguntas" element={<MyQuestions />} />
       </Routes>
     </BrowserRouter>
   )

@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import HeaderComponent from "../components/HeaderComponent";
 import FooterComponent from "../components/FooterComponent";
 import { getMe, getMyStats } from "../services/users";
+import { getMyQuestions } from "../services/questions";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [preguntas, setPreguntas] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,8 +21,17 @@ export default function Profile() {
         setStats(statsData);
       } catch (err) {
         setError("No se pudo cargar el perfil.");
+        return;
       } finally {
         setLoading(false);
+      }
+
+      // Carga secundaria — no bloquea el perfil si falla
+      try {
+        const preguntasData = await getMyQuestions();
+        setPreguntas(preguntasData);
+      } catch {
+        // silencioso: el botón simplemente no aparece
       }
     }
     cargarPerfil();
@@ -84,6 +95,11 @@ export default function Profile() {
         <button onClick={() => navigate("/nueva-pregunta")} style={btnPrimary}>
           Crear pregunta
         </button>
+        {preguntas.length > 0 && (
+          <button onClick={() => navigate("/mis-preguntas")} style={btnSecondary}>
+            Mis preguntas ({preguntas.length})
+          </button>
+        )}
         <button onClick={() => navigate("/home")} style={btnSecondary}>
           Volver al menú
         </button>

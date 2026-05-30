@@ -84,6 +84,9 @@ export default function Admin() {
         ))}
       </div>
 
+      <button onClick={() => navigate("/home")} style={btnBack}>
+        Volver al menú
+      </button>
       <FooterComponent />
     </main>
   );
@@ -118,4 +121,11 @@ const btnApprove = {
 const btnReject = {
   background: "#b71c1c", color: "#fff", border: "none",
   borderRadius: "6px", padding: "0.4rem 1rem", cursor: "pointer",
+};
+
+const btnBack = {
+  background: "transparent", color: "#fff",
+  border: "1px solid rgba(255,255,255,0.4)", borderRadius: "8px",
+  padding: "0.6rem 1.4rem", cursor: "pointer", fontSize: "1rem",
+  marginTop: "1.5rem", marginBottom: "2rem",
 };

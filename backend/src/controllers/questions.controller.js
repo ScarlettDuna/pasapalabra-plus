@@ -1,13 +1,14 @@
-import { prisma } from "../db/prisma.js"
+import { prisma } from "../db/prisma.js";
+import { checkAndGrantAchievements } from "../utils/achievements.js";
 
 export const createQuestion = async (req, res, next) => {
   try {
-    const { letter, question, answer, language, difficulty, categoryId, isPersonal} = req.body;
+    const { letter, question, answer, language, difficulty, categoryId, isPersonal } = req.body;
     if (!letter || !question || !answer || !language || !difficulty || !categoryId || isPersonal === undefined) {
       return res.status(400).json({
         message: "Query debe contener todos: letter, question, answer, language, difficulty, categoryId & isPersonal"
       })
-    } 
+    }
     const lang = String(language).toUpperCase();
     const ALLOWED_LANG = new Set(["ES", "EN", "FR"]);
 
@@ -25,7 +26,7 @@ export const createQuestion = async (req, res, next) => {
     if (!Number.isInteger(catId) || catId <= 0) {
       return res.status(400).json({ message: "categoryId debe ser un entero positivo" });
     }
-    const category = await prisma.category.findUnique({ where: {id: catId }});
+    const category = await prisma.category.findUnique({ where: { id: catId } });
     if (!category) return res.status(404).json({ message: "Categoría no encontrada" })
 
     const status = isPersonal ? "approved" : "pending";
@@ -39,14 +40,15 @@ export const createQuestion = async (req, res, next) => {
         difficulty: diff,
         categoryId: catId,
         isPersonal,
-        status, 
+        status,
         createdBy: req.user.userId
       },
       select: {
         id: true, letter: true, question: true, difficulty: true, status: true
       }
     })
-    res.status(201).json(pregunta)
+    res.status(201).json(pregunta);
+    checkAndGrantAchievements(req.user.userId).catch(() => {});
   } catch (err) {
     next(err)
   }
@@ -56,10 +58,9 @@ export const getMyQuestions = async (req, res, next) => {
   try {
     const questions = await prisma.question.findMany({
       where: { createdBy: req.user.userId },
-      orderBy: { createdAt: 'desc' },
       select: {
-        id: true, letter: true, question: true, answer: true, language: true, difficulty: true, categoryId: true,
-        isPersonal: true, status: true, createdAt: true
+        id: true, letter: true, question: true, answer: true, language: true,
+        difficulty: true, categoryId: true, isPersonal: true, status: true
       }
     });
 
