@@ -72,3 +72,22 @@
     color: black;
     font-style: oblique;
 }
+
+.social-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.btn-google {
+    background-color: #2D9CDB;
+    color: white;
+    font-style: oblique;
+}
+
+.btn-github {
+    background-color: #2b2b2b;
+    color: white;
+    font-style: oblique;
+}

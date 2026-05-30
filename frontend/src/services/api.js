@@ -1,6 +1,6 @@
 import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from "./token";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://b7dqr6qz-5000.uks1.devtunnels.ms/api";
 
 export default API_URL;
 
