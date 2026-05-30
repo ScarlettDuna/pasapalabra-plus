@@ -52,6 +52,7 @@ export default function RoscoComponent({ questions, gameId }) {
 
   // estado para guardar resultado partida -- empieza en null
   const [resultadoFinal, setResultadoFinal] = useState(null);
+  const [mostrarResumen, setMostrarResumen] = useState(false);
 
   const intervaloRef = useRef(null);
 
@@ -75,13 +76,9 @@ export default function RoscoComponent({ questions, gameId }) {
   }
 
   function pasarPalabra() {
-    setEstadoLetras({
-      ...estadoLetras, // usammos ... para añadir al obj la siguiente letra y no sobreescribir
-      [preguntaActual.letter]: "pasada",
-    });
-
-    irASiguientePregunta();
-
+    const newEstado = { ...estadoLetras, [preguntaActual.letter]: "pasada" };
+    setEstadoLetras(newEstado);
+    irASiguientePregunta(newEstado);
     setRespuestaUsuario("");
   }
 
@@ -90,58 +87,44 @@ export default function RoscoComponent({ questions, gameId }) {
   }
 
   function responderPregunta() {
-    // guardamos la questionid ej 1,2,3,4 y la respuesta del user ej. cerebro dentro del usestate answer
-    setAnswers([
-      ...answers, // usamos ... para no sobreescribir
-      {
-        questionId: preguntaActual.questionId,
-        answer: respuestaUsuario,
-      },
-    ]);
-    if (normalize(respuestaUsuario) === normalize(preguntaActual.answer)) {
-      //alert("respuesta correcta");
+    const newAnswers = [
+      ...answers,
+      { questionId: preguntaActual.questionId, answer: respuestaUsuario },
+    ];
+    setAnswers(newAnswers);
 
-      setEstadoLetras({
-        ...estadoLetras,
-        [preguntaActual.letter]: "correcta",
-      });
-
-      console.log("answers hasta ahora:", answers);
-    } else {
-      //alert("respuesta incorrecta");
-
-      setEstadoLetras({
-        ...estadoLetras,
-        [preguntaActual.letter]: "incorrecta",
-      });
-    }
-
+    const esCorrecta = normalize(respuestaUsuario) === normalize(preguntaActual.answer);
+    const newEstado = {
+      ...estadoLetras,
+      [preguntaActual.letter]: esCorrecta ? "correcta" : "incorrecta",
+    };
+    setEstadoLetras(newEstado);
     setRespuestaUsuario("");
 
-    irASiguientePregunta();
+    const todasRespondidas = questions.every(
+      (q) => newEstado[q.letter] === "correcta" || newEstado[q.letter] === "incorrecta"
+    );
+
+    if (todasRespondidas) {
+      terminarPartida(newAnswers);
+    } else {
+      irASiguientePregunta(newEstado);
+    }
   }
 
   // funcion para no vovler a caer en las letras ya jugadas.
-  function irASiguientePregunta() {
+  function irASiguientePregunta(estadoActual = estadoLetras) {
     let siguienteIndice = indicePregunta + 1;
 
-    if (siguienteIndice >= questions.length) {
-      siguienteIndice = 0;
-    }
+    if (siguienteIndice >= questions.length) siguienteIndice = 0;
 
     while (
-      estadoLetras[questions[siguienteIndice].letter] === "correcta" ||
-      estadoLetras[questions[siguienteIndice].letter] === "incorrecta"
+      estadoActual[questions[siguienteIndice].letter] === "correcta" ||
+      estadoActual[questions[siguienteIndice].letter] === "incorrecta"
     ) {
-      siguienteIndice = siguienteIndice + 1;
-
-      if (siguienteIndice >= questions.length) {
-        siguienteIndice = 0;
-      }
-
-      if (siguienteIndice === indicePregunta) {
-        break;
-      }
+      siguienteIndice++;
+      if (siguienteIndice >= questions.length) siguienteIndice = 0;
+      if (siguienteIndice === indicePregunta) break;
     }
 
     setIndicePregunta(siguienteIndice);
@@ -165,12 +148,9 @@ export default function RoscoComponent({ questions, gameId }) {
     intervaloRef.current = null;
   }
 
-  async function terminarPartida() {
-
+  async function terminarPartida(currentAnswers = answers) {
     pararCronometro();
-
-    const datosFinales = await finishGame(gameId, answers);
-
+    const datosFinales = await finishGame(gameId, currentAnswers);
     if (datosFinales.score) {
       setResultadoFinal(datosFinales);
     } else {
@@ -189,16 +169,44 @@ export default function RoscoComponent({ questions, gameId }) {
           <p>Tiempo empleado: {tiempoEmpleado} segundos</p>
         </div>
 
+        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+          <button onClick={() => setMostrarResumen(!mostrarResumen)} style={btnResumenStyle}>
+            {mostrarResumen ? "Ocultar resumen" : "Ver resumen de letras"}
+          </button>
+        </div>
+
+        {mostrarResumen && (
+          <div style={{ maxWidth: "700px", margin: "0 auto 2rem", display: "flex", flexDirection: "column", gap: "0.5rem", padding: "0 1rem" }}>
+            {questions.map((q) => {
+              const estado = estadoLetras[q.letter];
+              const color = estado === "correcta" ? "#7eff7e" : estado === "incorrecta" ? "#ff6b6b" : "#aaa";
+              const icono = estado === "correcta" ? "✓" : estado === "incorrecta" ? "✗" : "—";
+              return (
+                <div key={q.letter} style={{
+                  display: "flex", alignItems: "flex-start", gap: "0.75rem",
+                  background: "rgba(0,0,0,0.35)", borderRadius: "8px",
+                  padding: "0.6rem 1rem",
+                  borderLeft: `4px solid ${color}`,
+                }}>
+                  <span style={{ fontWeight: "bold", fontSize: "1.1rem", color, minWidth: "1.5rem" }}>
+                    {icono} {q.letter}
+                  </span>
+                  <div style={{ flex: 1, fontSize: "0.85rem" }}>
+                    <p style={{ margin: 0, opacity: 0.75 }}>{q.question}</p>
+                    <p style={{ margin: "0.2rem 0 0", color: "#ffd740", fontWeight: "bold" }}>
+                      {q.answer}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         <div className="opciones-fin">
-          <button onClick={() => navigate("/ranking")}>
-            Ver ranking
-          </button>
-          <button onClick={() => navigate("/gamemode")}>
-            Volver a jugar
-          </button>
-          <button onClick={() => navigate("/")}>
-            Salir
-          </button>
+          <button onClick={() => navigate("/ranking")}>Ver ranking</button>
+          <button onClick={() => navigate("/gamemode")}>Volver a jugar</button>
+          <button onClick={() => navigate("/")}>Salir</button>
         </div>
       </div>
     ) : (
@@ -287,7 +295,7 @@ export default function RoscoComponent({ questions, gameId }) {
             </button>
             <button
               type="button"
-              onClick={terminarPartida}
+              onClick={() => terminarPartida()}
               disabled={partidaTerminada}
             >
               Terminar
@@ -298,3 +306,13 @@ export default function RoscoComponent({ questions, gameId }) {
     )
   );
 }
+
+const btnResumenStyle = {
+  background: "rgba(255,255,255,0.1)",
+  color: "#fff",
+  border: "1px solid rgba(255,255,255,0.3)",
+  borderRadius: "8px",
+  padding: "0.5rem 1.2rem",
+  cursor: "pointer",
+  fontSize: "0.9rem",
+};

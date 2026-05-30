@@ -67,7 +67,21 @@ export default function CreateQuestion() {
         <HeaderComponent />
         <h2>¡Pregunta creada!</h2>
         <p>{form.isPersonal ? "Ya puedes usarla en tus partidas." : "Está pendiente de revisión y será visible para todos cuando se apruebe."}</p>
-        <button onClick={() => setExito(false)} style={{ marginRight: "1rem" }}>Crear otra</button>
+        <button onClick={() => {
+          setForm({
+            language: "ES",
+            categoryId: "",
+            letter: "A",
+            difficulty: "easy",
+            question: "",
+            answer: "",
+            isPersonal: true,
+          });
+          setError(null);
+          setExito(false);
+        }} style={{ marginRight: "1rem" }}>
+          Crear otra
+        </button>
         <button onClick={() => navigate("/profile")}>Volver al perfil</button>
         <FooterComponent />
       </main>
@@ -79,8 +93,10 @@ export default function CreateQuestion() {
       <HeaderComponent />
       <h2>Nueva Pregunta</h2>
 
-      <form onSubmit={handleSubmit} style={{ display: "inline-flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "500px", textAlign:
-"left" }}>
+      <form 
+        onSubmit={handleSubmit} 
+        style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "500px", textAlign: "left", margin: "0 auto" }}
+      >
 
         <label>
           Idioma
