@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./LoginComponent.css";
 import { login } from "../services/auth";
 import { saveTokens } from "../services/token";
+import API_URL from "../services/api";
+import googleLogo from "../assets/google-logo.webp";
+import githubLogo from "../assets/github-logo.webp";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
@@ -28,20 +31,24 @@ export default function LoginComponent() {
             saveTokens(token, refreshToken);
 
             alert("Login correcto");
-
             navigate("/gamemode");
-
         } catch (error) {
             console.error(error);
             alert("Error conectando con el servidor");
         }
-
     };
 
     const handleGuest = () => {
         alert("Entrando como invitado...");
-
         navigate("/gamemode");
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = `${API_URL}/auth/google`;
+    };
+
+    const handleGithubLogin = () => {
+        window.location.href = `${API_URL}/auth/github`;
     };
 
     return (
@@ -64,7 +71,6 @@ export default function LoginComponent() {
                 />
 
                 <div className="buttons-container">
-
                     <button type="submit" className="customButton btn-login">
                         Iniciar sesión
                     </button>
@@ -76,7 +82,30 @@ export default function LoginComponent() {
                     >
                         Invitado
                     </button>
+                </div>
 
+                <div className="social-buttons">
+                    <button
+                        type="button"
+                        className="customButton btn-google"
+                        onClick={handleGoogleLogin}
+                    >
+                        <span className="social-button-content">
+                            <img className="social-button-icon" src={googleLogo} alt="" />
+                            <span>ENTRAR CON GOOGLE</span>
+                        </span>
+                    </button>
+
+                    <button
+                        type="button"
+                        className="customButton btn-github"
+                        onClick={handleGithubLogin}
+                    >
+                        <span className="social-button-content">
+                            <img className="social-button-icon" src={githubLogo} alt="" />
+                            <span>ENTRAR CON GITHUB</span>
+                        </span>
+                    </button>
                 </div>
             </form>
         </div>
