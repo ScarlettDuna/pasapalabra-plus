@@ -32,6 +32,10 @@ const letrasRosco = [
   "Z",
 ];
 
+function normalize(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
 export default function RoscoComponent({ questions, gameId }) {
   const navigate = useNavigate();
 
@@ -94,9 +98,7 @@ export default function RoscoComponent({ questions, gameId }) {
         answer: respuestaUsuario,
       },
     ]);
-    if (
-      respuestaUsuario.toLowerCase() === preguntaActual.answer.toLowerCase()
-    ) {
+    if (normalize(respuestaUsuario) === normalize(preguntaActual.answer)) {
       //alert("respuesta correcta");
 
       setEstadoLetras({

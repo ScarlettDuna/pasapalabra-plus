@@ -11,6 +11,11 @@ function calcScore({ correct, wrong, duration }) {
     return correct * 100 - wrong * 25 - duration;
 }
 
+// Evita que de error por tildes
+function normalize(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
 export const startGame = async (req, res, next) => {
     try {
         console.log("Usuario autenticado:", req.user);
@@ -123,7 +128,7 @@ export const finishGame = async (req, res, next) => {
 
         for (let answer of dedupedAnswers) {
             const correctAnswer = answerMap.get(answer.questionId);
-            if (answer.answer.trim().toLowerCase() === correctAnswer.answer.trim().toLowerCase()) {
+            if (normalize(answer.answer) === normalize(correctAnswer.answer)) {
                 correct += 1;
             } else {
                 wrong += 1;
