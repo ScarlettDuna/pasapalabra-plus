@@ -10,38 +10,34 @@ import githubLogo from "../assets/github-logo.webp";
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setError(null);
+        setLoading(true);
         try {
             const result = await login(email, password);
-
-            console.log("LOGIN RESPONSE:", result);
-
             if (!result.ok) {
-                alert(result.data.message);
+                setError(result.data.message);
                 return;
             }
 
             const token = result.data.token;
             const refreshToken = result.data.refreshToken;
-
             saveTokens(token, refreshToken);
 
-            alert("Login correcto");
             navigate("/gamemode");
         } catch (error) {
-            console.error(error);
-            alert("Error conectando con el servidor");
+            setError("Error conectando con el servidor");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleGuest = () => {
-        alert("Entrando como invitado...");
-        navigate("/gamemode");
-    };
+    const handleGuest = () => { navigate("/gamemode"); };
 
     const handleGoogleLogin = () => {
         window.location.href = `${API_URL}/auth/google`;
@@ -61,7 +57,6 @@ export default function LoginComponent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-
                 <input
                     type="password"
                     placeholder="Contraseña"
@@ -70,37 +65,25 @@ export default function LoginComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
 
-                <div className="buttons-container">
-                    <button type="submit" className="customButton btn-login">
-                        Iniciar sesión
-                    </button>
+                {error && <p style={{ color: "#ff6b6b", fontSize: "0.875rem", margin: "0" }}>{error}</p>}
 
-                    <button
-                        type="button"
-                        className="customButton btn-guest"
-                        onClick={handleGuest}
-                    >
+                <div className="buttons-container">
+                    <button type="submit" className="customButton btn-login" disabled={loading}>
+                        {loading ? "Entrando..." : "Iniciar sesión"}
+                    </button>
+                    <button type="button" className="customButton btn-guest" onClick={handleGuest}>
                         Invitado
                     </button>
                 </div>
 
                 <div className="social-buttons">
-                    <button
-                        type="button"
-                        className="customButton btn-google"
-                        onClick={handleGoogleLogin}
-                    >
+                    <button type="button" className="customButton btn-google" onClick={handleGoogleLogin}>
                         <span className="social-button-content">
                             <img className="social-button-icon" src={googleLogo} alt="" />
                             <span>Google</span>
                         </span>
                     </button>
-
-                    <button
-                        type="button"
-                        className="customButton btn-github"
-                        onClick={handleGithubLogin}
-                    >
+                    <button type="button" className="customButton btn-github" onClick={handleGithubLogin}>
                         <span className="social-button-content">
                             <img className="social-button-icon" src={githubLogo} alt="" />
                             <span>Github</span>

@@ -8,7 +8,7 @@ const ALLOWED_DIFF = new Set(["easy", "medium", "hard"]);
 // Fórmula simple (ajustable)
 function calcScore({ correct, wrong, duration }) {
     // ejemplo: premio aciertos, penalizo fallos y tiempo
-    return correct * 100 - wrong * 25 - duration;
+    return Math.max(0, correct * 100 - wrong * 25 - duration);
 }
 
 // Evita que de error por tildes
