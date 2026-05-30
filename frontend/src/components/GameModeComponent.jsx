@@ -53,7 +53,7 @@ export default function GameModeComponent() {
     mensajeConexion = "No se pudo conectar con el backend";
   }
 
-  let nombreCategoria = "CARGANDO CATEGORIAS..."; // por defecto si no cargan
+  let nombreCategoria = "Cargando categorías..."; // por defecto si no cargan
 
   if (categorias.length > 0) {
     nombreCategoria = categorias[indiceTematica].name; // http://localhost:5000/api/categories?language=ES
@@ -94,7 +94,7 @@ export default function GameModeComponent() {
   return (
     <div className="contenedor-juego">
       <p className="enunciado">
-        CONFIGURE SU PARTIDA
+        Configure su partida
       </p>
       
       {/* PRUEBA CONEXIÓN CON BACKEND
@@ -106,7 +106,7 @@ export default function GameModeComponent() {
       */}
 
       <div className="fila-selector">
-        <p className="etiqueta-idioma">IDIOMA</p>
+        <p className="etiqueta-idioma">Idioma</p>
         <span className="flecha">⇔</span>
         <button className="btn-idioma" onClick={cambiarIdioma}>
           {idiomas[indiceIdioma]}
@@ -114,7 +114,7 @@ export default function GameModeComponent() {
       </div>
 
       <div className="fila-selector">
-        <p className="etiqueta-tematica">TEMÁTICA</p>
+        <p className="etiqueta-tematica">Temática</p>
         <span className="flecha">⇔</span>
         <button className="btn-tematica" onClick={cambiarTematica}>
           {nombreCategoria.toUpperCase()}
@@ -122,7 +122,7 @@ export default function GameModeComponent() {
       </div>
 
       <div className="fila-selector">
-        <p className="etiqueta-dificultad">DIFICULTAD</p>
+        <p className="etiqueta-dificultad">Dificultad</p>
         <span className="flecha">⇔</span>
         <button className="btn-dificultad" onClick={cambiarDificultad}>
           {niveles[indiceDificultad]}

@@ -189,13 +189,13 @@ export default function RoscoComponent({ questions, gameId }) {
 
         <div className="opciones-fin">
           <button onClick={() => navigate("/ranking")}>
-            VER RANKING
+            Ver ranking
           </button>
           <button onClick={() => navigate("/gamemode")}>
-            VOLVER A JUGAR
+            Volver a jugar
           </button>
           <button onClick={() => navigate("/")}>
-            SALIR
+            Salir
           </button>
         </div>
       </div>
@@ -243,7 +243,7 @@ export default function RoscoComponent({ questions, gameId }) {
 
           <div className="rosco-centro">
             <h3>{preguntaActual ? preguntaActual.letter : "-"}</h3>
-            <p>Tiempo restante:</p>
+            <p>Tiempo:</p>
             <span>{tiempoEmpleado}</span>
           </div>
         </div>
@@ -274,21 +274,21 @@ export default function RoscoComponent({ questions, gameId }) {
               onClick={responderPregunta}
               disabled={partidaTerminada}
             >
-              RESPONDER
+              Responder
             </button>
             <button
               type="button"
               onClick={pasarPalabra}
               disabled={partidaTerminada}
             >
-              PASAPALABRA
+              Pasapalabra
             </button>
             <button
               type="button"
               onClick={terminarPartida}
               disabled={partidaTerminada}
             >
-              TERMINAR
+              Terminar
             </button>
           </div>
         </div>

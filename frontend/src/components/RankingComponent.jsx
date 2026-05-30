@@ -65,11 +65,11 @@ export default function RankingComponent() {
           <table className="ranking-tabla">
             <thead>
               <tr>
-                <th>POS</th>
-                <th>JUGADOR</th>
-                <th>PUNTOS</th>
-                <th>FECHA</th>
-                <th>TIEMPO</th>
+                <th>Posición</th>
+                <th>Jugador</th>
+                <th>Puntos</th>
+                <th>Fecha</th>
+                <th>Tiempo</th>
               </tr>
             </thead>
 
@@ -106,7 +106,7 @@ export default function RankingComponent() {
       )}
 
       <Link to="/home">
-          <button className='botonMenu'>MENÚ PRINCIPAL</button>
+          <button className='botonMenu'>Menú principal</button>
       </Link>
       <FooterComponent></FooterComponent>
 
