@@ -57,24 +57,26 @@ export default function Profile() {
       {stats.byCategory.length > 0 && (
         <>
           <h3>Por Categoría</h3>
-          <table style={{ margin: "0 auto 2rem", borderCollapse: "collapse", minWidth: "400px" }}>
-            <thead>
-              <tr>
-                <th style={thStyle}>Categoría</th>
-                <th style={thStyle}>Partidas</th>
-                <th style={thStyle}>Media</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.byCategory.map((cat) => (
-                <tr key={cat.categoryId}>
-                  <td style={tdStyle}>{cat.name}</td>
-                  <td style={tdStyle}>{cat.games}</td>
-                  <td style={tdStyle}>{cat.avgScore}</td>
+          <div style={{ overflowX: "auto", marginBottom: "2rem" }}>
+            <table style={{ margin: "0 auto 2rem", borderCollapse: "collapse", minWidth: "400px" }}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Categoría</th>
+                  <th style={thStyle}>Partidas</th>
+                  <th style={thStyle}>Media</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {stats.byCategory.map((cat) => (
+                  <tr key={cat.categoryId}>
+                    <td style={tdStyle}>{cat.name}</td>
+                    <td style={tdStyle}>{cat.games}</td>
+                    <td style={tdStyle}>{cat.avgScore}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
 

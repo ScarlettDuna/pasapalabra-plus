@@ -11,3 +11,9 @@ export async function getMyStats() {
   if (!res.ok) throw new Error("No se pudo cargar las estadísticas");
   return res.json();
 }
+
+export async function getMyAchievements() {
+  const res = await apiFetch(`${API_URL}/users/me/achievements`);
+  if (!res.ok) throw new Error("No se pudieron cargar los logros");
+  return res.json();
+}
