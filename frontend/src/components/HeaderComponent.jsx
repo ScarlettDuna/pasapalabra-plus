@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import './HeaderComponent.css'
-import logo from '../assets/logo-pasapalabra.png'
+import logo from '../assets/logo-pasapalabra.webp'
 
 function HeaderComponent() {
   return (
