@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./LoginComponent.css";
 import { login } from "../services/auth";
 import { saveTokens } from "../services/token";
+import API_URL from "../services/api";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
@@ -28,20 +29,24 @@ export default function LoginComponent() {
             saveTokens(token, refreshToken);
 
             alert("Login correcto");
-
             navigate("/gamemode");
-
         } catch (error) {
             console.error(error);
             alert("Error conectando con el servidor");
         }
-
     };
 
     const handleGuest = () => {
         alert("Entrando como invitado...");
-
         navigate("/gamemode");
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = `${API_URL}/auth/google`;
+    };
+
+    const handleGithubLogin = () => {
+        window.location.href = `${API_URL}/auth/github`;
     };
 
     return (
@@ -64,7 +69,6 @@ export default function LoginComponent() {
                 />
 
                 <div className="buttons-container">
-
                     <button type="submit" className="customButton btn-login">
                         INICIAR SESIÓN
                     </button>
@@ -76,7 +80,24 @@ export default function LoginComponent() {
                     >
                         INVITADO
                     </button>
+                </div>
 
+                <div className="social-buttons">
+                    <button
+                        type="button"
+                        className="customButton btn-google"
+                        onClick={handleGoogleLogin}
+                    >
+                        ENTRAR CON GOOGLE
+                    </button>
+
+                    <button
+                        type="button"
+                        className="customButton btn-github"
+                        onClick={handleGithubLogin}
+                    >
+                        ENTRAR CON GITHUB
+                    </button>
                 </div>
             </form>
         </div>
