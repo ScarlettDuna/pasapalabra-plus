@@ -27,3 +27,13 @@ export function getAuthHeader() {
 export function isLoggedIn() {
   return !!getAccessToken();
 }
+
+export function getRole() {
+  const token = getAccessToken();
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split(".")[1])).role ?? null;
+  } catch {
+    return null;
+  }
+}

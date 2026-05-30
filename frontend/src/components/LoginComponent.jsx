@@ -72,7 +72,7 @@ export default function LoginComponent() {
 
                 <div className="buttons-container">
                     <button type="submit" className="customButton btn-login">
-                        INICIAR SESIÓN
+                        Iniciar sesión
                     </button>
 
                     <button
@@ -80,7 +80,7 @@ export default function LoginComponent() {
                         className="customButton btn-guest"
                         onClick={handleGuest}
                     >
-                        INVITADO
+                        Invitado
                     </button>
                 </div>
 
