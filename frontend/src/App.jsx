@@ -12,6 +12,7 @@ import AuthCallback from "./pages/AuthCallback";
 import Ranking from "./pages/Ranking";
 import Profile from './pages/Profile';
 import CreateQuestion from "./pages/CreateQuestion";
+import Admin from './pages/Admin';
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="/ranking" element={<Ranking />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/nueva-pregunta" element={<CreateQuestion />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   )

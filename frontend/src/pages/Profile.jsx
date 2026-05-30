@@ -78,12 +78,14 @@ export default function Profile() {
         </>
       )}
 
-      <button onClick={() => navigate("/home")} style={{ marginBottom: "2rem" }}>
-        Volver al menú
-      </button>
-      <button onClick={() => navigate("/nueva-pregunta")} style={{ marginBottom: "1rem", marginRight: "1rem" }}>
-        Crear Pregunta
-      </button>
+      <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginBottom: "2rem", flexWrap: "wrap" }}>
+        <button onClick={() => navigate("/nueva-pregunta")} style={btnPrimary}>
+          Crear pregunta
+        </button>
+        <button onClick={() => navigate("/home")} style={btnSecondary}>
+          Volver al menú
+        </button>
+      </div>
 
       <FooterComponent />
     </main>
@@ -102,3 +104,23 @@ function StatCard({ label, value }) {
 
 const thStyle = { padding: "8px 16px", borderBottom: "2px solid #fff", color: "#fff", textTransform: "uppercase" };
 const tdStyle = { padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.2)", color: "#fff" };
+const btnPrimary = {
+  background: "#4caf50",
+  color: "#fff",
+  border: "none",
+  borderRadius: "8px",
+  padding: "0.6rem 1.4rem",
+  cursor: "pointer",
+  fontSize: "1rem",
+  fontWeight: "bold",
+};
+
+const btnSecondary = {
+  background: "transparent",
+  color: "#fff",
+  border: "1px solid rgba(255,255,255,0.4)",
+  borderRadius: "8px",
+  padding: "0.6rem 1.4rem",
+  cursor: "pointer",
+  fontSize: "1rem",
+};
