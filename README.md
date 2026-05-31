@@ -82,6 +82,7 @@ GOOGLE_CLIENT_SECRET="..."
 GITHUB_CLIENT_ID="..."
 GITHUB_CLIENT_SECRET="..."
 FRONTEND_URL="http://localhost:5173"
+BACKEND_URL="http://localhost:5000"
 ```
 
 ```bash
@@ -96,6 +97,10 @@ npm run dev            # servidor en http://localhost:5000
 cd frontend
 npm install
 npm run dev            # aplicación en http://localhost:5173
+```
+
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
 ---
@@ -157,6 +162,6 @@ npm run dev            # aplicación en http://localhost:5173
 
 | Nombre | Rol |
 |---|---|
-| Arantxa | Backend, frontend, arquitectura general |
+| Arantxa | Backend, frontend (perfil, admin, integración), arquitectura general |
 | Jaime | Frontend (vistas y estilos) |
 | Luis Fernando | Frontend (componentes y flujos) |
