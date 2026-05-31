@@ -13,14 +13,14 @@
 
 /* ===== Logo ===== */
 
-.logo {
-    width: 250px;
+.header-container .logo {
+    width: clamp(165px, 30vw, 250px);
     padding: 1.2em;
     will-change: filter;
     transition: filter 300ms;
 }
 
-.logo:hover {
+.header-container .logo:hover {
     filter: drop-shadow(0 0 1em #fff);
     cursor: pointer;
 }
@@ -138,13 +138,24 @@
 
 /* ===== Responsive ===== */
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
+    .header-container {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .header-container .logo {
+        padding: 0.8em;
+    }
+
     .nav-desktop {
         display: none;
     }
 
     .hamburger {
         display: block;
-        margin-right: 1rem;
+        position: absolute;
+        right: 1rem;
+        margin-right: 0;
     }
 }
