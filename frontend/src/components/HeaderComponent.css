@@ -1,39 +1,150 @@
-.header {
+/* ===== Layout ===== */
+
+.header,
+.header-container {
     display: flex;
 }
 
-.logo:hover {
-    filter: drop-shadow(0 0 1em #ffffff);
-    cursor: pointer;
+.header-container {
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
 }
 
+/* ===== Logo ===== */
+
 .logo {
+    width: 250px;
     padding: 1.2em;
     will-change: filter;
     transition: filter 300ms;
-    width: 250px;
 }
 
-@media (max-width: 1160px) {
-    .logo {
-        width: 250px;
-    }
+.logo:hover {
+    filter: drop-shadow(0 0 1em #fff);
+    cursor: pointer;
 }
 
-.nav-desktop { display: flex; align-items: center; gap: 1rem; padding-right: 1.5rem; }
-.hamburger   { display: none; }
+/* ===== Navegación ===== */
+
+.nav-desktop {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-right: 1.5rem;
+}
+
+/* ===== Elementos interactivos ===== */
+
+.header-link,
+.header-logout-btn,
+.hamburger {
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    padding: 0.3rem 0.8rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Links */
+
+.header-link {
+    text-decoration: none;
+    color: #fff;
+
+    background: #3f2a7a;
+    border: 1px solid #6b52b3;
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    transition: all 0.2s ease;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 1.2rem;
+}
+
+.header-link:hover {
+    background: #5640a5;
+    border-color: #8f7cff;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 12px rgba(143, 124, 255, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Logout */
+
+.header-logout-btn {
+    color: white;
+    font-style: italic;
+
+    background: #f44336;
+    border: 1px solid #ef5350;
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    transition: all 0.2s ease;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 1.2rem;
+}
+
+.header-logout-btn:hover {
+    background: #e53935;
+    border-color: #ff8a80;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 14px rgba(255, 82, 82, 0.6),
+        0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Hamburguesa */
+
+.hamburger {
+    display: none;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Menú móvil ===== */
+
+.mobile-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    min-width: 160px;
+    padding: 1rem 1.25rem;
+
+    background: rgba(15, 10, 40, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0 0 10px 10px;
+
+    z-index: 100;
+}
+
+/* ===== Responsive ===== */
 
 @media (max-width: 600px) {
-.nav-desktop { display: none; }
-.hamburger {
-    display: block;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.4);
-    color: #fff;
-    font-size: 1.3rem;
-    padding: 0.3rem 0.7rem;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-right: 1rem;
-}
+    .nav-desktop {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+        margin-right: 1rem;
+    }
 }
