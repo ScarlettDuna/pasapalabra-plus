@@ -169,12 +169,6 @@ export default function RoscoComponent({ questions, gameId }) {
           <p>Tiempo empleado: {tiempoEmpleado} segundos</p>
         </div>
 
-        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-          <button onClick={() => setMostrarResumen(!mostrarResumen)} style={btnResumenStyle}>
-            {mostrarResumen ? "Ocultar resumen" : "Ver resumen de letras"}
-          </button>
-        </div>
-
         {mostrarResumen && (
           <div style={{ maxWidth: "700px", margin: "0 auto 2rem", display: "flex", flexDirection: "column", gap: "0.5rem", padding: "0 1rem" }}>
             {questions.map((q) => {
@@ -204,6 +198,9 @@ export default function RoscoComponent({ questions, gameId }) {
         )}
 
         <div className="opciones-fin">
+          <button className="btn-resumen" onClick={() => setMostrarResumen(!mostrarResumen)}>
+            {mostrarResumen ? "Ocultar resumen" : "Ver resumen de letras"}
+          </button>
           <button onClick={() => navigate("/ranking")}>Ver ranking</button>
           <button onClick={() => navigate("/gamemode")}>Volver a jugar</button>
           <button onClick={() => navigate("/")}>Salir</button>
@@ -306,13 +303,3 @@ export default function RoscoComponent({ questions, gameId }) {
     )
   );
 }
-
-const btnResumenStyle = {
-  background: "rgba(255,255,255,0.1)",
-  color: "#fff",
-  border: "1px solid rgba(255,255,255,0.3)",
-  borderRadius: "8px",
-  padding: "0.5rem 1.2rem",
-  cursor: "pointer",
-  fontSize: "0.9rem",
-};

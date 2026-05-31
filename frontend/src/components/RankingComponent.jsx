@@ -108,7 +108,6 @@ export default function RankingComponent() {
       <Link to="/home">
           <button className='botonMenu'>Menú principal</button>
       </Link>
-      <FooterComponent></FooterComponent>
 
     </div>
   );

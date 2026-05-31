@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import HeaderComponent from "../components/HeaderComponent";
 import FooterComponent from "../components/FooterComponent";
 import { getMyAchievements } from "../services/users";
+import "../components/ProfileComponent.css";
 
 const ACHIEVEMENTS = [
   { code: "FIRST_GAME",        name: "Primera partida",        description: "Completa tu primera partida" },
@@ -47,7 +48,7 @@ export default function Achievements() {
   return (
     <main style={{ padding: "20px", textAlign: "center" }}>
       <HeaderComponent />
-      <h2>Mis logros</h2>
+      <h2><span className='flechaSelección'>➥</span> MIS LOGROS</h2>
       <p style={{ opacity: 0.7, marginBottom: "2rem" }}>
         {desbloqueados} / {ACHIEVEMENTS.length} desbloqueados
       </p>
@@ -68,7 +69,7 @@ export default function Achievements() {
         ))}
       </div>
 
-      <button onClick={() => navigate("/profile")} style={btnStyle}>
+      <button className="btn-volver-perfil" onClick={() => navigate("/profile")}>
         Volver al perfil
       </button>
       <FooterComponent />
@@ -155,14 +156,3 @@ function AchievementCard({ achievement, unlockedAt }) {
     </div>
   );
 }
-
-const btnStyle = {
-  background: "transparent",
-  color: "#fff",
-  border: "1px solid rgba(255,255,255,0.4)",
-  borderRadius: "8px",
-  padding: "0.6rem 1.4rem",
-  cursor: "pointer",
-  fontSize: "1rem",
-  marginBottom: "2rem",
-};

@@ -77,7 +77,12 @@ export default function LoginComponent() {
                 </div>
 
                 <div className="social-buttons">
-                    <button type="button" className="customButton btn-google" onClick={handleGoogleLogin}>
+                    <button
+                        type="button"
+                        className="customButton btn-google btn-google-disabled"
+                        onClick={handleGoogleLogin}
+                        disabled
+                    >
                         <span className="social-button-content">
                             <img className="social-button-icon" src={googleLogo} alt="" />
                             <span>Google</span>

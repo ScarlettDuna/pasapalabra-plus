@@ -97,7 +97,7 @@ export default function GameModeComponent() {
       <p className="enunciado">
         Configure su partida
       </p>
-      
+
       {/* PRUEBA CONEXIÓN CON BACKEND
       
       <div className={`health-box health-${healthStatus}`}>
@@ -132,6 +132,10 @@ export default function GameModeComponent() {
 
       <button className="btn-comenzar" onClick={handleComenzar}>
         Comenzar
+      </button>
+
+      <button className="btn-volver" onClick={() => navigate("/home")}>
+        Volver al menú
       </button>
     </div>
   );
