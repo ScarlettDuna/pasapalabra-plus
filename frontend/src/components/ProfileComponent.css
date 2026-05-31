@@ -75,40 +75,165 @@
     color: #fff;
 }
 
-/* Botones */
+/* =========================
+   CONTENEDOR
+========================= */
+
 .profile-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
+
     justify-content: center;
     margin-bottom: 2rem;
-    flex-wrap: wrap;
 }
 
-.btn-primary {
-    background: #4caf50;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.6rem 1.4rem;
+.profile-actions button {
+    min-height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* =========================
+   BOTÓN PRINCIPAL
+   CREAR PREGUNTA
+========================= */
+
+.btn-crear-pregunta {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+
+    padding: 0.8rem 1.6rem;
+
+    font-size: 1.1rem;
+    font-weight: 700;
+
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
+
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.35),
+        0 0 14px rgba(76, 175, 80, 0.25);
+
+    transition: all 0.25s ease;
+
+    font-style: oblique;
 }
 
-.btn-secondary {
-    background: transparent;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 8px;
-    padding: 0.6rem 1.4rem;
+.btn-crear-pregunta:hover {
+    transform: translateY(-3px) scale(1.03);
+
+    box-shadow:
+        0 12px 26px rgba(0, 0, 0, 0.45),
+        0 0 24px rgba(76, 175, 80, 0.55);
+}
+
+/* =========================
+   BOTÓN SECUNDARIO
+   MIS PREGUNTAS
+========================= */
+
+.btn-mas-preguntas {
+    background: linear-gradient(135deg, #8a2be2, #6a5acd);
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 25px;
+
+    padding: 0.8rem 1.6rem;
+
+    font-size: 1.1rem;
+    font-weight: 600;
+
     cursor: pointer;
-    font-size: 1rem;
+
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.35),
+        0 0 14px rgba(138, 43, 226, 0.25);
+
+    transition: all 0.25s ease;
+
+    font-style: oblique;
 }
 
-.btn-primary:hover {
-    opacity: 0.9;
+.btn-mas-preguntas:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 26px rgba(0, 0, 0, 0.45),
+        0 0 26px rgba(138, 43, 226, 0.55);
 }
 
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+/* =========================
+   BOTÓN NEUTRO
+   VOLVER AL MENÚ
+========================= */
+
+.btn-volver-menu {
+    background: rgba(255, 255, 255, 0.08);
+
+    color: white;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    border-radius: 25px;
+
+    padding: 0.8rem 1.6rem;
+
+    font-size: 1.1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    backdrop-filter: blur(6px);
+
+    transition: all 0.25s ease;
+    font-style: oblique;
+}
+
+.btn-volver-menu:hover {
+    background: rgba(255, 255, 255, 0.15);
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.3),
+        0 0 14px rgba(255, 255, 255, 0.15);
+}
+
+/* =========================
+   ACTIVE FEEL
+========================= */
+
+.btn-crear-pregunta:active,
+.btn-mas-preguntas:active,
+.btn-volver-menu:active {
+    transform: translateY(0);
+}
+
+.btn-volver-perfil {
+        background: transparent;
+        font-style: oblique;
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.4);
+        border-radius: 25px;
+        padding: 0.6rem 1.4rem;
+        cursor: pointer;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        margin-top: 1.5rem;
+}
+
+.btn-volver-perfil:hover {
+    background: rgba(255, 255, 255, 0.15);
+
+    box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.3),
+        0 0 14px rgba(255, 255, 255, 0.15);
 }

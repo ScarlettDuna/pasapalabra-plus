@@ -138,7 +138,7 @@ export default function Profile() {
 
       <div className="profile-actions">
         <button
-          className="btn-primary"
+          className="btn-crear-pregunta"
           onClick={() => navigate("/nueva-pregunta")}
         >
           Crear pregunta
@@ -146,7 +146,7 @@ export default function Profile() {
 
         {preguntas.length > 0 && (
           <button
-            className="btn-secondary"
+            className="btn-mas-preguntas"
             onClick={() => navigate("/mis-preguntas")}
           >
             Mis preguntas ({preguntas.length})
@@ -154,7 +154,7 @@ export default function Profile() {
         )}
 
         <button
-          className="btn-secondary"
+          className="btn-volver-menu"
           onClick={() => navigate("/home")}
         >
           Volver al menú

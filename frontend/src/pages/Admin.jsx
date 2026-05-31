@@ -53,7 +53,7 @@ export default function Admin() {
   return (
     <main style={{ padding: "20px", textAlign: "center" }}>
       <HeaderComponent />
-      <h2>Panel de administración</h2>
+      <h2><span className='flechaSelección'>➥</span> PANEL DE ADMINISTRACIÓN</h2>
       <p style={{ opacity: 0.7 }}>Preguntas pendientes de revisión: {preguntas.length}</p>
 
       {preguntas.length === 0 && (
@@ -84,7 +84,7 @@ export default function Admin() {
         ))}
       </div>
 
-      <button onClick={() => navigate("/home")} style={btnBack}>
+      <button className="btn-volver-menu" onClick={() => navigate("/home")}>
         Volver al menú
       </button>
       <FooterComponent />
