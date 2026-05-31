@@ -10,6 +10,10 @@ import GameMode from './pages/GameMode';
 import Game from './pages/Game';
 import AuthCallback from "./pages/AuthCallback";
 import Ranking from "./pages/Ranking";
+import Profile from './pages/Profile';
+import CreateQuestion from "./pages/CreateQuestion";
+import Admin from './pages/Admin';
+import Achievements from "./pages/Achievements";
 
 function App() {
 
@@ -27,6 +31,10 @@ function App() {
         <Route path="/game" element={<Game />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/ranking" element={<Ranking />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/nueva-pregunta" element={<CreateQuestion />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/logros" element={<Achievements />} />
       </Routes>
     </BrowserRouter>
   )

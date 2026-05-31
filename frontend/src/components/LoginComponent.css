@@ -91,3 +91,17 @@
     color: white;
     font-style: oblique;
 }
+
+.social-button-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.social-button-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}

@@ -4,6 +4,8 @@ import "./LoginComponent.css";
 import { login } from "../services/auth";
 import { saveTokens } from "../services/token";
 import API_URL from "../services/api";
+import googleLogo from "../assets/google-logo.webp";
+import githubLogo from "../assets/github-logo.webp";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
@@ -70,7 +72,7 @@ export default function LoginComponent() {
 
                 <div className="buttons-container">
                     <button type="submit" className="customButton btn-login">
-                        INICIAR SESIÓN
+                        Iniciar sesión
                     </button>
 
                     <button
@@ -78,7 +80,7 @@ export default function LoginComponent() {
                         className="customButton btn-guest"
                         onClick={handleGuest}
                     >
-                        INVITADO
+                        Invitado
                     </button>
                 </div>
 
@@ -88,7 +90,10 @@ export default function LoginComponent() {
                         className="customButton btn-google"
                         onClick={handleGoogleLogin}
                     >
-                        ENTRAR CON GOOGLE
+                        <span className="social-button-content">
+                            <img className="social-button-icon" src={googleLogo} alt="" />
+                            <span>ENTRAR CON GOOGLE</span>
+                        </span>
                     </button>
 
                     <button
@@ -96,7 +101,10 @@ export default function LoginComponent() {
                         className="customButton btn-github"
                         onClick={handleGithubLogin}
                     >
-                        ENTRAR CON GITHUB
+                        <span className="social-button-content">
+                            <img className="social-button-icon" src={githubLogo} alt="" />
+                            <span>ENTRAR CON GITHUB</span>
+                        </span>
                     </button>
                 </div>
             </form>
