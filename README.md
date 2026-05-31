@@ -141,6 +141,13 @@ npm run dev            # aplicación en http://localhost:5173
 
 ---
 
+## Ideas para próximas mejoras
+
+- **Confirmación de email al registrarse** — enviar un enlace de verificación tras el registro para confirmar que la dirección es real. Los usuarios OAuth (Google/GitHub) se considerarían verificados automáticamente.
+- **Tecla "Pasapalabra"** — permitir omitir una pregunta durante la partida y volver a ella más tarde, replicando la mecánica original del programa.
+
+---
+
 ## Equipo
 
 | Nombre | Rol |
