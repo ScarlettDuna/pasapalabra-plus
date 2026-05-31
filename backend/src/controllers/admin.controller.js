@@ -5,9 +5,8 @@ export const getPendingQuestions = async (req, res, next) => {
     const preguntas = await prisma.question.findMany({
       where: { status: "pending" },
       include: {
-        creator: {
-          select: { id: true, username: true}
-        }
+        creator: { select: { id: true, username: true} },
+        category: { select: { id: true, name: true } }
       }
     })
     res.status(200).json({ "preguntas": preguntas})

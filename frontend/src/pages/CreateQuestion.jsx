@@ -67,7 +67,21 @@ export default function CreateQuestion() {
         <HeaderComponent />
         <h2>¡Pregunta creada!</h2>
         <p>{form.isPersonal ? "Ya puedes usarla en tus partidas." : "Está pendiente de revisión y será visible para todos cuando se apruebe."}</p>
-        <button onClick={() => setExito(false)} style={{ marginRight: "1rem" }}>Crear otra</button>
+        <button onClick={() => {
+          setForm({
+            language: "ES",
+            categoryId: "",
+            letter: "A",
+            difficulty: "easy",
+            question: "",
+            answer: "",
+            isPersonal: true,
+          });
+          setError(null);
+          setExito(false);
+        }} style={{ marginRight: "1rem" }}>
+          Crear otra
+        </button>
         <button onClick={() => navigate("/profile")}>Volver al perfil</button>
         <FooterComponent />
       </main>
@@ -79,8 +93,10 @@ export default function CreateQuestion() {
       <HeaderComponent />
       <h2>Nueva Pregunta</h2>
 
-      <form onSubmit={handleSubmit} style={{ display: "inline-flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "500px", textAlign:
-"left" }}>
+      <form 
+        onSubmit={handleSubmit} 
+        style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%", maxWidth: "500px", textAlign: "left", margin: "0 auto" }}
+      >
 
         <label>
           Idioma
@@ -139,7 +155,9 @@ export default function CreateQuestion() {
         </button>
 
       </form>
-
+      <button type="button" onClick={() => navigate("/profile")} style={btnBack}>
+        Volver al perfil
+      </button>
       <FooterComponent />
     </main>
   );
@@ -155,4 +173,11 @@ const selectStyle = {
   background: "rgba(0,0,0,0.4)",
   color: "#fff",
   fontSize: "1rem",
+};
+
+const btnBack = {
+  background: "transparent", color: "#fff",
+  border: "1px solid rgba(255,255,255,0.4)", borderRadius: "8px",
+  padding: "0.6rem 1.4rem", cursor: "pointer", fontSize: "1rem",
+  marginTop: "1.5rem", marginBottom: "2rem",
 };

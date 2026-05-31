@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import helmet from "helmet";
 import passport from "./config/passport.js";
 
@@ -12,8 +11,6 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/users.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import questionRoutes from "./routes/questions.routes.js"
-
-dotenv.config();
 
 const app = express();
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";

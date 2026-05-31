@@ -8,7 +8,12 @@ const ALLOWED_DIFF = new Set(["easy", "medium", "hard"]);
 // Fórmula simple (ajustable)
 function calcScore({ correct, wrong, duration }) {
     // ejemplo: premio aciertos, penalizo fallos y tiempo
-    return correct * 100 - wrong * 25 - duration;
+    return Math.max(0, correct * 100 - wrong * 25 - duration);
+}
+
+// Evita que de error por tildes
+function normalize(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
 export const startGame = async (req, res, next) => {
@@ -123,7 +128,7 @@ export const finishGame = async (req, res, next) => {
 
         for (let answer of dedupedAnswers) {
             const correctAnswer = answerMap.get(answer.questionId);
-            if (answer.answer.trim().toLowerCase() === correctAnswer.answer.trim().toLowerCase()) {
+            if (normalize(answer.answer) === normalize(correctAnswer.answer)) {
                 correct += 1;
             } else {
                 wrong += 1;

@@ -130,7 +130,7 @@ export default function GameModeComponent() {
       </div>
 
       <button className="btn-comenzar" onClick={handleComenzar}>
-        COMENZAR
+        Comenzar
       </button>
     </div>
   );

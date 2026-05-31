@@ -419,3 +419,174 @@ Los archivos añadidos, todos nuevos sin tocar los componentes existentes del eq
 - **`src/pages/Ranking.jsx`**: página de ranking global con selector de idioma (ES/EN/FR), tabla con posición, nombre del jugador, puntuación, aciertos y tiempo formateado (MM:SS), y estados de carga y error. Usa `apiFetch` para las llamadas a `GET /api/ranking`.
 
 - **`frontend/TODO.md`**: documento con todas las mejoras y correcciones pendientes en el frontend, ordenadas por impacto, para orientar al equipo.
+
+## Diario de desarrollo - Día 13
+
+**Nombre:** Arantxa
+**Fecha:** *30 mayo 2026*
+**Rol:** Frontend / Integración
+
+### Revisión de ramas de compañeros e integración en develop
+
+Se revisó el estado de las ramas de los compañeros (`frontend-luisfer`, `frontend-jaime`) antes de comenzar el trabajo propio. La rama `frontend-luisfer` tenía estructura base pero carecía de las páginas de perfil, logros, preguntas personalizadas y panel de administración. Se hizo merge de `origin/frontend-luisfer` en `develop` sin conflictos.
+
+### Reescritura de `HeroComponent`
+
+El componente Hero solo mostraba un botón de "Jugar" que abría un popup de instrucciones. Se rediseñó para comportarse de forma diferente según el estado de autenticación usando `isLoggedIn()`:
+
+- **Usuario autenticado:** un único botón "Jugar" → `/gamemode`.
+- **Usuario no autenticado:** tres botones: "Iniciar sesión" → `/login`, "Registrarse" → `/register`, "Jugar como invitado" → `/gamemode`.
+
+El popup de instrucciones se mantuvo.
+
+### Header responsive con menú hamburguesa y control de sesión
+
+Se reescribió `HeaderComponent` para añadir:
+
+- **Navegación condicional:** los enlaces solo se muestran si el usuario está autenticado (`isLoggedIn()`).
+- **Control de rol:** el enlace "Admin" solo aparece si `getRole() === "admin"`. La función `getRole()` decodifica el payload del JWT desde localStorage con `atob()` sin necesidad de llamada al servidor.
+- **Botón de cierre de sesión:** llama a `logoutUser()` (que invalida el refresh token en el backend y limpia localStorage) y redirige con `window.location.href = "/"` para forzar un rerender completo.
+- **Menú hamburguesa (responsive):** en móvil se oculta la barra de navegación y se muestra un botón ☰/✕. Al pulsarlo aparece un menú desplegable con posición absoluta. Los enlaces cierran el menú al hacer click.
+
+Se actualizó `HeaderComponent.css` con media queries para alternar entre la barra desktop y el botón hamburguesa en pantallas menores de 600px.
+
+### `services/token.js` — función `getRole`
+
+Se añadió la función `getRole()` que decodifica el payload del JWT almacenado y devuelve el campo `role`, o `null` si no hay token o el formato es inválido.
+
+### `services/auth.js` — función `logoutUser`
+
+Se añadió `logoutUser()`, que envía el refresh token al endpoint `POST /api/auth/logout` para invalidarlo en base de datos y después limpia ambos tokens de localStorage.
+
+### Página de perfil (`Profile.jsx`)
+
+Se implementó la página `/profile` con:
+
+- Carga paralela de datos de usuario y estadísticas con `Promise.all([getMe(), getMyStats()])`.
+- Información básica del usuario: username, email, fecha de registro.
+- Grid de `StatCard` con: partidas jugadas, mejor puntuación, puntuación media, aciertos totales, fallos totales, partidas perfectas y letra más fallada (condicional).
+- Tabla de estadísticas por categoría con scroll horizontal para móvil.
+- Botones: "Crear pregunta" (verde) → `/nueva-pregunta`, "Volver al menú" (outline) → `/home`.
+
+### Página de creación de preguntas (`CreateQuestion.jsx`)
+
+Se implementó el formulario `/nueva-pregunta` con:
+
+- Selectores para idioma, categoría (dinámica: se recarga al cambiar el idioma), letra, dificultad.
+- Textarea para la pregunta e input para la respuesta.
+- Checkbox `isPersonal`: si está marcado la pregunta se aprueba automáticamente y es solo para el creador; si no, entra en revisión para el admin.
+- Pantalla de confirmación tras el envío exitoso con opciones "Crear otra" y "Volver al perfil".
+
+### Panel de administración (`Admin.jsx`)
+
+Se implementó la página `/admin` que:
+
+- Carga las preguntas pendientes de revisión desde `GET /api/admin/pending`.
+- Muestra cada pregunta como una tarjeta con badges de letra, idioma, dificultad, categoría (en amarillo) y creador (atenuado).
+- Botones "Aprobar" y "Rechazar" que llaman a los endpoints PATCH correspondientes y eliminan la tarjeta de la lista de forma optimista.
+- Muestra "Acceso restringido" si la respuesta es 403 (usuario sin rol admin).
+
+Para que el panel mostrara la categoría correctamente se actualizó el controlador de admin en el backend para incluir `category: { select: { id: true, name: true } }` en el `include` de Prisma.
+
+### Página de logros (`Achievements.jsx`)
+
+Se implementó la página `/logros` con:
+
+- 13 logros definidos en el frontend con código, nombre y descripción.
+- Imágenes cargadas desde `/achievements/CODENAME.png` (archivos PNG en `frontend/public/achievements/`). Si la imagen no existe, un fallback con emoji 🏆 ocupa su lugar mediante el evento `onError`.
+- Las imágenes de logros bloqueados se muestran en escala de grises y reducida opacidad.
+- Tooltip al pasar el ratón: muestra la descripción del logro si está bloqueado, o la fecha de desbloqueo si está desbloqueado.
+- Contador de logros desbloqueados en la parte superior.
+
+Los archivos PNG de los logros fueron proporcionados por los compañeros. Ocho de ellos tenían espacios al final del nombre de archivo (ej. `EDITOR .png`) que se corrigieron con un script de PowerShell.
+
+### Comparación de respuestas insensible a tildes
+
+Se detectó que respuestas correctas como "Murciélago" no se aceptaban si el usuario escribía "Murcielago". Se implementó una función `normalize()` en ambos extremos:
+
+```js
+function normalize(str) {
+  return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+}
+```
+
+Se aplicó en `games.controller.js` (validación oficial en backend) y en `RoscoComponent.jsx` (feedback visual inmediato al usuario).
+
+### Corrección de URL hardcodeada en `api.js`
+
+Se detectó que un compañero había hardcodeado la URL de su túnel de desarrollo en `src/services/api.js`, rompiendo el login para el resto del equipo. Se corrigió usando `import.meta.env.VITE_API_URL || "http://localhost:5000/api"` y se documentó el uso de `.env.local` para configuración local sin afectar al repositorio.
+
+### Análisis y merge de `frontend-jaime`
+
+Se analizó la rama `frontend-jaime` antes del merge. Los cambios relevantes eran la adición de los botones de login con Google y GitHub en `LoginComponent`. El merge resultó en un único conflicto en `api.js` (la URL hardcodeada de Jaime vs. la variable de entorno de develop), resuelto manteniendo la versión de develop.
+
+
+### Corrección del flujo OAuth: `passwordHash` opcional y redirect roto
+
+Se han detectado y corregido dos bugs que impedían el login con Google y GitHub:
+
+**Bug 1 — `passwordHash` obligatorio en el schema:** El modelo `User` tenía `passwordHash String` como campo requerido, pero los usuarios OAuth se crean sin contraseña. Esto provocaba un error 500 al intentar crear el usuario. Se ha cambiado a `passwordHash String?` y se ha ejecutado la migración `optional_password_hash`. Además se ha añadido una comprobación en `POST /auth/login` para devolver un 401 descriptivo si un usuario OAuth intenta autenticarse con email y contraseña.
+
+**Bug 2 — `FRONTEND_URL` no definida:** El callback OAuth hacía `res.redirect(\`${process.env.FRONTEND_URL}/auth/callback?token=...\`)` pero `FRONTEND_URL` no estaba en el `.env`, resultando en un redirect a una URL relativa incorrecta. Se ha añadido `FRONTEND_URL=http://localhost:5173` al `.env`.
+
+**Bug 3 — Orden de carga de dotenv:** En un proyecto ES modules (`"type": "module"`), todos los `import` se resuelven antes de que se ejecute el cuerpo del módulo. `passport.js` leía `process.env.GOOGLE_CLIENT_ID` al importarse, pero `dotenv.config()` se llamaba después en el cuerpo de `app.js`, resultando en estrategias OAuth inicializadas con `undefined`. Se ha corregido moviendo la carga de dotenv a `server.js` como primer import: `import 'dotenv/config'`, y eliminando la llamada duplicada de `app.js`.
+
+### Botones OAuth en el registro
+
+Se han añadido los botones de Google y GitHub al formulario de registro (`RegisterComponent.jsx`), replicando el patrón ya existente en `LoginComponent`. Los handlers se han colocado dentro del componente para mantener coherencia de estilo.
+
+### Nuevas páginas y navegación
+
+Se han añadido botones "Volver" en todas las páginas que carecían de ellos: `GameMode` → `/home`, `Ranking` → `/home`, `Admin` → `/home`, `CreateQuestion` → `/profile`. También se ha añadido `FooterComponent` a `Ranking`, donde faltaba.
+
+Se ha creado la página `MyQuestions.jsx` que muestra las preguntas creadas por el usuario con badges de idioma, dificultad, tipo (personal/pública) y estado de moderación (aprobada/pendiente/rechazada) con código de colores. El botón "Mis preguntas" en `Profile` es condicional: solo aparece si el usuario tiene al menos una pregunta creada. La carga de preguntas en Profile es independiente de la carga principal — si falla, el perfil sigue mostrándose correctamente y el botón simplemente no aparece.
+
+### Corrección en `getMyQuestions`
+
+El controlador `getMyQuestions` tenía `orderBy: { createdAt: 'desc' }` y `createdAt: true` en el `select`, pero el modelo `Question` no tiene campo `createdAt` en el schema de Prisma, lo que provocaba un error 500. Se han eliminado ambas referencias.
+
+### Logro CONTRIBUTOR y EDITOR: disparo inmediato
+
+`checkAndGrantAchievements` solo se llamaba al finalizar una partida, por lo que los logros de contribución (`CONTRIBUTOR`, `EDITOR`) nunca se desbloqueaban al crear una pregunta. Se ha añadido la llamada en `questions.controller.js` tras crear la pregunta con `checkAndGrantAchievements(req.user.userId).catch(() => {})`. El `.catch` vacío evita que un fallo en los logros afecte a la respuesta ya enviada al cliente.
+
+### Score mínimo 0
+
+La fórmula de puntuación `correct * 100 - wrong * 25 - duration` podía producir valores negativos en partidas largas con muchos errores. Se ha añadido `Math.max(0, ...)` para garantizar que el mínimo posible sea siempre 0.
+
+### Revisión de calidad y correcciones críticas
+
+Se ha realizado una revisión completa del proyecto evaluando seguridad, calidad de código, UX y arquitectura. Los problemas críticos identificados y resueltos han sido:
+
+- **`alert()` del navegador eliminados:** `LoginComponent` y `RegisterComponent` usaban `window.alert()` para mostrar errores y confirmaciones. Se han sustituido por mensajes de error inline (`<p style={{ color: "#ff6b6b" }}>`) renderizados dentro del formulario. Se han añadido estados `error` y `loading` a ambos componentes. El botón de submit muestra "Entrando..." / "Registrando..." durante la petición y se deshabilita para evitar envíos dobles.
+
+- **`console.log` de debug eliminados:** Se han eliminado `console.log("LOGIN RESPONSE:", result)` y `console.log("REGISTER RESPONSE:", result)` que quedaban activos en producción.
+
+- **Auto-login tras registro:** Al registrarse correctamente, el sistema ahora hace login automáticamente con las mismas credenciales y redirige al juego, sin obligar al usuario a volver a introducir sus datos.
+
+- **Modo invitado funcional:** Los botones "Invitado" en Login y Register ya navegaban a `/gamemode` pero lo precedían de un `alert()` placeholder. Se han limpiado para navegar directamente sin bloquear al usuario.
+
+- **Rutas protegidas:** Se ha creado el componente `ProtectedRoute` que redirige a `/login` si no hay token en localStorage. Se ha aplicado a `/profile`, `/logros`, `/nueva-pregunta`, `/admin` y `/mis-preguntas`. Las rutas de juego (`/gamemode`, `/game`, `/ranking`) permanecen accesibles para invitados.
+
+### Mejoras en el popup de instrucciones
+
+Se ha ampliado el contenido del popup de instrucciones en `HeroComponent` para explicar las mecánicas específicas del juego: cómo funciona la puntuación (aciertos +100, fallos -25, tiempo descontado), las temáticas disponibles, los niveles de dificultad y los idiomas. Se ha añadido `max-height: 85vh` y `overflow-y: auto` al CSS del popup para que sea usable en móvil sin desbordar la pantalla.
+
+### Corrección del fin automático de partida en `RoscoComponent`
+
+Se ha corregido un bug por el que el rosco no terminaba automáticamente al responder la última pregunta, quedando bloqueado hasta que el usuario pulsaba el botón "Terminar" manualmente.
+
+La causa era que `irASiguientePregunta` y la comprobación de fin de partida usaban `estadoLetras` y `answers` del closure, que en React son el estado del render anterior (stale). Al responder la última letra, `estadoLetras` todavía no incluía esa respuesta y la comprobación fallaba.
+
+La solución fue calcular el nuevo `estadoLetras` y el nuevo array `answers` de forma local dentro de `responderPregunta`, antes de llamar a `setEstadoLetras` y `setAnswers`. Con el estado local actualizado se comprueba si todas las preguntas tienen estado `"correcta"` o `"incorrecta"` y, si es así, se llama a `terminarPartida(newAnswers)` pasando el array fresco directamente. `irASiguientePregunta` se ha actualizado para aceptar el estado como parámetro opcional por la misma razón.
+
+Se ha corregido también que el botón "Terminar" usaba `onClick={terminarPartida}`, lo que hacía que React le pasara el evento sintético como primer argumento. Se ha cambiado a `onClick={() => terminarPartida()}`.
+
+### Resumen de letras al terminar la partida
+
+Se ha añadido un botón "Ver resumen de letras" en la pantalla de resultados. Al pulsarlo se despliega una lista con las 26 letras, el resultado de cada una (✓ correcta / ✗ incorrecta / — no respondida) y la respuesta correcta resaltada en amarillo. El botón alterna entre mostrar y ocultar el resumen.
+
+### Correcciones en `CreateQuestion`
+
+- **Reset del formulario al crear otra:** El botón "Crear otra" solo hacía `setExito(false)` y volvía a mostrar el formulario con los datos de la pregunta anterior. Se ha añadido el reset completo del estado `form` a sus valores iniciales en el mismo click.
+
+- **Posición del formulario:** El formulario tenía `display: "inline-flex"`, lo que lo convertía en un elemento inline y hacía que el botón "Volver al perfil" apareciera a su lado en vez de debajo. Se ha cambiado a `display: "flex"` con `margin: "0 auto"` para que se comporte como bloque centrado.

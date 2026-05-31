@@ -67,6 +67,7 @@ export default function Admin() {
               <Badge>{p.letter}</Badge>
               <Badge>{p.language}</Badge>
               <Badge>{DIFICULTAD[p.difficulty]}</Badge>
+              <Badge accent>{p.category?.name ?? "Categoría desconocida"}</Badge>
               <Badge muted>por {p.creator?.username ?? "desconocido"}</Badge>
             </div>
 
@@ -83,16 +84,20 @@ export default function Admin() {
         ))}
       </div>
 
+      <button onClick={() => navigate("/home")} style={btnBack}>
+        Volver al menú
+      </button>
       <FooterComponent />
     </main>
   );
 }
 
-function Badge({ children, muted }) {
+function Badge({ children, muted, accent }) {
   return (
     <span style={{
       padding: "2px 8px", borderRadius: "12px", fontSize: "0.75rem", fontWeight: "bold",
-      background: muted ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.2)",
+      background: accent ? "rgba(255,200,0,0.2)" : muted ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.2)",
+      color: accent ? "#ffd740" : "#fff",
       opacity: muted ? 0.7 : 1,
     }}>
       {children}
@@ -101,7 +106,7 @@ function Badge({ children, muted }) {
 }
 
 const cardStyle = {
-  background: "rgba(0,0,0,0.45)",
+  background: "rgba(0, 0, 0, 0.6)",
   border: "1px solid rgba(255,255,255,0.15)",
   borderRadius: "10px",
   padding: "1rem 1.25rem",
@@ -116,4 +121,11 @@ const btnApprove = {
 const btnReject = {
   background: "#b71c1c", color: "#fff", border: "none",
   borderRadius: "6px", padding: "0.4rem 1rem", cursor: "pointer",
+};
+
+const btnBack = {
+  background: "transparent", color: "#fff",
+  border: "1px solid rgba(255,255,255,0.4)", borderRadius: "8px",
+  padding: "0.6rem 1.4rem", cursor: "pointer", fontSize: "1rem",
+  marginTop: "1.5rem", marginBottom: "2rem",
 };
