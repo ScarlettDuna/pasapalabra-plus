@@ -160,4 +160,3 @@ npm run dev            # aplicación en http://localhost:5173
 | Arantxa | Backend, frontend, arquitectura general |
 | Jaime | Frontend (vistas y estilos) |
 | Luis Fernando | Frontend (componentes y flujos) |
-| Scarlett | Frontend (perfil, Admin, integración) |
