@@ -590,3 +590,65 @@ Se ha añadido un botón "Ver resumen de letras" en la pantalla de resultados. A
 - **Reset del formulario al crear otra:** El botón "Crear otra" solo hacía `setExito(false)` y volvía a mostrar el formulario con los datos de la pregunta anterior. Se ha añadido el reset completo del estado `form` a sus valores iniciales en el mismo click.
 
 - **Posición del formulario:** El formulario tenía `display: "inline-flex"`, lo que lo convertía en un elemento inline y hacía que el botón "Volver al perfil" apareciera a su lado en vez de debajo. Se ha cambiado a `display: "flex"` con `margin: "0 auto"` para que se comporte como bloque centrado.
+
+---
+
+## 🗓️ Diario de desarrollo — Día 15
+
+**Nombre:** Arantxa
+**Fecha:** 31 mayo 2026
+**Rol:** Backend / Frontend / DevOps
+
+### Trabajo realizado
+
+#### Corrección de `callbackURL` en OAuth para producción
+
+Se detectó que las URLs de callback en `passport.js` estaban hardcodeadas a `http://localhost:5000`, lo que impedía que OAuth funcionara en cualquier entorno distinto al local. Se han sustituido por `${process.env.BACKEND_URL}/api/auth/google/callback` y `${process.env.BACKEND_URL}/api/auth/github/callback`, y se ha añadido `BACKEND_URL=http://localhost:5000` al `.env` local.
+
+Se detectó también que las ramas de los compañeros (`frontend-jaime` y `frontend-luisfer`) habían revertido este cambio junto con otros arreglos críticos (check de `passwordHash` en auth, filtro de categorías vacías). Se decidió hacer el despliegue sobre `develop`, que tiene todos los fixes correctos.
+
+#### Filtro de categorías sin preguntas
+
+Se ha modificado el endpoint `GET /api/categories` para devolver únicamente las categorías que tienen al menos una pregunta aprobada (`status: "approved"`, `isPersonal: false`). Esto resuelve el problema de que las categorías "Traducción EN" y "Traducción FR" aparecían en el selector pero generaban un rosco vacío al no tener preguntas asociadas.
+
+Se ha corregido también un bug relacionado en `GameModeComponent`: al cambiar de idioma, el índice de temática no se reseteaba a 0, lo que podía causar un acceso fuera de rango si el nuevo idioma tenía menos categorías que el anterior.
+
+#### Actualización del README general
+
+Se ha reescrito el `README.md` del proyecto para reflejar el estado actual completo: stack real (React 19, Vite 7, Express 5, Prisma, Passport.js, Helmet, node-cron, Vitest), instrucciones de instalación con todas las variables de entorno necesarias, tabla de rutas, tabla de endpoints de la API, sección de ideas para próximas mejoras y equipo corregido (Scarlett y Arantxa son la misma persona).
+
+#### Despliegue completo en AWS
+
+Se ha realizado el primer despliegue en producción de la aplicación completa usando los servicios de AWS. La arquitectura final:
+
+- **Base de datos:** AWS RDS PostgreSQL (`db.t3.micro`, eu-north-1). Security Group configurado para aceptar conexiones únicamente desde el Security Group del backend.
+- **Backend:** AWS EC2 Ubuntu 24.04 LTS (`t3.micro`, eu-north-1). Node.js 20, PM2 como process manager con startup automático. El backend clona la rama `develop` del repositorio, usa `prisma db push` para crear el schema (el repositorio no incluía carpeta de migraciones) y `prisma db seed` para cargar 1747 preguntas y los usuarios de prueba.
+- **Frontend:** AWS S3 con static website hosting habilitado. Build de producción generado con `npm run build` usando `.env.production` con `VITE_API_URL` apuntando al backend.
+
+**Problemas encontrados durante el despliegue:**
+
+1. **CloudFront bloqueado en AWS Academy:** Los permisos de Academy no permiten `cloudfront:CreateOriginAccessControl`. Se intentó con una cuenta de Academy sin éxito y se migró a una cuenta personal de AWS.
+
+2. **Mixed Content (HTTPS → HTTP):** Al servir el frontend desde CloudFront (HTTPS) y el backend en HTTP puro (IP sin dominio), el navegador bloqueaba todas las peticiones a la API por política de mixed content. Solución: usar la URL HTTP del website endpoint de S3 en lugar de CloudFront, manteniendo todo en HTTP.
+
+3. **CORS bloqueando peticiones:** El backend tenía `CORS_ORIGIN=http://localhost:5173` hardcodeado por defecto. Al llegar peticiones desde la URL de S3, el servidor las rechazaba. Solución: añadir `CORS_ORIGIN=http://pasapalabra-plus-frontend.s3-website.eu-north-1.amazonaws.com` al `.env` de producción.
+
+4. **Google OAuth no funciona en producción:** Google exige que las redirect URIs sean dominios reales con HTTPS. La IP pública del backend no es aceptada. Se documenta como limitación técnica del entorno: requeriría comprar un dominio y configurar HTTPS con nginx + Let's Encrypt. GitHub OAuth sí funciona porque acepta IPs.
+
+5. **Archivos subidos como carpeta en S3:** En la primera subida se cargó la carpeta `dist/` entera en lugar de su contenido, resultando en `NoSuchKey` para `index.html`. Se borró y se volvió a subir seleccionando el contenido de `dist/`, no la carpeta.
+
+#### URLs de producción
+
+| Servicio | URL |
+|---|---|
+| Frontend | `http://pasapalabra-plus-frontend.s3-website.eu-north-1.amazonaws.com` |
+| Backend | `http://13.53.132.73:5000` |
+| Base de datos | RDS `pasapalabra-db.cdco4uco8oul.eu-north-1.rds.amazonaws.com` |
+
+### Estado actual del proyecto
+
+- Aplicación completamente funcional en producción
+- Login con email/contraseña y GitHub OAuth operativos
+- Google OAuth pendiente de dominio con HTTPS
+- 1747 preguntas cargadas en RDS
+- Backend gestionado con PM2 con reinicio automático al arrancar la instancia
