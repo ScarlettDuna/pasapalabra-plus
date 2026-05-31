@@ -16,7 +16,10 @@ export const getCategories = async (req, res, next) => {
         }
 
         const categories = await prisma.category.findMany({
-            where: { language: lang },
+            where: {
+                language: lang,
+                questions: { some: { status: "approved", isPersonal: false } }
+            },
             orderBy: { id: "asc" },
             select: { id: true, name: true, language: true, type: true }
         });

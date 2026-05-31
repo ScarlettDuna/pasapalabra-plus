@@ -37,7 +37,8 @@ export default function GameModeComponent() {
 
       const languageCode = codigosIdioma[indiceIdioma];
       const data = await getCategories(languageCode);
-      setCategorias(data); // se piden las categorias seleccionadas filtradas por idioma al backend y se guardan en data
+      setCategorias(data);
+      setIndiceTematica(0);
     }
 
     cargarCategorias();
