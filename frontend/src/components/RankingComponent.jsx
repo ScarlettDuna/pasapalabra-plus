@@ -68,8 +68,8 @@ export default function RankingComponent() {
                 <th>Posición</th>
                 <th>Jugador</th>
                 <th>Puntos</th>
-                <th>Fecha</th>
-                <th>Tiempo</th>
+                <th className="ranking-fecha">Fecha</th>
+                <th className="ranking-tiempo">Tiempo</th>
               </tr>
             </thead>
 

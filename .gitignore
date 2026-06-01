@@ -37,3 +37,6 @@ coverage/
 .eslintcache
 
 google_oath.json
+
+# Documentación sensible
+documentacion/despliegue.md

@@ -139,7 +139,8 @@
   border: 2px solid #ffd700;
   font-size: 1rem;
   box-sizing: border-box;
-  color: white(255, 255, 255);
+  color: #ffffff;
+  background-color: #2a2a3e;
   font-style: oblique;
 }
 

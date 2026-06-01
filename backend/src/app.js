@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import passport from "./config/passport.js";
+import { prisma } from "./db/prisma.js";
 
 import categoriesRoutes from "./routes/categories.routes.js";
 import roscoRoutes from "./routes/rosco.routes.js";
@@ -30,12 +31,13 @@ app.use(express.json({ limit: "1mb" }));
 app.use(passport.initialize())
 
 // Routes
-app.get("/api/health", (_req, res) => {
-    res.status(200).json({
-        ok: true,
-        service: "pasapalabra-backend",
-        time: new Date().toISOString(),
-    });
+app.get("/api/health", async (_req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.status(200).json({ ok: true, service: "pasapalabra-backend", time: new Date().toISOString() });
+    } catch {
+        res.status(503).json({ ok: false, service: "pasapalabra-backend" });
+    }
 });
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/rosco", roscoRoutes);

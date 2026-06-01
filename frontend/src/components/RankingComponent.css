@@ -102,6 +102,24 @@
   font-weight: bold;
 }
 
+@media (max-width: 600px) {
+  .ranking-tabla {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .ranking-tabla th,
+  .ranking-tabla td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+
+  .ranking-fecha,
+  .ranking-tiempo {
+    display: none;
+  }
+}
+
 .botonMenu {
   background-color: #FFD700;
   font-style: italic;

@@ -17,17 +17,21 @@
 }
 
 /* Datos usuario */
+.profile-container h2 {
+    margin: 20px 0;
+}
+
 .profile-info {
-    margin-bottom: 2rem;
+    margin-bottom: 8px;
 }
 
 /* Estadísticas */
 .stats-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 1rem;
-    margin-bottom: 2rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
 }
 
 .stat-card {
@@ -35,7 +39,6 @@
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     padding: 1rem 1.5rem;
-    min-width: 130px;
 }
 
 .stat-label {
@@ -50,16 +53,34 @@
     font-weight: bold;
 }
 
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+}
+
+@media (max-width: 600px) {
+  .stats-container,
+  .achievements-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-container {
+    padding: 20px 0;
+  }
+}
+
 /* Tabla */
 .table-container {
-    overflow-x: auto;
     margin-bottom: 2rem;
 }
 
 .profile-table {
     margin: 0 auto 2rem;
     border-collapse: collapse;
-    min-width: 400px;
+    width: auto;
 }
 
 .profile-table th {
@@ -75,6 +96,20 @@
     color: #fff;
 }
 
+@media (max-width: 600px) {
+    .profile-table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    .profile-table th,
+    .profile-table td {
+        padding: 8px 6px;
+        font-size: 0.82rem;
+        word-break: break-word;
+    }
+}
+
 /* =========================
    CONTENEDOR
 ========================= */
@@ -83,13 +118,14 @@
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-
     justify-content: center;
+    align-items: center;
     margin-bottom: 2rem;
 }
 
 .profile-actions button {
-    min-height: 52px;
+    height: 52px;
+    border-radius: 25px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -195,6 +231,7 @@
 
     transition: all 0.25s ease;
     font-style: oblique;
+    align-self: center;
 }
 
 .btn-volver-menu:hover {

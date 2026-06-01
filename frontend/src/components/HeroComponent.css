@@ -242,11 +242,11 @@
     }
 
     .opciones button {
-        width: 90%;
-        max-width: 280px;
+        width: 75%;
+        max-width: 200px;
         font-size: 1rem;
         padding: 12px;
-        border-radius: 20px;
+        border-radius: 25px;
     }
 
     .dropdown {

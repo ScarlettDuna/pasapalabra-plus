@@ -84,7 +84,7 @@ export default function Admin() {
         ))}
       </div>
 
-      <button className="btn-volver-menu" onClick={() => navigate("/home")}>
+      <button className="btn-volver-menu" onClick={() => navigate("/home")} style={{ width: "fit-content", margin: "1rem auto" }}>
         Volver al menú
       </button>
       <FooterComponent />

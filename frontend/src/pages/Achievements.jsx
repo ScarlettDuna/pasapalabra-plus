@@ -53,13 +53,7 @@ export default function Achievements() {
         {desbloqueados} / {ACHIEVEMENTS.length} desbloqueados
       </p>
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
-        gap: "1.2rem",
-        maxWidth: "800px",
-        margin: "0 auto 2rem",
-      }}>
+      <div className="achievements-grid">
         {ACHIEVEMENTS.map((a) => (
           <AchievementCard
             key={a.code}
@@ -69,7 +63,7 @@ export default function Achievements() {
         ))}
       </div>
 
-      <button className="btn-volver-perfil" onClick={() => navigate("/profile")}>
+      <button className="btn-volver-perfil" onClick={() => navigate("/profile")} style={{ width: "fit-content", margin: "0 auto" }}>
         Volver al perfil
       </button>
       <FooterComponent />

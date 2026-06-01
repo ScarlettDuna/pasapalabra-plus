@@ -55,6 +55,7 @@ export default function RoscoComponent({ questions, gameId }) {
   const [mostrarResumen, setMostrarResumen] = useState(false);
 
   const intervaloRef = useRef(null);
+  const inputRef = useRef(null);
 
   // estado para el crono
   const [tiempoEmpleado, setTiempoEmpleado] = useState(0); // 0 seg
@@ -80,6 +81,7 @@ export default function RoscoComponent({ questions, gameId }) {
     setEstadoLetras(newEstado);
     irASiguientePregunta(newEstado);
     setRespuestaUsuario("");
+    inputRef.current?.focus();
   }
 
   function escribirRespuesta(evento) {
@@ -109,6 +111,7 @@ export default function RoscoComponent({ questions, gameId }) {
       terminarPartida(newAnswers);
     } else {
       irASiguientePregunta(newEstado);
+      inputRef.current?.focus();
     }
   }
 
@@ -262,11 +265,13 @@ export default function RoscoComponent({ questions, gameId }) {
               : "No hay preguntas cargadas"}
           </p>
           <input
+            ref={inputRef}
             type="text"
             placeholder="Escribe tu respuesta"
             value={respuestaUsuario}
             onChange={escribirRespuesta}
-            disabled={partidaTerminada} // para deshabilitarlo cuando partidaTerminada
+            disabled={partidaTerminada}
+            autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter" && !partidaTerminada) {
                 e.preventDefault();

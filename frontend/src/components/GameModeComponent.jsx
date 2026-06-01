@@ -30,19 +30,24 @@ export default function GameModeComponent() {
     comprobarBackend();
   }, []);
 
-  // useffect  cargar categorias
+  // useffect  cargar categorias — espera a que el health check responda para no pillar la BD en frío
   useEffect(() => {
+    if (healthStatus === "cargando") return;
+
     async function cargarCategorias() {
       const codigosIdioma = ["ES", "EN", "FR"];
-
       const languageCode = codigosIdioma[indiceIdioma];
-      const data = await getCategories(languageCode);
-      setCategorias(data);
-      setIndiceTematica(0);
+      try {
+        const data = await getCategories(languageCode);
+        setCategorias(data);
+        setIndiceTematica(0);
+      } catch (error) {
+        console.error("Error cargando categorías:", error);
+      }
     }
 
     cargarCategorias();
-  }, [indiceIdioma]); // ejecuntamos este effect cada vez que cambie el indice idioma
+  }, [indiceIdioma, healthStatus]); // healthStatus asegura que el pool de BD ya está caliente
 
   let mensajeConexion = "Comprobando conexion con el backend...";
 
