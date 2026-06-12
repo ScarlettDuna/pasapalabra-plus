@@ -21,8 +21,6 @@ export default function RankingComponent() {
         const idioma = idiomas[indiceIdioma];
         const data = await getRanking(idioma);
         setRanking(data);
-        console.log(data);
-        console.log(ranking);
       } catch (err) {
         setError("No se pudo cargar el ranking");
       }

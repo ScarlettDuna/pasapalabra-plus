@@ -148,24 +148,28 @@ VITE_API_URL=http://localhost:5000/api
 
 ## Ideas para próximas mejoras
 
-- **Migrar base de datos a la propia EC2** — eliminar el RDS para reducir el coste mensual de ~25€ a ~9€. Hacer un dump completo antes de migrar para no perder datos: `pg_dump -h <endpoint-rds> -U pasapalabra_user pasapalabra_db > backup.sql`.
-- **Edición de perfil** — permitir al usuario cambiar su contraseña, actualizar sus datos, añadir una biografía y subir una foto o elegir un avatar.
-- **Modo difícil con tildes** — en la corrección de respuestas no ignorar las tildes, de forma que "Murciélago" y "Murcielago" no sean equivalentes.
-- **Ampliar banco de preguntas** — cargar las preguntas de Cine y TV e Historia ya preparadas en `backend/Preguntas CineTV.tsv` y `backend/Preguntas Historia.tsv` modificando el seed para que las incluya.
-- **CI/CD con GitHub Actions** — automatizar el despliegue en AWS: al hacer push a `develop`, que el frontend se construya y suba a S3 automáticamente y el backend reinicie en EC2 via SSH.
-- **Confirmación de email al registrarse** — enviar un enlace de verificación tras el registro para confirmar que la dirección es real. Los usuarios OAuth (Google/GitHub) se considerarían verificados automáticamente.
-- **Atajo de teclado para "Pasapalabra"** — el botón ya existe, pero requiere levantar la mano del teclado. Añadir un atajo (p. ej. `Tabulador`) para activarlo sin usar el ratón.
-- **Modo multijugador** — dos jugadores compitiendo a la vez o por turnos.
-- **Chat o mensajería** — comunicación entre jugadores dentro del juego.
-- **Estadísticas personales avanzadas** — historial de partidas desglosado por idioma y temática.
-- **Efectos visuales y animaciones** — transiciones entre preguntas, animaciones al acertar o fallar, celebración al completar el rosco.
-- **Contador de palabras durante la partida** — mostrar en tiempo real cuántas palabras quedan por responder y cuántas se han fallado, como en el programa original.
-- **En el ranking, cuando estás conectado, te muestra tu posición**
-- **Panel de analytics para admin** — estadísticas de uso agregadas: qué idioma, categoría y nivel se juegan más, partidas por día, usuarios activos, etc. Útil para decidir dónde ampliar el banco de preguntas.
-- **Sistema de reports** — permitir a los usuarios reportar preguntas erróneas o mal formuladas durante la partida. El admin vería los reports en el panel y podría corregir o eliminar la pregunta.
-- **Categoría Popurrí** — mezclar preguntas de todas las categorías en una sola partida, para los que no quieran ceñirse a una temática concreta.
-- **Nivel "Todos"** — opción de dificultad que mezcle preguntas de los tres niveles (fácil, medio y difícil) en la misma partida.
-- **Revisar overflow en móvil** — en dispositivos móviles aparecen ~20px de margen extra a cada lado que generan scroll horizontal innecesario. Revisar paddings, margins y anchos en los componentes principales para que todo encaje dentro del viewport sin desbordarse.
+- [] **Migrar base de datos a la propia EC2** — eliminar el RDS para reducir el coste mensual de ~25€ a ~9€. Hacer un dump completo antes de migrar para no perder datos: `pg_dump -h <endpoint-rds> -U pasapalabra_user pasapalabra_db > backup.sql`.
+- [ ] **Edición de perfil** — permitir al usuario cambiar su contraseña, actualizar sus datos, añadir una biografía y subir una foto o elegir un avatar.
+- [ ] **Modo difícil con tildes** — en la corrección de respuestas no ignorar las tildes, de forma que "Murciélago" y "Murcielago" no sean equivalentes.
+- [ ] **Ampliar banco de preguntas** — cargar las preguntas de Cine y TV e Historia ya preparadas en `backend/Preguntas CineTV.tsv` y `backend/Preguntas Historia.tsv` modificando el seed para que las incluya.
+- [ ] **CI/CD con GitHub Actions** — automatizar el despliegue en AWS: al hacer push a `develop`, que el frontend se construya y suba a S3 automáticamente y el backend reinicie en EC2 via SSH.
+- [ ] **Confirmación de email al registrarse** — enviar un enlace de verificación tras el registro para confirmar que la dirección es real. Los usuarios OAuth (Google/GitHub) se considerarían verificados automáticamente.
+- [ ] **Atajo de teclado para "Pasapalabra"** — el botón ya existe, pero requiere levantar la mano del teclado. Añadir un atajo (p. ej. `Tabulador`) para activarlo sin usar el ratón.
+- [ ] **Modo multijugador** — dos jugadores compitiendo a la vez o por turnos.
+- [ ] **Chat o mensajería** — comunicación entre jugadores dentro del juego.
+- [ ] **Estadísticas personales avanzadas** — historial de partidas desglosado por idioma y temática.
+- [ ] **Efectos visuales y animaciones** — transiciones entre preguntas, animaciones al acertar o fallar, celebración al completar el rosco.
+- [ ] **Contador de palabras durante la partida** — mostrar en tiempo real cuántas palabras quedan por responder y cuántas se han fallado, como en el programa original.
+- [ ] **En el ranking, cuando estás conectado, te muestra tu posición**
+- [ ] **Panel de analytics para admin** — estadísticas de uso agregadas: qué idioma, categoría y nivel se juegan más, partidas por día, usuarios activos, etc. Útil para decidir dónde ampliar el banco de preguntas.
+- [ ] **Sistema de reports** — permitir a los usuarios reportar preguntas erróneas o mal formuladas durante la partida. El admin vería los reports en el panel y podría corregir o eliminar la pregunta.
+- [ ] **Rediseñar selección de partida** — sustituir los botones ciclables de idioma, categoría y dificultad por dropdowns (`<select>`), más intuitivos y escalables cuando haya más categorías.
+- [ ] **Categoría Popurrí** — mezclar preguntas de todas las categorías en una sola partida, para los que no quieran ceñirse a una temática concreta.
+- [ ] **Nivel "Todos"** — opción de dificultad que mezcle preguntas de los tres niveles (fácil, medio y difícil) en la misma partida.
+- [ ] **Huevo de pascua: Konami code** — al introducir ↑↑↓↓←→←→BA en cualquier pantalla, activar un efecto visual (confeti, modo arcoíris, etc.).
+- [ ] **Huevo de pascua: click en el logo** — hacer clic rápido varias veces (5-10) sobre el logo del menú principal para revelar un mensaje o efecto secreto.
+- [ ] **Huevo de pascua: palabra secreta en el rosco** — escribir una palabra concreta en el input del rosco (p. ej. el nombre de alguien del equipo) para activar un easter egg.
+- [ ] **Huevo de pascua: secuencia en la selección de partida** — elegir idiomas/dificultades en un orden concreto para desbloquear algo oculto.
 
 ---
 
