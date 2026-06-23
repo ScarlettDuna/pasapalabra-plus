@@ -13,7 +13,7 @@ export default function FooterComponent() {
                 <li>🌍 Ranking global</li>
               </Link>
 
-              <Link to='/#'>
+              <Link to='/about'>
                 <li>🏆 Acerca de nosotros</li>
               </Link>
             </ul>

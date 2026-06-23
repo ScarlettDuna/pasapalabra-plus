@@ -6,14 +6,12 @@ import { getCategories } from "../services/categories";
 import { startGame } from "../services/games";
 
 export default function GameModeComponent() {
-  const idiomas = ["ESPAÑOL", "INGLÉS", "FRANCÉS"];
-  const niveles = ["FÁCIL", "MEDIO", "DIFÍCIL"];
 
   const [healthStatus, setHealthStatus] = useState("cargando"); //para saber como va la conexion con la bbdd
   const [categorias, setCategorias] = useState([]);
-  const [indiceIdioma, setIndice] = useState(0); // indice del idioma , empeznado por 0 ES
-  const [indiceDificultad, setIndiceDificultad] = useState(0);
-  const [indiceTematica, setIndiceTematica] = useState(0);
+  const [idioma, setIdioma] = useState("");
+  const [dificultad, setDificultad] = useState("");
+  const [categoriaId, setCategoriaId] = useState(null);
   const navigate = useNavigate();
 
   // COMPROBAMOS QUE ESTÁ CORRECTAMENTE CONECTADO AL BACKEND Y MOSTRAMOS
@@ -33,62 +31,23 @@ export default function GameModeComponent() {
   // useffect  cargar categorias — espera a que el health check responda para no pillar la BD en frío
   useEffect(() => {
     if (healthStatus === "cargando") return;
+    if (!idioma) return;
 
     async function cargarCategorias() {
-      const codigosIdioma = ["ES", "EN", "FR"];
-      const languageCode = codigosIdioma[indiceIdioma];
       try {
-        const data = await getCategories(languageCode);
+        const data = await getCategories(idioma);
         setCategorias(data);
-        setIndiceTematica(0);
+        setCategoriaId(data[0]?.id ?? null);
       } catch (error) {
         console.error("Error cargando categorías:", error);
       }
     }
 
     cargarCategorias();
-  }, [indiceIdioma, healthStatus]); // healthStatus asegura que el pool de BD ya está caliente
-
-  let mensajeConexion = "Comprobando conexion con el backend...";
-
-  if (healthStatus === "bien") {
-    mensajeConexion = "Backend conectado";
-  }
-
-  if (healthStatus === "error") {
-    mensajeConexion = "No se pudo conectar con el backend";
-  }
-
-  let nombreCategoria = "Cargando categorías..."; // por defecto si no cargan
-
-  if (categorias.length > 0) {
-    nombreCategoria = categorias[indiceTematica].name; // http://localhost:5000/api/categories?language=ES
-  }
-
-  function cambiarIdioma() {
-    setIndice((indiceIdioma + 1) % idiomas.length);
-  }
-
-  function cambiarDificultad() {
-    setIndiceDificultad((indiceDificultad + 1) % niveles.length);
-  }
-
-  function cambiarTematica() {
-    if (categorias.length === 0) return;
-    setIndiceTematica((indiceTematica + 1) % categorias.length);
-  }
+  }, [idioma, healthStatus]); // healthStatus asegura que el pool de BD ya está caliente
 
   async function handleComenzar() {
-    const idioma = ["ES", "EN", "FR"][indiceIdioma];
-    const dificultad = ["easy", "medium", "hard"][indiceDificultad];
-    const categoria = categorias[indiceTematica].id;
-
-    const datos = await startGame(idioma, dificultad, categoria);
-
-    const gameId = datos.gameId;
-    const game = datos.game;
-    const questions = datos.questions;
-
+    const datos = await startGame(idioma, dificultad, categoriaId);
     navigate("/game", {
       state: {
         questions: datos.questions,
@@ -103,37 +62,32 @@ export default function GameModeComponent() {
         Configure su partida
       </p>
 
-      {/* PRUEBA CONEXIÓN CON BACKEND
-      
-      <div className={`health-box health-${healthStatus}`}>
-        {mensajeConexion}
-      </div>
+      <div className="selector-grupo">
+        <select className="selector-select" value={idioma} onChange={e => setIdioma(e.target.value)}>
+          <option value="" disabled>— Idioma —</option>
+          <option value="ES">Español</option>
+          <option value="EN">Inglés</option>
+          <option value="FR">Francés</option>
+        </select>
+    </div>
 
-      */}
+    <div className="selector-grupo">
+        <select className="selector-select" value={categoriaId ?? ""} onChange={e => setCategoriaId(Number(e.target.value))}>
+          <option value="" disabled>— Categoría —</option>
+            {categorias.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+        </select>
+    </div>
 
-      <div className="fila-selector">
-        <p className="etiqueta-idioma">Idioma</p>
-        <span className="flecha">⇔</span>
-        <button className="btn-idioma" onClick={cambiarIdioma}>
-          {idiomas[indiceIdioma]}
-        </button>
-      </div>
-
-      <div className="fila-selector">
-        <p className="etiqueta-tematica">Temática</p>
-        <span className="flecha">⇔</span>
-        <button className="btn-tematica" onClick={cambiarTematica}>
-          {nombreCategoria.toUpperCase()}
-        </button>
-      </div>
-
-      <div className="fila-selector">
-        <p className="etiqueta-dificultad">Dificultad</p>
-        <span className="flecha">⇔</span>
-        <button className="btn-dificultad" onClick={cambiarDificultad}>
-          {niveles[indiceDificultad]}
-        </button>
-      </div>
+    <div className="selector-grupo">
+        <select className="selector-select" value={dificultad} onChange={e => setDificultad(e.target.value)}>
+          <option value="" disabled>— Dificultad —</option>
+          <option value="easy">Fácil</option>
+          <option value="medium">Medio</option>
+          <option value="hard">Difícil</option>
+        </select>
+    </div>
 
       <button className="btn-comenzar" onClick={handleComenzar}>
         Comenzar

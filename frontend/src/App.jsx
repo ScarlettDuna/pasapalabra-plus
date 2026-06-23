@@ -1,6 +1,5 @@
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Welcome from './pages/Welcome';
 
 // 1. Importamos Home y el Router
 import Home from './pages/Home';
@@ -16,6 +15,7 @@ import Admin from './pages/Admin';
 import Achievements from "./pages/Achievements";
 import MyQuestions from './pages/MyQuestions';
 import ProtectedRoute from './components/ProtectedRoute';
+import About from './pages/About';
 
 function App() {
 
@@ -23,7 +23,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* RUTA 1: Lo que ves al entrar (Login/Bienvenida) */}
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<Home />} />
 
         {/* RUTA 2: La página Home */}
         <Route path="/home" element={<Home />} />
@@ -38,6 +38,7 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/logros" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
         <Route path="/mis-preguntas" element={<ProtectedRoute><MyQuestions /></ProtectedRoute>} />
+        <Route path="/about" element={<About />} />
       </Routes>
     </BrowserRouter>
   )
