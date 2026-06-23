@@ -148,7 +148,7 @@ VITE_API_URL=http://localhost:5000/api
 
 ## Ideas para próximas mejoras
 
-- [] **Migrar base de datos a la propia EC2** — eliminar el RDS para reducir el coste mensual de ~25€ a ~9€. Hacer un dump completo antes de migrar para no perder datos: `pg_dump -h <endpoint-rds> -U pasapalabra_user pasapalabra_db > backup.sql`.
+- [x] **Migrar base de datos a la propia EC2** — eliminar el RDS para reducir el coste mensual de ~25€ a ~9€. Hacer un dump completo antes de migrar para no perder datos: `pg_dump -h <endpoint-rds> -U pasapalabra_user pasapalabra_db > backup.sql`.
 - [ ] **Edición de perfil** — permitir al usuario cambiar su contraseña, actualizar sus datos, añadir una biografía y subir una foto o elegir un avatar.
 - [ ] **Modo difícil con tildes** — en la corrección de respuestas no ignorar las tildes, de forma que "Murciélago" y "Murcielago" no sean equivalentes.
 - [ ] **Ampliar banco de preguntas** — cargar las preguntas de Cine y TV e Historia ya preparadas en `backend/Preguntas CineTV.tsv` y `backend/Preguntas Historia.tsv` modificando el seed para que las incluya.

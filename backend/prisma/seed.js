@@ -76,9 +76,16 @@ async function main() {
     );
 
     // ── 3. Leer TSV ──────────────────────────────────────────────────────────
-    const csvPath = path.join(__dirname, "..", "Preguntas pasapalabra + allLang.tsv");
-    const rows = await parseTSV(csvPath);
-    console.log(`📄 ${rows.length} filas leídas del TSV`);
+    const tsvFiles = [
+        "Preguntas pasapalabra + allLang.tsv",
+        "Preguntas CineTV.tsv",
+        "Preguntas Historia.tsv",
+    ];
+    const allRows = await Promise.all(
+        tsvFiles.map(f => parseTSV(path.join(__dirname, "..", f)))
+    );
+    const rows = allRows.flat();
+    console.log(`📄 ${rows.length} filas leídas de ${tsvFiles.length} archivos TSV`);
 
     // ── 4. Construir preguntas ───────────────────────────────────────────────
     const questions = [];
